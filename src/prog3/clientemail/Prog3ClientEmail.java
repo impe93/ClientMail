@@ -7,7 +7,7 @@ package prog3.clientemail;
 
 /**
  *
- * @author lorenzo
+ * @author Lorenzo Imperatrice, Alessio Berger, Francesca Riddone
  */
 public class Prog3ClientEmail {
 
