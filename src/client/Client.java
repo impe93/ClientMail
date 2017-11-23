@@ -1,6 +1,7 @@
 package client;
 
 import java.util.ArrayList;
+import modelli.Email;
 
 /**
  *
@@ -8,10 +9,6 @@ import java.util.ArrayList;
  */
 public interface Client {
     
-    public boolean inoltraEmail(Email emailDaInoltrare);
-    
-    public ArrayList<Email> ordinaPerPriorita();
-    
-    public 
+    public boolean riceviEmail(Email emailRicevuta);
     
 }
