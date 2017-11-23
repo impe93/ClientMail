@@ -13,7 +13,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import modelli.Email;
 import modelli.Utente;
 
@@ -28,17 +34,24 @@ public class ClientGUI extends JFrame{
     private JPanel listaEmailPanel;
     private JPanel emailPanel;
     private JPanel intestazioneEmailPanel;
-    private JPanel corpoEmailPanel;
+    
+    private JScrollPane corpoEmailPanel;
+    private JTextArea corpoTextArea;
+    
     private JPanel conclusioneEmail;
+    
     private JPanel mittentePanel;
     private JLabel mittenteScrittaLabel;
     private JLabel mittenteEmailLabel;
+    
     private JPanel destinatariPanel;
     private JLabel destinatariScrittaLabel;
     private JLabel destinatariEmailLabel;
+    
     private JPanel oggettoPanel;
     private JLabel oggettoScrittaLabel;
     private JLabel oggettoEmailLabel;
+    
     
     public ClientGUI(Email emailDaVisualizzare) {
         this.emailDaVisualizzare = emailDaVisualizzare;
@@ -51,7 +64,14 @@ public class ClientGUI extends JFrame{
 /* ------ Email Panel ------ */
         this.emailPanel = new JPanel();
         BorderLayout emailPanelLayout = new BorderLayout();
+        emailPanelLayout.setHgap(20);
         this.emailPanel.setLayout(emailPanelLayout);
+        Border empty = new EmptyBorder(10, 10, 10, 10);
+        if (this.emailPanel.getBorder() == null) {
+            this.emailPanel.setBorder(empty);
+        } else {
+            this.emailPanel.setBorder(new CompoundBorder(empty, this.emailPanel.getBorder()));
+        }
         
  /* ------ Intestazione Email Panel ------ */
         this.intestazioneEmailPanel = new JPanel();
@@ -79,7 +99,11 @@ public class ClientGUI extends JFrame{
         this.destinatariPanel.add(this.destinatariScrittaLabel);
         this.destinatariEmailLabel = new JLabel();
         this.emailDaVisualizzare.getDestinatari().forEach(destinatario -> {
-            this.destinatariEmailLabel.setText(this.destinatariEmailLabel.getText() + ", " + destinatario.getEmail());
+            if (!this.destinatariEmailLabel.getText().equals("")) {
+                this.destinatariEmailLabel.setText(this.destinatariEmailLabel.getText() + ", " + destinatario.getEmail());
+            } else {
+                this.destinatariEmailLabel.setText(destinatario.getEmail());
+            }
         });
         this.destinatariPanel.add(this.destinatariEmailLabel);
         this.intestazioneEmailPanel.add(this.destinatariPanel);
@@ -102,12 +126,14 @@ public class ClientGUI extends JFrame{
         
         
  /* ------ Corpo Email Panel ------ */
-        this.corpoEmailPanel = new JPanel();
+        this.corpoTextArea = new JTextArea();
+        this.corpoTextArea.setEditable(false);
+        this.corpoTextArea.setLineWrap(true);
+        this.corpoTextArea.setWrapStyleWord(true);
+        this.corpoTextArea.setText(this.emailDaVisualizzare.getCorpo());
+        this.corpoEmailPanel = new JScrollPane(this.corpoTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        this.emailPanel.add(this.corpoEmailPanel, BorderLayout.CENTER);
  /* ------ Fine Corpo Email Panel ------ */
-        
- /* ------ Conclusione Email Panel ------ */
-        this.conclusioneEmail = new JPanel();
- /* ------ Fine Conclusione Email Panel ------ */
 
  
  
