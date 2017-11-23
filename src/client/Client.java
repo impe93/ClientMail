@@ -1,14 +1,15 @@
 package client;
 
-import java.util.ArrayList;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import modelli.Email;
 
 /**
  *
- * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
+ * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public interface Client {
+public interface Client extends Remote{
     
-    public boolean riceviEmail(Email emailRicevuta);
+    public boolean riceviEmail(Email emailRicevuta) throws RemoteException;
     
 }
