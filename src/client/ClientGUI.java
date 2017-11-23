@@ -7,7 +7,7 @@ package client;
 
 /**
  *
- * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
+ * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
 public class ClientGUI {
     
