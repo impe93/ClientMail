@@ -8,6 +8,7 @@ package client;
 import java.util.ArrayList;
 import modelli.Email;
 import modelli.Utente;
+import server.Server;
 
 /**
  *
