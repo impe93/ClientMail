@@ -44,35 +44,35 @@ public class Email {
     
     /*GETTER*/
     
-    int getId(){
+    public int getId(){
         return this.id;
     }
     
-    Utente getMittente(){
+    public Utente getMittente(){
         return this.mittente;
     }
     
-    ArrayList<Utente> getDestinatari(){
+    public ArrayList<Utente> getDestinatari(){
         return this.destinatari;
     }
     
-    String getOggetto(){
+    public String getOggetto(){
         return this.oggetto;
     }
     
-    String getCorpo(){
+    public String getCorpo(){
         return this.corpo;
     }
     
-    Date getData(){
+    public Date getData(){
         return this.data;
     }
     
-    int getPriorita(){
+    public int getPriorita(){
         return this.priorita;
     }
     
-    boolean getLetto(){
+    public boolean getLetto(){
         return this.letto;
     }
     
