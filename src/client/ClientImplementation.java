@@ -34,6 +34,9 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     private ClientModel modelloClient;
     
     public ClientImplementation(String emailUtente) throws RemoteException{
+        
+        this.modelloClient = new ClientModel(emailUtente);
+        //this.utente = this.modelloClient.recuperaDatiUtente();
         /* 
         registrazione dell'oggetto ClientImplementation presso il registro di 
         bootstrap (rmiregistry)
