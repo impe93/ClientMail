@@ -1,8 +1,8 @@
 package server;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
+import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 /**
@@ -37,9 +36,10 @@ public class ServerGUI {
         panel.add(lblIntestazione, BorderLayout.PAGE_START);
         lblIntestazione.setHorizontalAlignment( JLabel.CENTER );
         
-        JTextArea log = new JTextArea();
+        JTextArea log = new JTextArea("- [SERVER START - " + (new Date()).toString() + " ]");
         log.setLineWrap(true);
         log.setBorder(bordoDieci);
+        log.setEditable(false);
         JScrollPane sp = new JScrollPane(log);
         
         panel.add(sp, BorderLayout.CENTER);
