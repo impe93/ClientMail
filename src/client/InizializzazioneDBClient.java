@@ -6,6 +6,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -18,9 +20,10 @@ public class InizializzazioneDBClient {
     
     public static void main(String[] args) {
         try {
-            DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            String SDriverName = "org.sqlite.JDBC";
+            Class.forName(SDriverName);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(InizializzazioneDBClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             creaDBClient();
