@@ -16,8 +16,8 @@ public class Email {
     Date data;
     int priorita;
     boolean letto;
+
     
-   
     public Email(int id, Utente mittente, ArrayList destinatari, String oggetto, String corpo){
         this.id = id;
         this.mittente = mittente;

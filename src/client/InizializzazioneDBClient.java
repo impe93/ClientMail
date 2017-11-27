@@ -39,6 +39,10 @@ public class InizializzazioneDBClient {
         }
     }
     
+    /**
+     * Crea un database per ognuno dei 3 Client
+     * @throws SQLException 
+     */
     private static void creaDBClient() throws SQLException {
         for(int i = 0; i <= 2; i++){
             String urlDB = url + nomiDB[i] + ".db";
@@ -56,6 +60,11 @@ public class InizializzazioneDBClient {
         }
     }
     
+    /**
+     * Crea la tabella Utente nel DB con nome nomeDB
+     * @param nomeDB: stringa corrispondente al nome del database di un Client
+     * @throws SQLException 
+     */
     private static void creaTabellaUtente(String nomeDB) throws SQLException{
         String urlDB = url + nomeDB + ".db";
         String creazioneTabella 
@@ -68,6 +77,11 @@ public class InizializzazioneDBClient {
         eseguiQueryDB(urlDB, eliminazioneTabella, creazioneTabella);
     }
     
+    /**
+     * Crea la tabella Email_inviate nel DB con nome nomeDB
+     * @param nomeDB: stringa corrispondente al nome del database di un Client
+     * @throws SQLException 
+     */
     private static void creaTabellaEmailInviate(String nomeDB) throws SQLException{
         String urlDB = url + nomeDB + ".db";
         String creazioneTabella
@@ -86,6 +100,11 @@ public class InizializzazioneDBClient {
         eseguiQueryDB(urlDB, eliminazioneTabella, creazioneTabella);
     }
     
+    /**
+     * Crea la tabella Email_ricevute nel DB con nome nomeDB
+     * @param nomeDB: stringa corrispondente al nome del database di un Client
+     * @throws SQLException 
+     */
     private static void creaTabellaEmailRicevute(String nomeDB) throws SQLException{
         String urlDB = url + nomeDB + ".db";
         String creazioneTabella
@@ -104,13 +123,19 @@ public class InizializzazioneDBClient {
         eseguiQueryDB(urlDB, eliminazioneTabella, creazioneTabella);
     }
     
+    /**
+     * Inserisce nella table Utente del DB con nome nomeDB i dati dell'utente
+     * @param nomeDB: stringa corrispondente al nome del database di un Client
+     * @throws SQLException 
+     */
     private static void inserisciUtenteInTabellaUtente(String nomeDB) throws SQLException{
         String urlDB = url + nomeDB + ".db";
         String emailUtente = nomeDB.replace("DB_","");
         String nomeCognome = emailUtente.replace("@edu.unito.it", "");
         String nome = nomeCognome.substring(0, nomeCognome.indexOf("."));
+        nome = nome.substring(0,1).toUpperCase() + nome.substring(1,nome.length()).toLowerCase();
         String cognome = nomeCognome.substring(nomeCognome.indexOf(".")+1);
-        
+        cognome = cognome.substring(0,1).toUpperCase() + cognome.substring(1, cognome.length()).toLowerCase();
         String inserimentoUtente = "INSERT INTO utente (email, nome, cognome) VALUES (?, ?, ?)";
         
         Connection conn = null;
@@ -138,6 +163,14 @@ public class InizializzazioneDBClient {
         }   
     }
     
+    /**
+     * Si connette al DB con url urlDB e prima esegue la query contenuta nel
+     * parametro eliminazioneTabella e poi quella contenuta nel parametro 
+     * creazioneTabella
+     * @param urlDB: url del DB sul quale vogliamo operare
+     * @param eliminazioneTabella: query di eliminazione di una table del DB
+     * @param creazioneTabella: query di creazione di una table nel DB
+     */
     private static void eseguiQueryDB(String urlDB, String eliminazioneTabella, String creazioneTabella){
         Connection conn = null;
         Statement st = null;
