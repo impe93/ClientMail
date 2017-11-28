@@ -2,6 +2,7 @@ package server;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.rmi.RemoteException;
 import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -57,9 +58,10 @@ public class ServerGUI {
         
     }
     
-    public static void main(String[] args){
+    public static void main(String[] args) throws RemoteException{
         
         ServerGUI gui = new ServerGUI();
+        ServerImplementation server = new ServerImplementation();
     
     }
 }

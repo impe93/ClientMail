@@ -82,8 +82,4 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }    
     }
-    
-    public static void main(String[] args) throws RemoteException{
-        ServerImplementation server = new ServerImplementation(); 
-    }
 }
