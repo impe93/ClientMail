@@ -8,6 +8,7 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -187,6 +188,14 @@ public class ClientGUI extends JFrame{
         ArrayList<Email> listaEmail = new ArrayList<>();
         listaEmail.add(emailVisualizzata);
         ClientGUI client = new ClientGUI(new Utente("Francesca", "Riddone", "francesca.riddone@edu.unito.it"), emailVisualizzata, listaEmail);
+        
+        
+        
+        try {
+            ClientImplementation modelloClient = new ClientImplementation("francesca.riddone@edu.unito.it");
+        } catch (RemoteException e) {
+            System.out.println(e.getMessage());
+        }
     }
     
 }
