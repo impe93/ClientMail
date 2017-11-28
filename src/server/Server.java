@@ -15,6 +15,6 @@ public interface Server extends Remote{
     ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException;
     boolean eliminaEmail(Email emailDaEliminare, Utente utente) throws RemoteException;
     boolean inviaEmail(Email emailDaInviare) throws RemoteException;
-    void connettiAlClient(Email emailClient) throws RemoteException;
+    void connettiAlClient(String emailClient) throws RemoteException;
     void ciao() throws RemoteException;
 }

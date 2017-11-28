@@ -42,7 +42,6 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         lanciaRMIRegistry();
         try {
             Naming.rebind("//localhost/Client" + this.utente.getEmail(), this);
-            //chiamare metodo di server perchè lui mi registri come oggetto remoto
         }
         catch(MalformedURLException | RemoteException e) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, e);
@@ -53,6 +52,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         */
         try {
             this.server = (Server)Naming.lookup("//localhost/Server");
+            this.server.connettiAlClient(this.utente.getEmail());
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
