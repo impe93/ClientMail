@@ -1,8 +1,10 @@
 package server;
 
+import client.Client;
 import client.ClientImplementation;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
@@ -18,9 +20,12 @@ import modelli.Utente;
  */
 public class ServerImplementation extends UnicastRemoteObject implements Server{
     
+    /*String[] clientOnline = new String[3];*/
+    Client client;
+    
     public ServerImplementation() throws RemoteException{
         /* 
-        registrazione dell'oggetto ClientImplementation presso il registro di 
+        registrazione dell'oggetto ServerImplementation presso il registro di 
         bootstrap (rmiregistry)
         */
         lanciaRMIRegistry();
@@ -64,4 +69,15 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
     }
     
+    public void connettiAlClient(String clientEmail){
+        try {
+            this.client = (Client)Naming.lookup("//localhost/" + clientEmail);
+        } catch (NotBoundException | MalformedURLException | RemoteException ex) {
+            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void ciao(){
+        System.out.println("ciao Impe, suca");
+    }
 }
