@@ -10,12 +10,15 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -29,16 +32,19 @@ import modelli.Utente;
 public class ClientGUI extends JFrame{
     
     private Email emailDaVisualizzare;
+    private ArrayList<Email> listaEmailRicevute;
     
     private JSplitPane clientSplitPane;
-    private JPanel listaEmailPanel;
+    private JScrollPane listaEmailScrollPane;
+    private JList<Email> listaEmailList;
+    private DefaultListModel<Email> modelListaEmail;
+    
+    
     private JPanel emailPanel;
     private JPanel intestazioneEmailPanel;
     
     private JScrollPane corpoEmailPanel;
     private JTextArea corpoTextArea;
-    
-    private JPanel conclusioneEmail;
     
     private JPanel mittentePanel;
     private JLabel mittenteScrittaLabel;
@@ -53,9 +59,10 @@ public class ClientGUI extends JFrame{
     private JLabel oggettoEmailLabel;
     
     
-    public ClientGUI(Email emailDaVisualizzare) {
+    public ClientGUI(Utente utenteUtilizzatore, Email emailDaVisualizzare, ArrayList<Email> listaEmailRicevute) {
+        super(utenteUtilizzatore.getNome() + " " + utenteUtilizzatore.getCognome() + " - " + utenteUtilizzatore.getEmail());
         this.emailDaVisualizzare = emailDaVisualizzare;
-        
+        this.listaEmailRicevute = listaEmailRicevute;
         initGUI();
     }
     
@@ -135,21 +142,31 @@ public class ClientGUI extends JFrame{
         this.emailPanel.add(this.corpoEmailPanel, BorderLayout.CENTER);
  /* ------ Fine Corpo Email Panel ------ */
 
- 
+/* ------ Fine Email Panel ------ */
  
 /* ------ Lista Email Panel ------ */
-        this.listaEmailPanel = new JPanel();
-        /* ------ Fine Lista Email Panel ------ */
+        this.listaEmailList = new JList();
+        this.listaEmailList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        this.modelListaEmail = new DefaultListModel<>();
+        this.listaEmailList.setModel(this.modelListaEmail);
+        this.listaEmailList.setCellRenderer(new EmailCellRenderer());
+        this.listaEmailRicevute.forEach(email -> {
+            this.modelListaEmail.addElement(email);
+        });
+        this.listaEmailScrollPane = new JScrollPane(this.listaEmailList);
+ /* ------ Lista Email Scroll ------ */
         
-        /* ------ Fine Email Panel ------ */
+ /* ------ Fine Lista Email Scroll ------ */
+        
+/* ------ Fine Lista Email Panel ------ */
         
         /* ------ Split Pane ------ */
-        this.clientSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.listaEmailPanel, this.emailPanel);
+        this.clientSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.listaEmailScrollPane, this.emailPanel);
         this.clientSplitPane.setOneTouchExpandable(true);
-        this.clientSplitPane.setDividerLocation(150);
+        this.clientSplitPane.setDividerLocation(300);
         
-        Dimension minimumSize = new Dimension(100, 50);
-        this.listaEmailPanel.setMinimumSize(minimumSize);
+        Dimension minimumSize = new Dimension(300, 50);
+        this.listaEmailScrollPane.setMinimumSize(minimumSize);
         this.emailPanel.setMinimumSize(minimumSize);
         
         /* Frame */
@@ -164,7 +181,12 @@ public class ClientGUI extends JFrame{
     public static void main (String[] args) {
         ArrayList<Utente> destinatari = new ArrayList<>();
         destinatari.add(new Utente("Francesca", "Riddone", "francesca.riddone@edu.unito.it"));
-        ClientGUI client = new ClientGUI(new Email(2, new Utente("Lorenzo", "Imperatrice", "lorenzo.imperatrice@gmail.com"), destinatari, "Prova", "Prova"));
+        String corpo = "Ciao mi chiamo Lorenzo Imperatrice, le ho mandato questo messaggio per proporle una collaborazione con Jesu";
+        String oggetto = "Collaborazione con Jesu";
+        Email emailVisualizzata = new Email(2, new Utente("Lorenzo", "Imperatrice", "lorenzo.imperatrice@gmail.com"), destinatari, oggetto, corpo);
+        ArrayList<Email> listaEmail = new ArrayList<>();
+        listaEmail.add(emailVisualizzata);
+        ClientGUI client = new ClientGUI(new Utente("Francesca", "Riddone", "francesca.riddone@edu.unito.it"), emailVisualizzata, listaEmail);
     }
     
 }
