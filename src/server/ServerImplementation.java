@@ -75,7 +75,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     }
 
     @Override
-    public void connettiAlClient(Email emailClient) throws RemoteException {
+    public void connettiAlClient(String emailClient) throws RemoteException {
         try {
             this.client = (Client)Naming.lookup("//localhost/" + emailClient);
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
