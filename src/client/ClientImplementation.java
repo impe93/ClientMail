@@ -11,12 +11,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import modelli.Email;
 import modelli.Utente;
 import server.Server;
@@ -27,20 +23,25 @@ import server.Server;
  */
 public class ClientImplementation extends UnicastRemoteObject implements Client{
     
-    private ArrayList<Email> emailRicevute;
-    private ArrayList<Email> emailInviate;
     private Utente utente;
     private Server server;
-    private ClientModel modelloClient;
+    private CasellaPostaElettronicaClient casellaPostaleClient;
     
     public ClientImplementation(String emailUtente) throws RemoteException{
+        connettiAlServer();
+        this.casellaPostaleClient = new CasellaPostaElettronicaClient(emailUtente);
+        this.utente = this.casellaPostaleClient.recuperaDatiUtente(emailUtente);
+        
+    }
+    
+    private void connettiAlServer(){
         /* 
         registrazione dell'oggetto ClientImplementation presso il registro di 
         bootstrap (rmiregistry)
         */
         lanciaRMIRegistry();
         try {
-            Naming.rebind("//localhost/Client"+emailUtente, this);
+            Naming.rebind("//localhost/Client" + this.utente.getEmail(), this);
             //chiamare metodo di server perchè lui mi registri come oggetto remoto
         }
         catch(MalformedURLException | RemoteException e) {
@@ -52,7 +53,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         */
         try {
             this.server = (Server)Naming.lookup("//localhost/Server");
-        } catch (NotBoundException | MalformedURLException ex) {
+        } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -67,8 +68,33 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         }
     }
     
+    //public boolean inoltraEmail(Email emailDaInoltrare){}
+    
+    //public ArrayList<Email> ordinaPerPriorità(){}
+    
+    //public ArrayList<Email> ordinaPerData(){}
+    
+    /*
+    Ritorna l'intero corrispondente all'id dell'ultima email ricevuta dal
+    utente proprietario della casella di posta elettronica
+    */
+    public int getUltimaRicevuta(){
+        return this.casellaPostaleClient.getUltimaRicevuta();
+    }
+    
+    /*
+    Ritorna l'intero corrispondente all'id dell'ultima email inviata dal
+    utente proprietario della casella di posta elettronica
+    */
+    public int getUltimaInviata(){
+        return this.casellaPostaleClient.getUltimaInviata();
+    }
+    
+    //fare metodi per prendere mail inviate e ricevute
+    
     @Override
     public boolean riceviEmail(Email emailRicevuta) throws RemoteException{
+        //azioni da intraprendere quando viene ricevuta una mail
         System.out.println("RMI FUNZIONA!!!!!");
         return true;
     }
