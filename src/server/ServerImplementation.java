@@ -69,15 +69,16 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
     }
     
-    public void connettiAlClient(String clientEmail){
-        try {
-            this.client = (Client)Naming.lookup("//localhost/" + clientEmail);
-        } catch (NotBoundException | MalformedURLException | RemoteException ex) {
-            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public void ciao(){
+    @Override
+    public void ciao() throws RemoteException{
         System.out.println("ciao Impe, suca");
     }
+
+    @Override
+    public void connettiAlClient(Email emailClient) throws RemoteException {
+ try {
+            this.client = (Client)Naming.lookup("//localhost/" + emailClient);
+        } catch (NotBoundException | MalformedURLException | RemoteException ex) {
+            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+        }    }
 }
