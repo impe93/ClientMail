@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import modelli.CasellaPostaElettronica;
 import modelli.Email;
 import modelli.Utente;
 
@@ -16,7 +17,7 @@ import modelli.Utente;
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public class CasellaPostaElettronicaClient {
+public class CasellaPostaElettronicaClient implements CasellaPostaElettronica{
     private final String urlDB;
     private final Utente utenteProprietario;
     private ArrayList<Email> emailRicevute;
@@ -40,6 +41,18 @@ public class CasellaPostaElettronicaClient {
 
     public ArrayList<Email> getEmailInviate() {
         return emailInviate;
+    }
+    
+    /**
+     * Registrazione del driver
+     */
+    private void registraDriver(){
+        try {
+            String SDriverName = "org.sqlite.JDBC";
+            Class.forName(SDriverName);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(InizializzazioneDBClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /*
@@ -104,17 +117,66 @@ public class CasellaPostaElettronicaClient {
         return idUltimaEmail;
     }
     
-    /**
-     * Registrazione del driver
-     */
-    private void registraDriver(){
-        try {
-            String SDriverName = "org.sqlite.JDBC";
-            Class.forName(SDriverName);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(InizializzazioneDBClient.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public ArrayList<Email> ordinaRicevutePerData(){
+        return ordinaEmailPerData("email_ricevute");
     }
+    
+    public ArrayList<Email> ordinaInviatePerData(){
+        return ordinaEmailPerData("email_inviate");
+    }
+    
+    private ArrayList<Email> ordinaEmailPerData(String tabellaEmail){
+        ArrayList<Email> emailOrdinatePerData = new ArrayList<>();
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        String ordinaEmailPerData =
+                "SELECT * " + 
+                "FROM " + tabellaEmail + " " +
+                "ORDER BY YEAR(data) DESC, MONTH(data) DESC, DAY(data) DESC";
+        boolean isInviate = tabellaEmail.equals("email_inviate");
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            rs = st.executeQuery(ordinaEmailPerData);
+            while(rs.next()){
+                Email email = new Email();
+                email.setId(rs.getInt("id_email"));
+                email.setMittente(recuperaDatiUtente(rs.getString("mittente")));
+                email.setDestinatari(recuperaUtentiDestinatari(rs.getInt("id_email"), isInviate));
+                email.setOggetto(rs.getString("oggetto"));
+                email.setCorpo(rs.getString("corpo"));
+                email.setData(new Date(rs.getDate("data").getTime()));
+                email.setPriorita(rs.getInt("priorita"));
+                email.setLetto(rs.getBoolean("letto"));
+                if(isInviate){
+                    if(!emailOrdinatePerData.contains(email)){
+                        emailOrdinatePerData.add(email);
+                    }
+                } else{
+                    emailOrdinatePerData.add(email);
+                }
+            }
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(rs != null){
+                    rs.close();
+                }
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return emailOrdinatePerData;
+    }
+    
     
     /**
      * Recupera i dati personali di un utente e li restituisce all'interno di 
@@ -292,9 +354,18 @@ public class CasellaPostaElettronicaClient {
         return utentiDestinatari;        
     }
     
-    /*
-    inserisciInInviate(Email email)
-    inserisciInRicevute(Email email)
-    elimina(Email email)
-    */
+    @Override
+    public void inserisciInInviati(Email email) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void inserisciInRicevuti(Email email) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void elimina(Email email) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

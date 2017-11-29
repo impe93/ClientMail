@@ -73,9 +73,16 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     
     //public ArrayList<Email> ordinaPerPriorità(){}
     
-    /*public ArrayList<Email> ordinaPerData(){
-        return this.casellaPostaleClient.ordinaPerData();
-    }*/
+    /*
+    public ArrayList<Email> ordinaInviatePerData(){
+        return this.casellaPostaleClient.ordinaInviatePerData();
+    }
+    
+    public ArrayList<Email> ordinaRicevutePerData(){
+        return this.casellaPostaleClient.ordinaRicevutePerData();
+    }
+    
+    */
     
     public void chiamaMetodoProvaServer(){
         try {
