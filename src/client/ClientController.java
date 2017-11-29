@@ -14,22 +14,39 @@ import java.awt.event.ActionListener;
  */
 public class ClientController implements ActionListener {
     
+    private ClientImplementation model;
+    
+    public ClientController(ClientImplementation model) {
+        this.model = model;
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         Component fonte = (Component)e.getSource();
         switch (fonte.getName()) {
-            case "emailInviate":
+            case "emailInviate": {
+                System.out.println("Sono entrato in emailInviate!");
                 break;
-            case "emailRicevute":
+            }
+            case "emailRicevute": {
+                System.out.println("Sono entrato in emailRicevute!");
                 break;
-            case "nuova":
+            }
+            case "nuova": {
+                System.out.println("Sono entrato in nuova!");
                 break;
-            case "elimina":
+            }
+            case "elimina": {
+                System.out.println("Sono entrato in elimina!");
                 break;
-            case "inoltra":
+            }
+            case "inoltra": {
+                System.out.println("Sono entrato in inoltra!");
                 break;
-            default:
+            }
+            default: {
                 break;
+            }
         }
     }
     

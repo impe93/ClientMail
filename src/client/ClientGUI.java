@@ -8,7 +8,6 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -29,7 +28,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import modelli.Email;
-import modelli.Utente;
 
 /**
  * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
@@ -37,10 +35,12 @@ import modelli.Utente;
 public class ClientGUI extends JFrame implements Observer{
     
     private final ClientController controller;
+    private final ClientImplementation model;
     
     private Email emailDaVisualizzare;
-    private final ArrayList<Email> listaEmailRicevute;
+    private final ArrayList<Email> listaEmail;
     
+    /* Variabili per la GUI */
     private JSplitPane clientSplitPane;
     private JScrollPane listaEmailScrollPane;
     private JList<Email> listaEmailList;
@@ -75,11 +75,11 @@ public class ClientGUI extends JFrame implements Observer{
     private JButton inoltraSelezionata;
     
     
-    public ClientGUI(Utente utenteUtilizzatore, Email emailDaVisualizzare, ArrayList<Email> listaEmailRicevute) {
-        super(utenteUtilizzatore.getNome() + " " + utenteUtilizzatore.getCognome() + " - " + utenteUtilizzatore.getEmail());
-        this.emailDaVisualizzare = emailDaVisualizzare;
-        this.listaEmailRicevute = listaEmailRicevute;
-        this.controller = new ClientController();
+    public ClientGUI(String email) {
+        super(email);
+        this.listaEmail = new ArrayList<>();
+        this.model = new ClientImplementation(email);
+        this.controller = new ClientController(this.model);
         initGUI();
     }
     
@@ -167,7 +167,7 @@ public class ClientGUI extends JFrame implements Observer{
         this.modelListaEmail = new DefaultListModel<>();
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
-        this.listaEmailRicevute.forEach(email -> {
+        this.listaEmail.forEach(email -> {
             this.modelListaEmail.addElement(email);
         });
         this.listaEmailList.addListSelectionListener((ListSelectionEvent e) -> {
@@ -251,23 +251,10 @@ public class ClientGUI extends JFrame implements Observer{
     }
     
     public static void main (String[] args) {
-        ArrayList<Utente> destinatari = new ArrayList<>();
-        destinatari.add(new Utente("Francesca", "Riddone", "francesca.riddone@edu.unito.it"));
-        String corpo = "Ciao mi chiamo Lorenzo Imperatrice, le ho mandato questo messaggio per proporle una collaborazione con Jesu";
-        String oggetto = "Collaborazione con Jesu";
-        Email emailVisualizzata = new Email(2, new Utente("Lorenzo", "Imperatrice", "lorenzo.imperatrice@gmail.com"), destinatari, oggetto, corpo);
-        ArrayList<Email> listaEmail = new ArrayList<>();
-        listaEmail.add(emailVisualizzata);
-        emailVisualizzata = new Email(3, new Utente("Alessio", "Berger", "alessio.berger@edu.unito.it"), destinatari, oggetto, corpo);
-        emailVisualizzata.setCorpo("Ciao sono di nuovo io e non sapevo se jesoo voleva fare la cacca");
-        listaEmail.add(emailVisualizzata);
-        ClientGUI client = new ClientGUI(new Utente("Francesca", "Riddone", "francesca.riddone@edu.unito.it"), emailVisualizzata, listaEmail);
-        
-        try {
-            ClientImplementation modelloClient = new ClientImplementation("francesca.riddone@edu.unito.it");
-            modelloClient.chiamaMetodoProvaServer();
-        } catch (RemoteException e) {
-            System.out.println(e.getMessage());
+        ClientImplementation modelloClient = null;
+        ClientGUI client = null;
+        if (args.length == 1) {
+            client = new ClientGUI(args[0]);
         }
     }
 
