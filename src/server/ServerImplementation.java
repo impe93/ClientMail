@@ -70,20 +70,17 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     }
     
     @Override
-    public void ciao() throws RemoteException{
+    public boolean ciao() throws RemoteException{
         System.out.println("ciao Impe, suca");
+        return true;
     }
 
     @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
         try {
-            this.client = (Client)Naming.lookup("//localhost/" + emailClient);
+            this.client = (Client)Naming.lookup("//localhost/Client/" + emailClient);
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }    
-    }
-    
-    public static void main(String[] args) throws RemoteException{
-        ServerImplementation server = new ServerImplementation(); 
     }
 }

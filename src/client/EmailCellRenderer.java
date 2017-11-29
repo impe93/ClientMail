@@ -6,15 +6,20 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 import modelli.Email;
 
 /**
@@ -44,7 +49,7 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         labelData.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
         
         this.labelTitolo = new JLabel();
-        labelTitolo.setFont(new Font(labelTitolo.getFont().getName(), Font.BOLD, 12));
+        labelTitolo.setFont(new Font(labelTitolo.getFont().getName(), Font.BOLD, 14));
         labelTitolo.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         
         pannelloHeader.add(labelTitolo, BorderLayout.WEST);
@@ -53,6 +58,7 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         this.centralePanel = new JPanel();
         this.centralePanel.setLayout(new BoxLayout(this.centralePanel, BoxLayout.Y_AXIS));
         this.corpoLabel = new JLabel();
+        this.corpoLabel.setForeground(new Color(124, 124, 124));
         this.oggettoLabel = new JLabel();
         this.centralePanel.add(this.oggettoLabel);
         this.centralePanel.add(this.corpoLabel);
@@ -89,9 +95,24 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         
         
         if (selected) {
-            // Background e foreground di selezionato
+            Border bordo = BorderFactory.createLineBorder(Color.black);
+            this.pannelloEmail.setBorder(bordo);
+            this.pannelloEmail.setBackground(Color.lightGray);
+            this.pannelloHeader.setBackground(Color.lightGray);
+            this.centralePanel.setBackground(Color.lightGray);
+            this.labelTitolo.setBackground(Color.lightGray);
+            this.labelData.setBackground(Color.lightGray);
+            this.oggettoLabel.setBackground(Color.lightGray);
+            this.corpoLabel.setBackground(Color.lightGray);
         } else {
-            // Background e foreground di selezionato
+            Border bordo = BorderFactory.createEmptyBorder();
+            this.pannelloEmail.setBorder(bordo);
+            this.pannelloHeader.setBackground(Color.white);
+            this.centralePanel.setBackground(Color.white);
+            this.labelTitolo.setBackground(Color.white);
+            this.labelData.setBackground(Color.white);
+            this.oggettoLabel.setBackground(Color.white);
+            this.corpoLabel.setBackground(Color.white);
         }
         
         return this.pannelloEmail;
@@ -99,7 +120,7 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
     
     private String formattaCorpo (String corpo) {
         String stringaFormattata = "";
-        for (int i = 0; i < 50 && i < corpo.length(); i++) {
+        for (int i = 0; i < 30 && i < corpo.length(); i++) {
             stringaFormattata += corpo.charAt(i);
         }
         stringaFormattata = stringaFormattata.trim();

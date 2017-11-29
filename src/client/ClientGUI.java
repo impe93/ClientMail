@@ -8,9 +8,11 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,8 +33,8 @@ import modelli.Utente;
  */
 public class ClientGUI extends JFrame{
     
-    private Email emailDaVisualizzare;
-    private ArrayList<Email> listaEmailRicevute;
+    private final Email emailDaVisualizzare;
+    private final ArrayList<Email> listaEmailRicevute;
     
     private JSplitPane clientSplitPane;
     private JScrollPane listaEmailScrollPane;
@@ -57,6 +59,15 @@ public class ClientGUI extends JFrame{
     private JPanel oggettoPanel;
     private JLabel oggettoScrittaLabel;
     private JLabel oggettoEmailLabel;
+    
+    private JPanel toolbarPanel;
+    private JPanel toolbarSinistraPanel;
+    private JButton inviateButton;
+    private JButton ricevuteButton;
+    private JPanel toolbarDestraPanel;
+    private JButton creaEmail;
+    private JButton eliminaSelezionata;
+    private JButton inoltraSelezionata;
     
     
     public ClientGUI(Utente utenteUtilizzatore, Email emailDaVisualizzare, ArrayList<Email> listaEmailRicevute) {
@@ -146,7 +157,7 @@ public class ClientGUI extends JFrame{
  
 /* ------ Lista Email Panel ------ */
         this.listaEmailList = new JList();
-        this.listaEmailList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        this.listaEmailList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.modelListaEmail = new DefaultListModel<>();
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
@@ -154,24 +165,48 @@ public class ClientGUI extends JFrame{
             this.modelListaEmail.addElement(email);
         });
         this.listaEmailScrollPane = new JScrollPane(this.listaEmailList);
- /* ------ Lista Email Scroll ------ */
-        
- /* ------ Fine Lista Email Scroll ------ */
-        
 /* ------ Fine Lista Email Panel ------ */
+
+/* ------ Toolbar Panel ------ */
+        this.toolbarPanel = new JPanel();
+        this.toolbarPanel.setLayout(new BorderLayout());
+ /* ------ Toolbar Destra Panel ------ */
+        this.toolbarDestraPanel = new JPanel();
+        this.toolbarDestraPanel.setLayout(new FlowLayout());
+        this.creaEmail = new JButton("Nuova Email");
+        this.toolbarDestraPanel.add(this.creaEmail);
+        this.eliminaSelezionata = new JButton("Elimina selezionata");
+        this.toolbarDestraPanel.add(this.eliminaSelezionata);
+        this.inoltraSelezionata = new JButton("Inoltra selezionata");
+        this.toolbarDestraPanel.add(this.inoltraSelezionata);
+ /* ------ Fine Toolbar Destra Panel ------ */
+ /* ------ Toolbar Sinistra Panel ------ */
+        this.toolbarSinistraPanel = new JPanel();
+        this.toolbarSinistraPanel.setLayout(new FlowLayout());
+        this.ricevuteButton = new JButton("Ricevute");
+        this.toolbarSinistraPanel.add(this.ricevuteButton);
+        this.inviateButton = new JButton("Inviate");
+        this.toolbarSinistraPanel.add(this.inviateButton);
+ /* ------ Fine Toolbar Destra Panel ------ */
+        this.toolbarPanel.add(this.toolbarSinistraPanel, BorderLayout.WEST);
+        this.toolbarPanel.add(this.toolbarDestraPanel, BorderLayout.EAST);
+/* ------ Fine Toolbar Panel ------ */
         
         /* ------ Split Pane ------ */
         this.clientSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.listaEmailScrollPane, this.emailPanel);
         this.clientSplitPane.setOneTouchExpandable(true);
-        this.clientSplitPane.setDividerLocation(300);
+        this.clientSplitPane.setDividerLocation(250);
         
-        Dimension minimumSize = new Dimension(300, 50);
+        Dimension minimumSize = new Dimension(250, 50);
         this.listaEmailScrollPane.setMinimumSize(minimumSize);
         this.emailPanel.setMinimumSize(minimumSize);
         
-        /* Frame */
-        this.setPreferredSize(new Dimension(500, 500));
-        this.add(this.clientSplitPane);
+        /* ------ Frame ------ */
+        this.setPreferredSize(new Dimension(700, 500));
+        this.setLayout(new BorderLayout());
+        
+        this.add(this.toolbarPanel, BorderLayout.NORTH);
+        this.add(this.clientSplitPane, BorderLayout.CENTER);
         
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
@@ -186,7 +221,18 @@ public class ClientGUI extends JFrame{
         Email emailVisualizzata = new Email(2, new Utente("Lorenzo", "Imperatrice", "lorenzo.imperatrice@gmail.com"), destinatari, oggetto, corpo);
         ArrayList<Email> listaEmail = new ArrayList<>();
         listaEmail.add(emailVisualizzata);
+        listaEmail.add(emailVisualizzata);
+        listaEmail.add(emailVisualizzata);
+        listaEmail.add(emailVisualizzata);
         ClientGUI client = new ClientGUI(new Utente("Francesca", "Riddone", "francesca.riddone@edu.unito.it"), emailVisualizzata, listaEmail);
+        
+        
+        try {
+            ClientImplementation modelloClient = new ClientImplementation("francesca.riddone@edu.unito.it");
+            modelloClient.chiamaMetodoProvaServer();
+        } catch (RemoteException e) {
+            System.out.println(e.getMessage());
+        }
     }
     
 }
