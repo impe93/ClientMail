@@ -29,10 +29,9 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     private CasellaPostaElettronicaClient casellaPostaleClient;
     
     public ClientImplementation(String emailUtente) throws RemoteException{
-        connettiAlServer();
         this.casellaPostaleClient = new CasellaPostaElettronicaClient(emailUtente);
         this.utente = this.casellaPostaleClient.recuperaDatiUtente(emailUtente);
-        
+        connettiAlServer();
     }
     
     private void connettiAlServer(){
@@ -42,7 +41,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         */
         lanciaRMIRegistry();
         try {
-            Naming.rebind("//localhost/Client" + this.utente.getEmail(), this);
+            Naming.rebind("//localhost/Client/" + this.utente.getEmail(), this);
         }
         catch(MalformedURLException | RemoteException e) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, e);
@@ -79,7 +78,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     
     public void chiamaMetodoProvaServer(){
         try {
-            this.server.ciao();
+            System.out.println(this.server.ciao());
         } catch (RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
