@@ -31,6 +31,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     public ClientImplementation(String emailUtente) throws RemoteException{
         this.casellaPostaleClient = new CasellaPostaElettronicaClient(emailUtente);
         this.utente = this.casellaPostaleClient.recuperaDatiUtente(emailUtente);
+        this.server = null;
         connettiAlServer();
     }
     
@@ -56,6 +57,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }
     
     public static void lanciaRMIRegistry() {
@@ -83,11 +85,24 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     
     */
     
-    public void chiamaMetodoProvaServer(){
-        try {
-            System.out.println(this.server.ciao());
-        } catch (RemoteException ex) {
-            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+    public void registraOsservatoreEAggiornaEmail(ClientGUI osservatore){
+        this.casellaPostaleClient.addObserver(osservatore);
+        this.casellaPostaleClient.recuperaTutteEmail();
+        ArrayList<Email> nuoveEmailInviate = null;
+        ArrayList<Email> nuoveEmailRicevute = null;
+        if(this.server != null){
+            try {
+                nuoveEmailInviate = this.server.getInviate(getUltimaInviata(), this.utente);
+                nuoveEmailRicevute = this.server.getRicevute(getUltimaRicevuta(), this.utente);
+            } catch (RemoteException ex) {
+                Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
+                this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
+            }
+            if(nuoveEmailRicevute != null && nuoveEmailRicevute.size() > 0){
+                this.casellaPostaleClient.inserisciNuoveEmailRicevute(nuoveEmailRicevute);
+            }
         }
     }
     

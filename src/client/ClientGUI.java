@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -31,7 +33,7 @@ import modelli.Utente;
 /**
  * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
  */
-public class ClientGUI extends JFrame{
+public class ClientGUI extends JFrame implements Observer{
     
     private final Email emailDaVisualizzare;
     private final ArrayList<Email> listaEmailRicevute;
@@ -233,6 +235,11 @@ public class ClientGUI extends JFrame{
         } catch (RemoteException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
