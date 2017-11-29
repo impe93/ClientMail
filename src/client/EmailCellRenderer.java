@@ -95,8 +95,6 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         
         
         if (selected) {
-            Border bordo = BorderFactory.createLineBorder(Color.black);
-            this.pannelloEmail.setBorder(bordo);
             this.pannelloEmail.setBackground(Color.lightGray);
             this.pannelloHeader.setBackground(Color.lightGray);
             this.centralePanel.setBackground(Color.lightGray);
@@ -105,8 +103,7 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
             this.oggettoLabel.setBackground(Color.lightGray);
             this.corpoLabel.setBackground(Color.lightGray);
         } else {
-            Border bordo = BorderFactory.createEmptyBorder();
-            this.pannelloEmail.setBorder(bordo);
+            this.pannelloEmail.setBackground(Color.lightGray);
             this.pannelloHeader.setBackground(Color.white);
             this.centralePanel.setBackground(Color.white);
             this.labelTitolo.setBackground(Color.white);
