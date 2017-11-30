@@ -48,6 +48,7 @@ public class ServerGUI {
         JPanel footer = new JPanel();
         footer.setBorder(bordoDieci);
         JButton chiudi = new JButton("Chiudi il server");
+        chiudi.setName("chiudi");
         footer.add(chiudi);
         frame.add(footer, BorderLayout.PAGE_END);
         
