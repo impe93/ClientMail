@@ -20,8 +20,8 @@ import modelli.Utente;
  */
 public class ServerImplementation extends UnicastRemoteObject implements Server{
     
-    /*String[] clientOnline = new String[3];*/
     Client client;
+    CasellaServer casella;
     
     public ServerImplementation() throws RemoteException{
         /* 
@@ -36,6 +36,8 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         catch(MalformedURLException | RemoteException e) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, e);
         }
+        
+        casella = new CasellaServer();
     
     }
 
@@ -46,7 +48,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException {
-    return null;
+    return casella.recuperaEmailRicevuteUtente(ultimaRicevuta, utente);
     }
 
     @Override
@@ -83,4 +85,19 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }    
     }
+    
+    public static void main(String[] args) throws RemoteException{
+        
+    ArrayList<Email> email = new ArrayList<Email>();
+    ServerImplementation server = new ServerImplementation();
+        
+        
+            email = server.getRicevute(1,new Utente("Lorenzo","Imperatrice",
+                    "lorenzo.imperatrice@edu.unito.it"));
+       
+            for (int i=0;i<email.size();i++){
+                email.get(i).toString();
+            }
+    }
+    
 }

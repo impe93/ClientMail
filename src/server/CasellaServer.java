@@ -5,8 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import modelli.Email;
 import modelli.Utente;
 
@@ -21,7 +21,7 @@ public class CasellaServer {
         this.urlDB = "jdbc:sqlite:Server.db";
     }
     
-    public ArrayList<Email> recuperaEmailRicevuteUtente(Utente utente){
+    public ArrayList<Email> recuperaEmailRicevuteUtente(int ultimaRicevuta, Utente utente){
         ArrayList<Email> emailRicevuteUtente = new ArrayList<Email>();
         
         Connection conn = null;
@@ -30,7 +30,8 @@ public class CasellaServer {
         String cercaEmailRicevuteUtente =
                 "SELECT * " + 
                 "FROM email " +
-                "WHERE destinatario = " + utente.getEmail();
+                "WHERE destinatario = '" + utente.getEmail() 
+                + "' AND id_email >" + ultimaRicevuta;
         
         try {
             conn = DriverManager.getConnection(urlDB);
@@ -77,7 +78,7 @@ public class CasellaServer {
         ResultSet rs = null;
         String queryUtente = 
                 "SELECT * " + 
-                "FROM utente " +
+                "FROM utenti " +
                 "WHERE email = '" + emailUtente + "'";
         try {
             conn = DriverManager.getConnection(urlDB);
