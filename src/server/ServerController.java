@@ -26,7 +26,13 @@ public class ServerController implements ActionListener{
         Component button = (Component)e.getSource();
         switch (button.getName()) {
             case "chiudi": {
-                MyQuitDialog chiudi = new MyQuitDialog();
+                 int risposta=JOptionPane.showConfirmDialog(null,"Confermi la chiusura del server?","Conferma",JOptionPane.YES_NO_OPTION,
+     JOptionPane.WARNING_MESSAGE);
+                 
+                 if(risposta == JOptionPane.YES_OPTION){
+                     System.exit(0);
+                 }
+                
                 break;
             }
             default: {
