@@ -8,9 +8,12 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -34,8 +37,8 @@ import modelli.Email;
  */
 public class ClientGUI extends JFrame implements Observer{
     
-    private final ClientController controller;
-    private final ClientImplementation model;
+    private ClientController controller;
+    private ClientImplementation model;
     
     private Email emailDaVisualizzare;
     private final ArrayList<Email> listaEmail;
@@ -78,8 +81,14 @@ public class ClientGUI extends JFrame implements Observer{
     public ClientGUI(String email) {
         super(email);
         this.listaEmail = new ArrayList<>();
-        this.model = new ClientImplementation(email);
-        this.controller = new ClientController(this.model);
+        this.model = null;
+        this.controller = null;
+        try {
+            this.model = new ClientImplementation(email);
+            this.controller = new ClientController(this.model);
+        } catch (RemoteException ex) {
+            Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         initGUI();
     }
     
