@@ -24,21 +24,26 @@ import server.Server;
  */
 public class ClientImplementation extends UnicastRemoteObject implements Client{
     
-    private Utente utente;
+    private final Utente utente;
     private Server server;
-    private CasellaPostaElettronicaClient casellaPostaleClient;
+    private final CasellaPostaElettronicaClient casellaPostaleClient;
     
-    public ClientImplementation(String emailUtente) throws RemoteException{
+    public ClientImplementation(String emailUtente) throws RemoteException {
         this.casellaPostaleClient = new CasellaPostaElettronicaClient(emailUtente);
         this.utente = this.casellaPostaleClient.recuperaDatiUtente(emailUtente);
         this.server = null;
         connettiAlServer();
     }
     
+    /**
+     * Registra ClientImplementation presso un rmiregistry e ottiene un 
+     * riferimento all'oggetto remoto Server conoscendo il nome dell'oggetto
+     * remoto e la posizione del rmiregistry presso il quale è registrato 
+     */
     private void connettiAlServer(){
         /* 
         registrazione dell'oggetto ClientImplementation presso il registro di 
-        bootstrap (rmiregistry)
+        bootstrap (rmiregistry) e il numero di porta (localhost)
         */
         lanciaRMIRegistry();
         try {
@@ -60,6 +65,9 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         
     }
     
+    /**
+     * Metodo per lanciare l'rmiregistry tramite codice Java
+     */
     public static void lanciaRMIRegistry() {
         try {
             LocateRegistry.createRegistry(1099);
@@ -70,21 +78,13 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         }
     }
     
-    //public boolean inoltraEmail(Email emailDaInoltrare){}
-    
-    //public ArrayList<Email> ordinaPerPriorità(){}
-    
-    /*
-    public ArrayList<Email> ordinaInviatePerData(){
-        return this.casellaPostaleClient.ordinaInviatePerData();
-    }
-    
-    public ArrayList<Email> ordinaRicevutePerData(){
-        return this.casellaPostaleClient.ordinaRicevutePerData();
-    }
-    
-    */
-    
+    /**
+     * Registra la ClientGUI contenuta nel parametro osservatore come Observer 
+     * della casella postale dell'utente proprietario e aggiorna le email 
+     * inviate e ricevute contenute nella casella postale
+     * @param osservatore: ClientGUI che viene registrata come Observer del 
+     *      modello
+     */
     public void registraOsservatoreEAggiornaEmail(ClientGUI osservatore){
         this.casellaPostaleClient.addObserver(osservatore);
         this.casellaPostaleClient.recuperaTutteEmail();
@@ -106,11 +106,43 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         }
     }
     
+    /**
+     * Ordina le email inviate nella casella postale dell'utente proprietario
+     * per priorità decrescente
+     */
+    public void ordinaInviatePerPriorità(){
+        this.casellaPostaleClient.ordinaInviatePerPriorita();
+    }
+    
+    /**
+     * Ordina le email ricevute nella casella postale dell'utente proprietario
+     * per priorità decrescente
+     */
+    public void ordinaRicevutePerPriorita(){
+        this.casellaPostaleClient.ordinaRicevutePerPriorita();
+    }
+    
+    /**
+     * Ordina le email inviate nella casella postale dell'utente proprietario 
+     * per data decrescente
+     */
+    public void ordinaInviatePerData(){
+        this.casellaPostaleClient.ordinaInviatePerData();
+    }
+    
+    /**
+     * Ordina le email ricevute nella casella postale dell'utente proprietario
+     * per data decrescemte
+     */
+    public void ordinaRicevutePerData(){
+        this.casellaPostaleClient.ordinaRicevutePerData();
+    }
+    
     /*
     Ritorna l'intero corrispondente all'id dell'ultima email ricevuta dal
     utente proprietario della casella di posta elettronica
     */
-    public int getUltimaRicevuta(){
+    private int getUltimaRicevuta(){
         return this.casellaPostaleClient.getUltimaRicevuta();
     }
     
@@ -118,16 +150,17 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     Ritorna l'intero corrispondente all'id dell'ultima email inviata dal
     utente proprietario della casella di posta elettronica
     */
-    public int getUltimaInviata(){
+    private int getUltimaInviata(){
         return this.casellaPostaleClient.getUltimaInviata();
     }
     
-    //fare metodi per prendere mail inviate e ricevute
+    
+    
+    //public boolean inoltraEmail(Email emailDaInoltrare){}
     
     @Override
     public boolean riceviEmail(Email emailRicevuta) throws RemoteException{
-        //azioni da intraprendere quando viene ricevuta una mail
-        System.out.println("RMI FUNZIONA!!!!!");
+        
         return true;
     }
     

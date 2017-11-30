@@ -2,6 +2,7 @@ package client;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -120,6 +121,34 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     }
     
     /**
+     * Ordina le email inviate per priorità decrescente
+     */
+    public void ordinaInviatePerPriorita(){
+        Collections.sort(this.emailInviate, new Comparator<Email>() {
+            @Override
+            public int compare(Email email1, Email email2) {
+                return email1.getPriorita() - email2.getPriorita();
+            }
+        });
+        setChanged();
+        notifyObservers();
+    }
+    
+    /**
+     * Ordina le email ricevute per priorità decrescente
+     */
+    public void ordinaRicevutePerPriorita(){
+        Collections.sort(this.emailRicevute, new Comparator<Email>() {
+            @Override
+            public int compare(Email email1, Email email2) {
+                return email1.getPriorita() - email2.getPriorita();
+            }
+        });
+        setChanged();
+        notifyObservers();
+    }
+    
+    /**
      * Ordina le email inviate per data decrescente
      */
     public void ordinaInviatePerData(){
@@ -190,6 +219,10 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         return utente;
     }
     
+    /**
+     * Recupera tutte le email (inviate e ricevute) contenute nella casella 
+     * postale dell'utente
+     */
     public void recuperaTutteEmail(){
         recuperaEmailInviate();
         recuperaEmailRicevute();
@@ -337,6 +370,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param nuoveEmailInviate: ArrayList di nuove Email da inserire in table 
      *      email_inviate
      */
+    // DA RIFARE!!!!!!!!!!!
     public void inserisciNuoveEmailInviate(ArrayList<Email> nuoveEmailInviate){
         this.emailInviate.addAll(nuoveEmailInviate);
         setChanged();
@@ -348,24 +382,94 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param nuoveEmailRicevute: ArrayList di nuove Email da inserire in table 
      *      email_ricevute
      */
+    // DA RIFARE!!!!!!!!!!!!!!!!
     public void inserisciNuoveEmailRicevute(ArrayList<Email> nuoveEmailRicevute){
         this.emailRicevute.addAll(nuoveEmailRicevute);
         setChanged();
         notifyObservers();
     }
     
+    private void inserisciNuovaEmailInviata(Email email){
+        String inserimentoNuovaEmail = 
+                "INSERT INTO email_inviate (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
+              + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            ps = conn.prepareStatement(inserimentoNuovaEmail);
+            if(email.getDestinatari() == null){
+                ps.setInt(1, email.getId());
+                ps.setString(2, email.getMittente().getEmail());
+                //continua
+                ps.executeUpdate();
+                
+            } else{
+                email.getDestinatari().forEach((destinatario) -> {
+                    
+                });
+            }
+              
+        } catch (SQLException ex) {
+            Logger.getLogger(CasellaPostaElettronicaClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void inserisciNuovaEmailRicevuta(Email email){
+        String inserimentoNuovaEmail = 
+                "INSERT INTO email_ricevute (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
+              + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            ps = conn.prepareStatement(inserimentoNuovaEmail);
+            if(email.getDestinatari() == null){
+                ps.setInt(1, email.getId());
+                ps.setString(2, email.getMittente().getEmail());
+                //continua
+                ps.executeUpdate();
+                
+            } else{
+                email.getDestinatari().forEach((destinatario) -> {
+                    
+                });
+            }
+              
+        } catch (SQLException ex) {
+            Logger.getLogger(CasellaPostaElettronicaClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }
+    
+    
+    //TODO
+    public void inoltraEmail(Email emailDaInoltrare){
+        
+    }
+    
+    
+    
+    
+    
+    
     @Override
     public void inserisciInInviati(Email email) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        inserisciNuovaEmailInviata(email);
+        setChanged();
+        notifyObservers();
     }
 
     @Override
     public void inserisciInRicevuti(Email email) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        inserisciNuovaEmailRicevuta(email);
+        setChanged();
+        notifyObservers();
     }
 
+    //TODO
     @Override
     public void elimina(Email email) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
