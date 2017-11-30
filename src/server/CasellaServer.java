@@ -39,12 +39,13 @@ public class CasellaServer {
             rs = st.executeQuery(cercaEmailRicevuteUtente);
             while(rs.next()){
                 Email email = new Email();
+                
                 email.setId(rs.getInt("id_email"));
                 email.setMittente(recuperaDatiUtente(rs.getString("mittente")));
                 email.setDestinatari(recuperaUtentiDestinatari(rs.getInt("id_email")));
                 email.setOggetto(rs.getString("oggetto"));
                 email.setCorpo(rs.getString("corpo"));
-                email.setData(new Date(rs.getDate("data").getTime()));
+                email.setData(new java.sql.Date(rs.getDate("data").getTime()));
                 email.setPriorita(rs.getInt("priorita"));
                 email.setLetto(rs.getBoolean("letto"));
                 emailRicevuteUtente.add(email);
@@ -67,6 +68,7 @@ public class CasellaServer {
                 System.out.println(ex.getMessage());
             }
         }
+        
         return emailRicevuteUtente;
         
     }

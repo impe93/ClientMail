@@ -167,20 +167,18 @@ public class InizializzazioneDBServer {
         String corpo="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
                 + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
                 + "laoreet vitae urna.";
-        Date[] data = {
-            new Date("10/10/2017"),
-            new Date("10/11/2017"),
-            new Date("04/10/2017"),
-            new Date("01/12/2017"),
-            new Date("15/06/2017"),
-            new Date("04/04/2017"),
-            new Date("15/09/2017"),
-            new Date("23/12/2017"),
-            new Date("10/08/2017")};
+        java.sql.Date[] data = {
+            new java.sql.Date(1507586400000l),
+            new java.sql.Date(1507672800000l),
+            new java.sql.Date(1506895200000l),
+            new java.sql.Date(1507413600000l),
+            new java.sql.Date(1486508400000l),
+            new java.sql.Date(1488236400000l),
+            new java.sql.Date(1511823600000l),
+            new java.sql.Date(1509577200000l),
+            new java.sql.Date(1495490400000l),
+        };
         
-        java.sql.Date[] dataSql = new java.sql.Date[9];
-        for(int i =0; i<dataSql.length;i++)
-            dataSql[i] = new java.sql.Date(data[i].getTime());
         
         int priorita = 3;
         int letto = 0;
@@ -200,7 +198,7 @@ public class InizializzazioneDBServer {
                 pst.setString(3,destinatario[i]);
                 pst.setString(4,oggetto);
                 pst.setString(5,corpo);
-                pst.setDate(6,dataSql[i]);
+                pst.setDate(6,data[i]);
                 pst.setInt(7,priorita);
                 pst.setInt(8,letto);
                 pst.executeUpdate();
