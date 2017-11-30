@@ -1,5 +1,7 @@
 package modelli;
 
+import java.util.Objects;
+
 /**
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
@@ -32,4 +34,6 @@ public class Utente {
     public String getEmail(){
         return this.email;
     }
+
+    
 }

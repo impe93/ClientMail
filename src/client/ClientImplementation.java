@@ -86,8 +86,9 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      *      modello
      */
     public void registraOsservatoreEAggiornaEmail(ClientGUI osservatore){
+        this.casellaPostaleClient.recuperaEmailInviate();
         this.casellaPostaleClient.addObserver(osservatore);
-        this.casellaPostaleClient.recuperaTutteEmail();
+        this.casellaPostaleClient.recuperaEmailRicevute();
         ArrayList<Email> nuoveEmailInviate = null;
         ArrayList<Email> nuoveEmailRicevute = null;
         if(this.server != null){
