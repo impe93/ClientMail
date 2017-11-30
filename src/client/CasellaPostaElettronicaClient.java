@@ -2,11 +2,15 @@ package client;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import modelli.CasellaPostaElettronica;
@@ -17,30 +21,29 @@ import modelli.Utente;
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public class CasellaPostaElettronicaClient implements CasellaPostaElettronica{
+public class CasellaPostaElettronicaClient extends Observable implements CasellaPostaElettronica{
     private final String urlDB;
     private final Utente utenteProprietario;
-    private ArrayList<Email> emailRicevute;
     private ArrayList<Email> emailInviate;
+    private ArrayList<Email> emailRicevute;
+    
     
     public CasellaPostaElettronicaClient(String emailUtente){
         registraDriver();
         this.urlDB = "jdbc:sqlite:" + "DB_" + emailUtente + ".db";   
         this.utenteProprietario = recuperaDatiUtente(emailUtente);
-        recuperaEmailRicevute();
-        recuperaEmailInviate();
     }
 
     public Utente getUtenteProprietario() {
         return utenteProprietario;
     }
 
-    public ArrayList<Email> getEmailRicevute() {
-        return emailRicevute;
-    }
-
     public ArrayList<Email> getEmailInviate() {
         return emailInviate;
+    }
+    
+    public ArrayList<Email> getEmailRicevute() {
+        return emailRicevute;
     }
     
     /**
@@ -56,19 +59,19 @@ public class CasellaPostaElettronicaClient implements CasellaPostaElettronica{
     }
     
     /*
-    Ritorna l'intero corrispondente all'id dell'ultima email ricevuta dal
-    utente proprietario della casella di posta elettronica
-    */
-    public int getUltimaRicevuta(){
-        return getUltimaEmail("email_ricevute");
-    }
-    
-    /*
     Ritorna l'intero corrispondente all'id dell'ultima email inviata dal
     utente proprietario della casella di posta elettronica
     */
     public int getUltimaInviata(){
         return getUltimaEmail("email_inviate");
+    }
+    
+    /*
+    Ritorna l'intero corrispondente all'id dell'ultima email ricevuta dal
+    utente proprietario della casella di posta elettronica
+    */
+    public int getUltimaRicevuta(){
+        return getUltimaEmail("email_ricevute");
     }
     
     /**
@@ -117,66 +120,61 @@ public class CasellaPostaElettronicaClient implements CasellaPostaElettronica{
         return idUltimaEmail;
     }
     
-    public ArrayList<Email> ordinaRicevutePerData(){
-        return ordinaEmailPerData("email_ricevute");
-    }
-    
-    public ArrayList<Email> ordinaInviatePerData(){
-        return ordinaEmailPerData("email_inviate");
-    }
-    
-    private ArrayList<Email> ordinaEmailPerData(String tabellaEmail){
-        ArrayList<Email> emailOrdinatePerData = new ArrayList<>();
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rs = null;
-        String ordinaEmailPerData =
-                "SELECT * " + 
-                "FROM " + tabellaEmail + " " +
-                "ORDER BY YEAR(data) DESC, MONTH(data) DESC, DAY(data) DESC";
-        boolean isInviate = tabellaEmail.equals("email_inviate");
-        try {
-            conn = DriverManager.getConnection(urlDB);
-            st = conn.createStatement();
-            rs = st.executeQuery(ordinaEmailPerData);
-            while(rs.next()){
-                Email email = new Email();
-                email.setId(rs.getInt("id_email"));
-                email.setMittente(recuperaDatiUtente(rs.getString("mittente")));
-                email.setDestinatari(recuperaUtentiDestinatari(rs.getInt("id_email"), isInviate));
-                email.setOggetto(rs.getString("oggetto"));
-                email.setCorpo(rs.getString("corpo"));
-                email.setData(new Date(rs.getDate("data").getTime()));
-                email.setPriorita(rs.getInt("priorita"));
-                email.setLetto(rs.getBoolean("letto"));
-                if(isInviate){
-                    if(!emailOrdinatePerData.contains(email)){
-                        emailOrdinatePerData.add(email);
-                    }
-                } else{
-                    emailOrdinatePerData.add(email);
-                }
+    /**
+     * Ordina le email inviate per priorità decrescente
+     */
+    public void ordinaInviatePerPriorita(){
+        Collections.sort(this.emailInviate, new Comparator<Email>() {
+            @Override
+            public int compare(Email email1, Email email2) {
+                return email1.getPriorita() - email2.getPriorita();
             }
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            try {
-                if(rs != null){
-                    rs.close();
-                }
-                if(st != null){
-                    st.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-        return emailOrdinatePerData;
+        });
+        setChanged();
+        notifyObservers();
     }
     
+    /**
+     * Ordina le email ricevute per priorità decrescente
+     */
+    public void ordinaRicevutePerPriorita(){
+        Collections.sort(this.emailRicevute, new Comparator<Email>() {
+            @Override
+            public int compare(Email email1, Email email2) {
+                return email1.getPriorita() - email2.getPriorita();
+            }
+        });
+        setChanged();
+        notifyObservers();
+    }
+    
+    /**
+     * Ordina le email inviate per data decrescente
+     */
+    public void ordinaInviatePerData(){
+        Collections.sort(this.emailInviate, new Comparator<Email>() {
+            @Override
+            public int compare(Email email1, Email email2) {
+                return email1.getData().compareTo(email2.getData());
+            }
+        });
+        setChanged();
+        notifyObservers();
+    }
+    
+    /**
+     * Ordina le email ricevute per data decrescente
+     */
+    public void ordinaRicevutePerData(){
+        Collections.sort(this.emailRicevute, new Comparator<Email>() {
+            @Override
+            public int compare(Email email1, Email email2) {
+                return email1.getData().compareTo(email2.getData());
+            }
+        });
+        setChanged();
+        notifyObservers();
+    }
     
     /**
      * Recupera i dati personali di un utente e li restituisce all'interno di 
@@ -222,16 +220,12 @@ public class CasellaPostaElettronicaClient implements CasellaPostaElettronica{
     }
     
     /**
-     * Recupera tutte le email ricevute dall'utente proprietario della casella
-     * di posta elettronica
+     * Recupera tutte le email (inviate e ricevute) contenute nella casella 
+     * postale dell'utente
      */
-    private synchronized void recuperaEmailRicevute(){
-        this.emailRicevute = new ArrayList<>();
-        String queryEmailRicevute = 
-                "SELECT * " + 
-                "FROM email_ricevute " +
-                "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
-        recuperaEmailUtente(queryEmailRicevute, false);
+    public void recuperaTutteEmail(){
+        recuperaEmailInviate();
+        recuperaEmailRicevute();
     }
     
     /**
@@ -245,6 +239,23 @@ public class CasellaPostaElettronicaClient implements CasellaPostaElettronica{
                 "FROM email_inviate " +
                 "WHERE mittente = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, true);
+        setChanged();
+        notifyObservers();
+    }
+    
+    /**
+     * Recupera tutte le email ricevute dall'utente proprietario della casella
+     * di posta elettronica
+     */
+    private synchronized void recuperaEmailRicevute(){
+        this.emailRicevute = new ArrayList<>();
+        String queryEmailRicevute = 
+                "SELECT * " + 
+                "FROM email_ricevute " +
+                "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
+        recuperaEmailUtente(queryEmailRicevute, false);
+        setChanged();
+        notifyObservers();
     }
     
     /**
@@ -354,18 +365,111 @@ public class CasellaPostaElettronicaClient implements CasellaPostaElettronica{
         return utentiDestinatari;        
     }
     
+    /**
+     * Aggiorna le email inviate al momento della connessione al server
+     * @param nuoveEmailInviate: ArrayList di nuove Email da inserire in table 
+     *      email_inviate
+     */
+    // DA RIFARE!!!!!!!!!!!
+    public void inserisciNuoveEmailInviate(ArrayList<Email> nuoveEmailInviate){
+        this.emailInviate.addAll(nuoveEmailInviate);
+        setChanged();
+        notifyObservers();
+    }
+    
+    /**
+     * Aggiorna le email ricevute al momento della connessione al server
+     * @param nuoveEmailRicevute: ArrayList di nuove Email da inserire in table 
+     *      email_ricevute
+     */
+    // DA RIFARE!!!!!!!!!!!!!!!!
+    public void inserisciNuoveEmailRicevute(ArrayList<Email> nuoveEmailRicevute){
+        this.emailRicevute.addAll(nuoveEmailRicevute);
+        setChanged();
+        notifyObservers();
+    }
+    
+    private void inserisciNuovaEmailInviata(Email email){
+        String inserimentoNuovaEmail = 
+                "INSERT INTO email_inviate (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
+              + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            ps = conn.prepareStatement(inserimentoNuovaEmail);
+            if(email.getDestinatari() == null){
+                ps.setInt(1, email.getId());
+                ps.setString(2, email.getMittente().getEmail());
+                //continua
+                ps.executeUpdate();
+                
+            } else{
+                email.getDestinatari().forEach((destinatario) -> {
+                    
+                });
+            }
+              
+        } catch (SQLException ex) {
+            Logger.getLogger(CasellaPostaElettronicaClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void inserisciNuovaEmailRicevuta(Email email){
+        String inserimentoNuovaEmail = 
+                "INSERT INTO email_ricevute (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
+              + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            ps = conn.prepareStatement(inserimentoNuovaEmail);
+            if(email.getDestinatari() == null){
+                ps.setInt(1, email.getId());
+                ps.setString(2, email.getMittente().getEmail());
+                //continua
+                ps.executeUpdate();
+                
+            } else{
+                email.getDestinatari().forEach((destinatario) -> {
+                    
+                });
+            }
+              
+        } catch (SQLException ex) {
+            Logger.getLogger(CasellaPostaElettronicaClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }
+    
+    
+    //TODO
+    public void inoltraEmail(Email emailDaInoltrare){
+        
+    }
+    
+    
+    
+    
+    
+    
     @Override
     public void inserisciInInviati(Email email) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        inserisciNuovaEmailInviata(email);
+        setChanged();
+        notifyObservers();
     }
 
     @Override
     public void inserisciInRicevuti(Email email) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        inserisciNuovaEmailRicevuta(email);
+        setChanged();
+        notifyObservers();
     }
 
+    //TODO
     @Override
     public void elimina(Email email) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
