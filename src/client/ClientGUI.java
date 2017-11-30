@@ -37,11 +37,13 @@ import modelli.Email;
  */
 public class ClientGUI extends JFrame implements Observer{
     
-    private ClientController controller;
-    private ClientImplementation model;
+    public static final String RICEVUTI = "ricevuti";
+    public static final String INVIATI = "inviati";
     
+    private final ClientController controllore;
     private Email emailDaVisualizzare;
     private final ArrayList<Email> listaEmail;
+    private final String inVisualizzazione;
     
     /* Variabili per la GUI */
     private JSplitPane clientSplitPane;
@@ -78,17 +80,12 @@ public class ClientGUI extends JFrame implements Observer{
     private JButton inoltraSelezionata;
     
     
-    public ClientGUI(String email) {
+    public ClientGUI(String email, ClientController controller) {
         super(email);
+        this.emailDaVisualizzare = null;
+        this.controllore = controller;
         this.listaEmail = new ArrayList<>();
-        this.model = null;
-        this.controller = null;
-        try {
-            this.model = new ClientImplementation(email);
-            this.controller = new ClientController(this.model);
-        } catch (RemoteException ex) {
-            Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.inVisualizzazione = ClientGUI.RICEVUTI;
         initGUI();
     }
     
@@ -118,7 +115,7 @@ public class ClientGUI extends JFrame implements Observer{
         this.mittentePanel.setLayout(mittentePanelLayout);
         this.mittenteScrittaLabel = new JLabel("Mittente: ");
         this.mittentePanel.add(this.mittenteScrittaLabel);
-        this.mittenteEmailLabel = new JLabel(this.emailDaVisualizzare.getMittente().getEmail());
+        this.mittenteEmailLabel = new JLabel();
         this.mittentePanel.add(this.mittenteEmailLabel);
         this.intestazioneEmailPanel.add(this.mittentePanel);
   /* ------ Fine Mittente Email Panel ------ */
@@ -131,13 +128,6 @@ public class ClientGUI extends JFrame implements Observer{
         this.destinatariScrittaLabel = new JLabel("Destinatari/o: ");
         this.destinatariPanel.add(this.destinatariScrittaLabel);
         this.destinatariEmailLabel = new JLabel();
-        this.emailDaVisualizzare.getDestinatari().forEach(destinatario -> {
-            if (!this.destinatariEmailLabel.getText().equals("")) {
-                this.destinatariEmailLabel.setText(this.destinatariEmailLabel.getText() + ", " + destinatario.getEmail());
-            } else {
-                this.destinatariEmailLabel.setText(destinatario.getEmail());
-            }
-        });
         this.destinatariPanel.add(this.destinatariEmailLabel);
         this.intestazioneEmailPanel.add(this.destinatariPanel);
   /* ------ Fine Destinatari Email Panel ------ */
@@ -149,7 +139,7 @@ public class ClientGUI extends JFrame implements Observer{
         this.oggettoPanel.setLayout(oggettoPanelLayout);
         this.oggettoScrittaLabel = new JLabel("Oggetto: ");
         this.oggettoPanel.add(this.oggettoScrittaLabel);
-        this.oggettoEmailLabel = new JLabel(this.emailDaVisualizzare.getOggetto());
+        this.oggettoEmailLabel = new JLabel();
         this.oggettoPanel.add(oggettoEmailLabel);
         this.intestazioneEmailPanel.add(this.oggettoPanel);
   /* ------ Fine Oggetto Email Panel ------ */
@@ -163,7 +153,6 @@ public class ClientGUI extends JFrame implements Observer{
         this.corpoTextArea.setEditable(false);
         this.corpoTextArea.setLineWrap(true);
         this.corpoTextArea.setWrapStyleWord(true);
-        this.corpoTextArea.setText(this.emailDaVisualizzare.getCorpo());
         this.corpoEmailPanel = new JScrollPane(this.corpoTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         this.emailPanel.add(this.corpoEmailPanel, BorderLayout.CENTER);
  /* ------ Fine Corpo Email Panel ------ */
@@ -176,9 +165,6 @@ public class ClientGUI extends JFrame implements Observer{
         this.modelListaEmail = new DefaultListModel<>();
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
-        this.listaEmail.forEach(email -> {
-            this.modelListaEmail.addElement(email);
-        });
         this.listaEmailList.addListSelectionListener((ListSelectionEvent e) -> {
             emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
             mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
@@ -206,17 +192,17 @@ public class ClientGUI extends JFrame implements Observer{
         
         this.creaEmail = new JButton("Nuova Email");
         this.creaEmail.setName("nuova");
-        this.creaEmail.addActionListener(this.controller);
+        this.creaEmail.addActionListener(this.controllore);
         this.toolbarDestraPanel.add(this.creaEmail);
         
         this.eliminaSelezionata = new JButton("Elimina selezionata");
         this.eliminaSelezionata.setName("elimina");
-        this.eliminaSelezionata.addActionListener(this.controller);
+        this.eliminaSelezionata.addActionListener(this.controllore);
         this.toolbarDestraPanel.add(this.eliminaSelezionata);
         
         this.inoltraSelezionata = new JButton("Inoltra selezionata");
         this.inoltraSelezionata.setName("inoltra");
-        this.inoltraSelezionata.addActionListener(this.controller);
+        this.inoltraSelezionata.addActionListener(this.controllore);
         this.toolbarDestraPanel.add(this.inoltraSelezionata);
  /* ------ Fine Toolbar Destra Panel ------ */
  
@@ -226,12 +212,12 @@ public class ClientGUI extends JFrame implements Observer{
         
         this.ricevuteButton = new JButton("Ricevute");
         this.ricevuteButton.setName("emailRicevute");
-        this.ricevuteButton.addActionListener(this.controller);
+        this.ricevuteButton.addActionListener(this.controllore);
         this.toolbarSinistraPanel.add(this.ricevuteButton);
         
         this.inviateButton = new JButton("Inviate");
         this.inviateButton.setName("emailInviate");
-        this.inviateButton.addActionListener(this.controller);
+        this.inviateButton.addActionListener(this.controllore);
         this.toolbarSinistraPanel.add(this.inviateButton);
  /* ------ Fine Toolbar Sinistra Panel ------ */
  
@@ -260,16 +246,46 @@ public class ClientGUI extends JFrame implements Observer{
     }
     
     public static void main (String[] args) {
-        ClientImplementation modelloClient = null;
+        ClientImplementation modello = null;
+        ClientController controller = null;
         ClientGUI client = null;
         if (args.length == 1) {
-            client = new ClientGUI(args[0]);
+            try {
+                modello = new ClientImplementation(args[0]);
+                controller = new ClientController(modello);
+                client = new ClientGUI(args[0], controller);
+                modello.registraOsservatoreEAggiornaEmail(client);
+            } catch (RemoteException ex) {
+                Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch((String)arg) {
+            case ClientGUI.RICEVUTI: {
+                if (this.inVisualizzazione.equals(ClientGUI.RICEVUTI)) {
+                    this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
+                    this.listaEmail.forEach(email -> {
+                        this.modelListaEmail.addElement(email);
+                    });
+                    if (this.listaEmail.size() > 0) {
+                        this.emailDaVisualizzare = this.listaEmail.get(0);
+                    }
+                }
+                break;
+            }
+            case ClientGUI.INVIATI: {
+                if (this.inVisualizzazione.equals(ClientGUI.INVIATI)) {
+                    
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
     
 }
