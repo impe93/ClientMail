@@ -109,4 +109,12 @@ public class Email {
     public void setLetto(boolean letto) {
         this.letto = letto;
     }
+    
+     @Override
+    public String toString() {
+        return "Email{" + "id=" + id + ", mittente=" 
+                + mittente + ", destinatari=" + destinatari + ", oggetto=" 
+                + oggetto + ", corpo=" + corpo + ", data=" + data + ", priorita=" 
+                + priorita + ", letto=" + letto + '}';
+    }
 }

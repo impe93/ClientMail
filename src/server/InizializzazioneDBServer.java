@@ -4,8 +4,10 @@ import client.InizializzazioneDBClient;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,7 +68,7 @@ public class InizializzazioneDBServer {
                 = "create table email ("
                 + "id_email integer not null,"
                 + "mittente text not null references UTENTE(email),"
-                + "destinatario text not null,"
+                + "destinatario text not null references UTENTE(email),"
                 + "oggetto text,"
                 + "corpo text,"
                 + "data date not null,"
@@ -106,7 +108,6 @@ public class InizializzazioneDBServer {
     }
     
     private static void inserisciUtentiInTabellaUtenti() throws SQLException{
-        String urlDB = "jdbc:sqlite:Server.db";
        
         String inserimentoUtenti 
                 = "INSERT INTO utenti (email, nome, cognome)"
@@ -139,70 +140,75 @@ public class InizializzazioneDBServer {
     }
     
     private static void inserisciEmailInTabellaEmail() throws SQLException{
-        String urlDB = "jdbc:sqlite:Server.db";
+        
+        String[] mittente = {
+            "alessio.berger@edu.unito.it",
+            "alessio.berger@edu.unito.it",
+            "alessio.berger@edu.unito.it",
+            "francesca.riddone@edu.unito.it",
+            "francesca.riddone@edu.unito.it",
+            "francesca.riddone@edu.unito.it",
+            "lorenzo.imperatrice@edu.unito.it",
+            "lorenzo.imperatrice@edu.unito.it",
+            "lorenzo.imperatrice@edu.unito.it"
+        };
+        String[] destinatario = {
+            "francesca.riddone@edu.unito.it",
+            "lorenzo.imperatrice@edu.unito.it",
+            "lorenzo.imperatrice@edu.unito.it",
+            "alessio.berger@edu.unito.it",
+            "alessio.berger@edu.unito.it",
+            "lorenzo.imperatrice@edu.unito.it",
+            "francesca.riddone@edu.unito.it",
+            "francesca.riddone@edu.unito.it",
+            "alessio.berger@edu.unito.it"
+        };
+        String oggetto="Lorem ipsum";
+        String corpo="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
+                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
+                + "laoreet vitae urna.";
+        java.sql.Date[] data = {
+            new java.sql.Date(1507586400000l),
+            new java.sql.Date(1507672800000l),
+            new java.sql.Date(1506895200000l),
+            new java.sql.Date(1507413600000l),
+            new java.sql.Date(1486508400000l),
+            new java.sql.Date(1488236400000l),
+            new java.sql.Date(1511823600000l),
+            new java.sql.Date(1509577200000l),
+            new java.sql.Date(1495490400000l),
+        };
+        
+        
+        int priorita = 3;
+        int letto = 0;
        
-        String inserimentoEmail 
-                = "INSERT INTO email (id_email, mittente, destinatario, oggetto, corpo,"
-                + "data, priorita,letto) "
-                + "VALUES "
-                + "(1,'alessio.berger@edu.unito.it','francesca.riddone@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-11-02',3,0),"
-                + ""
-                + "(2,'alessio.berger@edu.unito.it','lorenzo.imperatrice@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-12-02',3,0),"
-                +""
-                + "(3,'alessio.berger@edu.unito.it','lorenzo.imperatrice@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-09-02',3,0),"
-                +""
-                + "(4,'lorenzo.imperatrice@edu.unito.it','alessio.berger@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-09-09',3,0),"
-                +""
-                + "(5,'lorenzo.imperatrice@edu.unito.it','francesca.riddone@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-05-09',3,0),"
-                +""
-                + "(6,'lorenzo.imperatrice@edu.unito.it','francesca.riddone@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-09-08',3,0),"
-                +""
-                + "(7,'francesca.riddone@edu.unito.it','alessio.berger@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-04-07',3,0),"
-                +""
-                + "(8,'francesca.riddone@edu.unito.it','alessio.berger@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-04-06',3,0),"
-                +""
-                + "(9,'francesca.riddone@edu.unito.it','lorenzo.imperatrice@edu.unito.it','Lorem ipsum',"
-                + "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
-                + "laoreet vitae urna.','2017-07-19',3,0);";
+        String inserimentoEmail = "INSERT INTO email (id_email, mittente, destinatario, oggetto, corpo,"
+                + "data, priorita,letto) VALUES (?,?,?,?,?,?,?,?)";
         
         Connection conn = null;
-        Statement st = null;
+        PreparedStatement pst = null;
 
         try{
             conn = DriverManager.getConnection(urlDB);
-            st = conn.createStatement();
-            st.executeUpdate(inserimentoEmail);
+            for(int i=0;i<9;i++){
+                pst = conn.prepareStatement(inserimentoEmail);
+                pst.setInt(1,i+1);
+                pst.setString(2,mittente[i]);
+                pst.setString(3,destinatario[i]);
+                pst.setString(4,oggetto);
+                pst.setString(5,corpo);
+                pst.setDate(6,data[i]);
+                pst.setInt(7,priorita);
+                pst.setInt(8,letto);
+                pst.executeUpdate();
+            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
             try {
-                if(st != null){
-                    st.close();
+                if(pst != null){
+                    pst.close();
                 }
                 if (conn != null) {
                     conn.close();

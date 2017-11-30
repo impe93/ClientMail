@@ -231,7 +231,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "WHERE mittente = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, true);
         setChanged();
-        notifyObservers();
+        notifyObservers(ClientGUI.INVIATI);
     }
     
     /**
@@ -245,8 +245,10 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM email_ricevute " +
                 "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, false);
+        System.out.println("Entro Nel Metodo");
+        this.getEmailRicevute().forEach(email -> System.out.println("EMAIL" + email));
         setChanged();
-        notifyObservers();
+        notifyObservers(ClientGUI.RICEVUTI);
     }
     
     /**
