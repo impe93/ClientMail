@@ -68,7 +68,7 @@ public class InizializzazioneDBServer {
                 = "create table email ("
                 + "id_email integer not null,"
                 + "mittente text not null references UTENTE(email),"
-                + "destinatario text not null,"
+                + "destinatario text not null references UTENTE(email),"
                 + "oggetto text,"
                 + "corpo text,"
                 + "data date not null,"

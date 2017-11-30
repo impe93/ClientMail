@@ -43,13 +43,12 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public ArrayList<Email> getInviate(int ultimaInviata, Utente utente) throws RemoteException {
-    return null;
+        return casella.recuperaEmailInviateUtente(ultimaInviata, utente);
     }
 
     @Override
     public ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException {
-        ArrayList<Email> emails = casella.recuperaEmailRicevuteUtente(ultimaRicevuta, utente);
-        return emails;
+        return casella.recuperaEmailRicevuteUtente(ultimaRicevuta, utente);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     ServerImplementation server = new ServerImplementation();
         
         
-            emails = server.getRicevute(1,new Utente("Lorenzo","Imperatrice",
+            emails = server.getInviate(1,new Utente("Lorenzo","Imperatrice",
                     "lorenzo.imperatrice@edu.unito.it"));
        
            emails.forEach(email -> System.out.println(email));
