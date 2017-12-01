@@ -1,5 +1,6 @@
 package modelli;
 
+import static java.lang.System.currentTimeMillis;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -13,9 +14,9 @@ public class Email {
     ArrayList<Utente> destinatari;
     String oggetto;
     String corpo;
-    Date data;
+    java.sql.Date data;
     int priorita;
-    boolean letto;
+    int letto;
 
     
     public Email(int id, Utente mittente, ArrayList destinatari, String oggetto, String corpo){
@@ -24,9 +25,9 @@ public class Email {
         this.destinatari = destinatari;
         this.oggetto = oggetto;
         this.corpo = corpo;
-        this.data = new Date();
+        this.data = new java.sql.Date(currentTimeMillis());
         this.priorita = 3;
-        this.letto = false;
+        this.letto = 0;
                 
     }
     
@@ -38,7 +39,7 @@ public class Email {
         this.corpo = null;
         this.data = null;
         this.priorita = 0;
-        this.letto = false;
+        this.letto = 0;
                 
     }
     
@@ -72,7 +73,7 @@ public class Email {
         return this.priorita;
     }
     
-    public boolean getLetto(){
+    public int getLetto(){
         return this.letto;
     }
     
@@ -98,7 +99,7 @@ public class Email {
         this.corpo = corpo;
     }
 
-    public void setData(Date data) {
+    public void setData(java.sql.Date data) {
         this.data = data;
     }
 
@@ -106,7 +107,7 @@ public class Email {
         this.priorita = priorita;
     }
 
-    public void setLetto(boolean letto) {
+    public void setLetto(int letto) {
         this.letto = letto;
     }
     

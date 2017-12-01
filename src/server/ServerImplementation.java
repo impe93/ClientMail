@@ -58,7 +58,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public boolean inviaEmail(Email emailDaInviare) throws RemoteException {
-    return false;
+        return casella.inviaEmail(emailDaInviare);
     }
     
     public static void lanciaRMIRegistry() {
@@ -88,14 +88,18 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     
     public static void main(String[] args) throws RemoteException{
         
-    ArrayList<Email> emails;
-    ServerImplementation server = new ServerImplementation();
+        ServerImplementation server = new ServerImplementation();
+        Utente uno = new Utente("alessio","berger","alessio.berger@edu.unito.it");
+        Utente due = new Utente("lorenzo","imperatrice","lorenzo.imperatrice@edu.unito.it");
+        ArrayList<Utente> destinatari = new ArrayList();
+        destinatari.add(uno);
+        destinatari.add(due);
         
         
-            emails = server.getInviate(1,new Utente("Lorenzo","Imperatrice",
-                    "lorenzo.imperatrice@edu.unito.it"));
-       
-           emails.forEach(email -> System.out.println(email));
+        
+    Email emailInviare = new Email(10,uno,destinatari,"ciao","ciao ciao");
+        
+        server.casella.inviaEmail(emailInviare);
     }
     
 }

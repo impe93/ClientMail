@@ -48,7 +48,7 @@ public class CasellaServer {
                 email.setCorpo(rs.getString("corpo"));
                 email.setData(new java.sql.Date(rs.getDate("data").getTime()));
                 email.setPriorita(rs.getInt("priorita"));
-                email.setLetto(rs.getBoolean("letto"));
+                email.setLetto(rs.getInt("letto"));
                 emailRicevuteUtente.add(email);
                 
             }
@@ -100,7 +100,7 @@ public class CasellaServer {
                 email.setCorpo(rs.getString("corpo"));
                 email.setData(new java.sql.Date(rs.getDate("data").getTime()));
                 email.setPriorita(rs.getInt("priorita"));
-                email.setLetto(rs.getBoolean("letto"));
+                email.setLetto(rs.getInt("letto"));
                 emailInviateUtente.add(email);
                 
             }
@@ -200,4 +200,63 @@ public class CasellaServer {
         return utentiDestinatari;        
     }
     
+    public boolean inviaEmail(Email emailDaInviare){
+        
+        /*FUNZIONA MA METTE LA DATA NON IN MILLISECONDI ---> CORREGGERE*/
+        
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        int[] val = new int[emailDaInviare.getDestinatari().size()];
+      
+        Utente destinatario;
+        try {
+            
+        for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
+            destinatario = emailDaInviare.getDestinatari().get(i);
+        
+        String inserisciEmail =
+                "INSERT INTO email (id_email,mittente,destinatario,oggetto,"
+                + "corpo,data,priorita,letto)"
+                + "VALUES"
+                + "(" + emailDaInviare.getId() + ",'" + emailDaInviare.getMittente().getEmail()
+                + "','" + destinatario.getEmail()+ "','" + emailDaInviare.getOggetto() + "','"
+                + emailDaInviare.getCorpo() + "','" + emailDaInviare.getData() +"'," + emailDaInviare.getPriorita() + ","
+                + emailDaInviare.getLetto() +");";
+        
+        
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            val[i] = st.executeUpdate(inserisciEmail);
+        
+    }
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } 
+        
+        finally {
+            try {
+                if(rs != null){
+                    rs.close();
+                }
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        
+        boolean eseguitaCorrettamente = true;
+        int i = 0;
+        while(i<val.length && eseguitaCorrettamente==true){
+            if(val[i]<0)
+                eseguitaCorrettamente = false;
+        }
+            
+        return eseguitaCorrettamente;
+    }
 }
