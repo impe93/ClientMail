@@ -57,8 +57,8 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     }
 
     @Override
-    public boolean inviaEmail(Email emailDaInviare) throws RemoteException {
-    return false;
+    public int inviaEmail(Email emailDaInviare) throws RemoteException {
+    return -1;
     }
     
     public static void lanciaRMIRegistry() {
@@ -71,12 +71,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
     }
     
-    @Override
-    public boolean ciao() throws RemoteException{
-        System.out.println("ciao Impe, suca");
-        return true;
-    }
-
     @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
         try {

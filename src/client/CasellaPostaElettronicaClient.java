@@ -535,6 +535,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     
     
     
+    private void eliminaEmailDaDB(Email email){
+        //1)copire se il mio utente è il mittente o un destinatario della mail
+        //cosi so in che tabella andare ad agire
+    }
+    
+    
     
     
     //TODO
@@ -558,8 +564,8 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         notifyObservers();
     }
 
-    //TODO
     @Override
     public void elimina(Email email) {
+        eliminaEmailDaDB(email);
     }
 }

@@ -10,6 +10,6 @@ import modelli.Email;
  */
 public interface Client extends Remote{
     
-    public boolean riceviEmail(Email emailRicevuta) throws RemoteException;
+    public void riceviEmail(Email emailRicevuta) throws RemoteException;
     
 }
