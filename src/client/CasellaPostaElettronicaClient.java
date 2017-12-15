@@ -275,7 +275,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 email.setCorpo(rs.getString("corpo"));
                 email.setData(new Date(rs.getDate("data").getTime()));
                 email.setPriorita(rs.getInt("priorita"));
-                email.setLetto(rs.getBoolean("letto"));
+                email.setLetto(rs.getInt("letto"));
                 if(isInviate){
                     if(!this.emailInviate.contains(email)){
                         this.emailInviate.add(email);
@@ -318,7 +318,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        String queryUtentiDestinatari = "";
+        String queryUtentiDestinatari;
         if(inInviate){
             queryUtentiDestinatari =
                     "SELECT * " + 
@@ -416,8 +416,8 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "INSERT INTO " + nomeTabella + " (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
-        Connection conn = null;
-        PreparedStatement ps = null;
+        Connection conn;
+        PreparedStatement ps;
         
         try {
             conn = DriverManager.getConnection(urlDB);
@@ -431,7 +431,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                         email.getCorpo(), 
                         email.getData(), 
                         email.getPriorita(), 
-                        (email.getLetto() ? 1:0));
+                        email.getLetto());
                 ps.executeUpdate();
             } else{
                 for(Utente utente : email.getDestinatari()){
@@ -443,7 +443,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                             email.getCorpo(),
                             email.getData(),
                             email.getPriorita(),
-                            (email.getLetto() ? 1:0));
+                            (email.getLetto() == 1 ? 1:0)); // Cambiato Questa rova qui
                     ps.executeUpdate();
                 }
             }    
@@ -531,11 +531,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         ps.setInt(7, par7);
         ps.setInt(8, par8);
     }
-    
-    
-    
-    
-    
     
     //TODO
     public void inoltraEmail(Email emailDaInoltrare){

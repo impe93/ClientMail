@@ -25,7 +25,8 @@ import javax.swing.border.EmptyBorder;
  */
 public class NuovaEmailGUI extends JFrame {
     
-    private ClientController controller;
+    private final ClientController controller;
+    private final int posizione;
     
     private JPanel panelSuperiore;
     
@@ -44,16 +45,22 @@ public class NuovaEmailGUI extends JFrame {
     private JTextArea corpoTextArea;
     
     private JPanel bottoniPanel;
-    private JButton inviaButton;
-    private JButton cancellaButton;
+    private BottoneInviaCancella inviaButton;
+    private BottoneInviaCancella cancellaButton;
     
-    public NuovaEmailGUI (ClientController controller) {
+    public NuovaEmailGUI (ClientController controller, int posizione) {
         super("Nuova Email");
         this.controller = controller;
+        this.posizione = posizione;
         this.initGUI();
     }
     
+    public int getPosizione() {
+        return this.posizione;
+    }
+    
     private void initGUI () {
+        Border empty = new EmptyBorder(10, 10, 10, 10);
         this.setLayout(new BorderLayout());
         
         this.panelSuperiore = new JPanel();
@@ -62,9 +69,14 @@ public class NuovaEmailGUI extends JFrame {
         /* ----- Destinatari Panel ----- */
         this.destinatariPanel = new JPanel();
         this.destinatariPanel.setLayout(new BorderLayout());
+        if (this.getContentPane() == null) {
+            this.destinatariPanel.setBorder(empty);
+        } else {
+            this.destinatariPanel.setBorder(new CompoundBorder(empty, this.destinatariPanel.getBorder()));
+        }
         this.destinatariLabel = new JLabel("Destinatario/i: ");
         this.destinatariPanel.add(this.destinatariLabel, BorderLayout.WEST);
-        this.destinatariTextField = new JTextField();
+        this.destinatariTextField = new JTextField(20);
         this.destinatariPanel.add(this.destinatariTextField, BorderLayout.EAST);
         this.panelSuperiore.add(this.destinatariPanel, BorderLayout.NORTH);
         /* ----- Fine Destinatari Panel ----- */
@@ -72,11 +84,16 @@ public class NuovaEmailGUI extends JFrame {
         /* ----- Oggetto Panel ----- */
         this.oggettoPanel = new JPanel();
         this.oggettoPanel.setLayout(new BorderLayout());
+        if (this.getContentPane() == null) {
+            this.oggettoPanel.setBorder(empty);
+        } else {
+            this.oggettoPanel.setBorder(new CompoundBorder(empty, this.oggettoPanel.getBorder()));
+        }
         this.oggettoLabel = new JLabel("Oggetto: ");
         this.oggettoPanel.add(this.oggettoLabel, BorderLayout.WEST);
         this.textFieldPanel = new JPanel();
         this.textFieldPanel.setLayout(new BoxLayout(this.textFieldPanel, BoxLayout.X_AXIS));
-        this.oggettoTextField = new JTextField();
+        this.oggettoTextField = new JTextField(20);
         this.textFieldPanel.add(this.oggettoTextField);
         this.oggettoPanel.add(this.textFieldPanel, BorderLayout.EAST);
         this.panelSuperiore.add(this.oggettoPanel, BorderLayout.CENTER);
@@ -87,7 +104,6 @@ public class NuovaEmailGUI extends JFrame {
         /* ----- Text Area ----- */
         this.corpoPanel = new JPanel();
         this.corpoPanel.setLayout(new BorderLayout());
-        Border empty = new EmptyBorder(10, 10, 10, 10);
         if (this.getContentPane() == null) {
             this.corpoPanel.setBorder(empty);
         } else {
@@ -106,11 +122,11 @@ public class NuovaEmailGUI extends JFrame {
         /* ----- Bottoni Panel ----- */
         this.bottoniPanel = new JPanel();
         this.bottoniPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        this.inviaButton = new JButton("Invia");
+        this.inviaButton = new BottoneInviaCancella("Invia", this.posizione);
         this.inviaButton.setName("invia");
         this.inviaButton.addActionListener(controller);
         this.bottoniPanel.add(this.inviaButton);
-        this.cancellaButton = new JButton("Cancel");
+        this.cancellaButton = new BottoneInviaCancella("Cancel", this.posizione);
         this.cancellaButton.setName("cancella");
         this.cancellaButton.addActionListener(controller);
         this.bottoniPanel.add(this.cancellaButton);
@@ -123,4 +139,17 @@ public class NuovaEmailGUI extends JFrame {
         
     }
     
+    public class BottoneInviaCancella extends JButton {
+        
+        private final int posizione;
+        
+        public BottoneInviaCancella(String nome, int posizione) {
+            super(nome);
+            this.posizione = posizione;
+        }
+        
+        public int getPosizione() {
+            return this.posizione;
+        }
+    }
 }
