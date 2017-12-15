@@ -363,8 +363,10 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param nuoveEmailInviate: ArrayList di nuove Email da inserire in table 
      *      email_inviate
      */
-    // DA RIFARE!!!!!!!!!!!
     public void inserisciNuoveEmailInviate(ArrayList<Email> nuoveEmailInviate){
+        for(Email email: nuoveEmailInviate){
+            inserisciNuovaEmailInviata(email);
+        }
         this.emailInviate.addAll(nuoveEmailInviate);
         setChanged();
         notifyObservers();
@@ -375,66 +377,164 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param nuoveEmailRicevute: ArrayList di nuove Email da inserire in table 
      *      email_ricevute
      */
-    // DA RIFARE!!!!!!!!!!!!!!!!
     public void inserisciNuoveEmailRicevute(ArrayList<Email> nuoveEmailRicevute){
+        for(Email email: nuoveEmailRicevute){
+            inserisciNuovaEmailRicevuta(email);
+        }
         this.emailRicevute.addAll(nuoveEmailRicevute);
         setChanged();
         notifyObservers();
     }
     
+    /**
+     * Inserisce una nuova email in table email_inviate
+     * @param email: email da aggiungere a email inviate in DB
+     */
     private void inserisciNuovaEmailInviata(Email email){
+        inserisciNuovaEmail(email, "email_inviate");
+    }
+    
+    /**
+     * Inserisce una nuova email in table email_ricevute
+     * @param email: email da aggiungere a email ricevute in DB
+     */
+    private void inserisciNuovaEmailRicevuta(Email email){
+        inserisciNuovaEmail(email, "email_ricevute");
+    }
+    
+    /**
+     * Inserisce una nuova email in email_ricevute o in email_inviate a seconda
+     * del contenuto del paramentro nomeTabella
+     * @param email: email da aggiungere in DB
+     * @param nomeTabella: stringa contenente il nome della table in cui 
+     *      effettuare l'inserimento
+     */
+    private void inserisciNuovaEmail(Email email, String nomeTabella){
+        ArrayList<Utente> utentiPerControllo = utentiInEmail(email);
+        controllaPresenzaUtentiInDB(utentiPerControllo);
         String inserimentoNuovaEmail = 
-                "INSERT INTO email_inviate (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
+                "INSERT INTO " + nomeTabella + " (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        
         Connection conn = null;
         PreparedStatement ps = null;
+        
         try {
             conn = DriverManager.getConnection(urlDB);
             ps = conn.prepareStatement(inserimentoNuovaEmail);
             if(email.getDestinatari() == null){
-                ps.setInt(1, email.getId());
-                ps.setString(2, email.getMittente().getEmail());
-                //continua
+                inserisciValoriInPS(
+                        ps, email.getId(), 
+                        email.getMittente().getEmail(), 
+                        email.getDestinatari().get(0).getEmail(), 
+                        email.getOggetto(), 
+                        email.getCorpo(), 
+                        email.getData(), 
+                        email.getPriorita(), 
+                        (email.getLetto() ? 1:0));
                 ps.executeUpdate();
-                
             } else{
-                email.getDestinatari().forEach((destinatario) -> {
-                    
-                });
-            }
-              
+                for(Utente utente : email.getDestinatari()){
+                    inserisciValoriInPS(
+                            ps, email.getId(),
+                            email.getMittente().getEmail(),
+                            utente.getEmail(),
+                            email.getOggetto(),
+                            email.getCorpo(),
+                            email.getData(),
+                            email.getPriorita(),
+                            (email.getLetto() ? 1:0));
+                    ps.executeUpdate();
+                }
+            }    
         } catch (SQLException ex) {
             Logger.getLogger(CasellaPostaElettronicaClient.class.getName()).log(Level.SEVERE, null, ex);
+        }   
+    }
+    
+    /**
+     * Trova tutti gli utenti che compaiono nell'email e li restituisce 
+     * all'interno di un ArrayList
+     * @param email: email da cui estrapolare oggetti Utente
+     * @return ArrayList contenente tutti gli utenti che compaiono nell'email
+     */
+    private ArrayList<Utente> utentiInEmail(Email email){
+        ArrayList<Utente> tuttiUtenti = new ArrayList<>();
+        if(email.getDestinatari() != null){
+            tuttiUtenti.addAll(email.getDestinatari());
+        }
+        if(email.getMittente() != null){
+            tuttiUtenti.add(email.getMittente());
+        }
+        return tuttiUtenti;
+    }
+    
+    /**
+     * Inserisce in table utente gli eventuali utenti non ancora presenti in DB
+     * contenuti nel parametro utenti
+     * @param utenti: ArrayList contenente oggetti di tipo Utente dei quali 
+     *      vogliamo verificare la presenza in DB
+     */
+    private void controllaPresenzaUtentiInDB(ArrayList<Utente> utenti){
+        if(utenti != null){
+            String inserimentoUtente = "INSERT INTO utente (email, nome, cognome) VALUES (?, ?, ?)";
+            Connection conn = null;
+            PreparedStatement pst = null;
+            try{
+                conn = DriverManager.getConnection(urlDB);
+                pst = conn.prepareStatement(inserimentoUtente);
+                for(Utente utente: utenti){
+                    pst.setString(1, utente.getEmail());
+                    pst.setString(2, utente.getNome());
+                    pst.setString(3, utente.getCognome());
+                    pst.executeUpdate();
+                }
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            } finally {
+                try {
+                    if(pst != null){
+                        pst.close();
+                    }
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
         }
     }
     
-    private void inserisciNuovaEmailRicevuta(Email email){
-        String inserimentoNuovaEmail = 
-                "INSERT INTO email_ricevute (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
-              + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DriverManager.getConnection(urlDB);
-            ps = conn.prepareStatement(inserimentoNuovaEmail);
-            if(email.getDestinatari() == null){
-                ps.setInt(1, email.getId());
-                ps.setString(2, email.getMittente().getEmail());
-                //continua
-                ps.executeUpdate();
-                
-            } else{
-                email.getDestinatari().forEach((destinatario) -> {
-                    
-                });
-            }
-              
-        } catch (SQLException ex) {
-            Logger.getLogger(CasellaPostaElettronicaClient.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
+    /**
+     * Inserisce i valori presenti nei parametri all'intero del PrepareStatement
+     * passato nel parametro ps
+     * @param ps: oggetto di tipo PreparedStatement
+     * @param par1: intero contenente id dell'email
+     * @param par2: stringa contenente email del mittente
+     * @param par3: stringa contenente email del destinatario
+     * @param par4: stringa contenente oggetto dell'email
+     * @param par5: stringa contenente il corpo dell'email
+     * @param par6: oggetto di tipo Date rappresentante la data dell'email
+     * @param par7: intero compreso tra 1 e 10 rappresentante la priorità
+     * @param par8: intero di valore 0 o 1
+     * @throws SQLException 
+     */
+    private void inserisciValoriInPS(PreparedStatement ps, int par1, String par2, String par3, String par4, String par5, Date par6, int par7, int par8) throws SQLException{
+        ps.setInt(1, par1);
+        ps.setString(2, par2);
+        ps.setString(3, par3);
+        ps.setString(4, par4);
+        ps.setString(5, par5);
+        java.sql.Date par6sql = new java.sql.Date(par6.getTime());
+        ps.setDate(6, par6sql);
+        ps.setInt(7, par7);
+        ps.setInt(8, par8);
     }
+    
+    
+    
+    
     
     
     //TODO
@@ -445,6 +545,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     @Override
     public void inserisciInInviati(Email email) {
         inserisciNuovaEmailInviata(email);
+        this.emailInviate.add(email);
         setChanged();
         notifyObservers();
     }
@@ -452,6 +553,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     @Override
     public void inserisciInRicevuti(Email email) {
         inserisciNuovaEmailRicevuta(email);
+        this.emailRicevute.add(email);
         setChanged();
         notifyObservers();
     }
