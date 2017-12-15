@@ -40,10 +40,10 @@ public class ClientGUI extends JFrame implements Observer{
     public static final String RICEVUTI = "ricevuti";
     public static final String INVIATI = "inviati";
     
-    private final ClientController controllore;
     private Email emailDaVisualizzare;
+    private final ClientImplementation modello;
     private final ArrayList<Email> listaEmail;
-    private final String inVisualizzazione;
+    private String inVisualizzazione;
     
     /* Variabili per la GUI */
     private JSplitPane clientSplitPane;
@@ -79,13 +79,19 @@ public class ClientGUI extends JFrame implements Observer{
     private JButton eliminaSelezionata;
     private JButton inoltraSelezionata;
     
+    private JPanel panelSinistro;
     
-    public ClientGUI(String email, ClientController controller) {
+    private JPanel ordinePanel;
+    private JButton prioritaOrdineButton;
+    private JButton dataOrdineButton;
+    
+    
+    public ClientGUI(String email, ClientImplementation modello) {
         super(email);
         this.emailDaVisualizzare = null;
-        this.controllore = controller;
         this.listaEmail = new ArrayList<>();
         this.inVisualizzazione = ClientGUI.RICEVUTI;
+        this.modello = modello;
         initGUI();
     }
     
@@ -192,17 +198,17 @@ public class ClientGUI extends JFrame implements Observer{
         
         this.creaEmail = new JButton("Nuova Email");
         this.creaEmail.setName("nuova");
-        this.creaEmail.addActionListener(this.controllore);
+        this.creaEmail.addActionListener(new ClientController(modello));
         this.toolbarDestraPanel.add(this.creaEmail);
         
         this.eliminaSelezionata = new JButton("Elimina selezionata");
         this.eliminaSelezionata.setName("elimina");
-        this.eliminaSelezionata.addActionListener(this.controllore);
+        this.eliminaSelezionata.addActionListener(new ClientController(modello));
         this.toolbarDestraPanel.add(this.eliminaSelezionata);
         
         this.inoltraSelezionata = new JButton("Inoltra selezionata");
         this.inoltraSelezionata.setName("inoltra");
-        this.inoltraSelezionata.addActionListener(this.controllore);
+        this.inoltraSelezionata.addActionListener(new ClientController(modello));
         this.toolbarDestraPanel.add(this.inoltraSelezionata);
  /* ------ Fine Toolbar Destra Panel ------ */
  
@@ -212,12 +218,12 @@ public class ClientGUI extends JFrame implements Observer{
         
         this.ricevuteButton = new JButton("Ricevute");
         this.ricevuteButton.setName("emailRicevute");
-        this.ricevuteButton.addActionListener(this.controllore);
+        this.ricevuteButton.addActionListener(new ClientController(modello));
         this.toolbarSinistraPanel.add(this.ricevuteButton);
         
         this.inviateButton = new JButton("Inviate");
         this.inviateButton.setName("emailInviate");
-        this.inviateButton.addActionListener(this.controllore);
+        this.inviateButton.addActionListener(new ClientController(modello));
         this.toolbarSinistraPanel.add(this.inviateButton);
  /* ------ Fine Toolbar Sinistra Panel ------ */
  
@@ -225,8 +231,25 @@ public class ClientGUI extends JFrame implements Observer{
         this.toolbarPanel.add(this.toolbarDestraPanel, BorderLayout.EAST);
 /* ------ Fine Toolbar Panel ------ */
         
+        this.panelSinistro = new JPanel();
+        this.panelSinistro.setLayout(new BorderLayout());
+        
+        this.ordinePanel = new JPanel();
+        this.ordinePanel.setLayout(new BorderLayout());
+        
+        this.prioritaOrdineButton = new JButton("Per priorità");
+        this.prioritaOrdineButton.setName("perPrioritaRicevuti");
+        this.ordinePanel.add(this.prioritaOrdineButton, BorderLayout.WEST);
+        
+        this.dataOrdineButton = new JButton("Per data");
+        this.dataOrdineButton.setName("perDataRicevuti");
+        this.ordinePanel.add(this.dataOrdineButton, BorderLayout.EAST);
+        
+        this.panelSinistro.add(this.ordinePanel, BorderLayout.NORTH);
+        this.panelSinistro.add(this.listaEmailScrollPane, BorderLayout.CENTER);
+
 /* ------ Split Pane ------ */
-        this.clientSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.listaEmailScrollPane, this.emailPanel);
+        this.clientSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.panelSinistro, this.emailPanel);
         this.clientSplitPane.setOneTouchExpandable(true);
         this.clientSplitPane.setDividerLocation(250);
 /* ------ Fine Split Pane ------ */
@@ -245,45 +268,47 @@ public class ClientGUI extends JFrame implements Observer{
 /* ------ Fine Frame ------ */
     }
     
-    public static void main (String[] args) {
-        ClientImplementation modello = null;
-        ClientController controller = null;
-        ClientGUI client = null;
-        if (args.length == 1) {
-            try {
-                modello = new ClientImplementation(args[0]);
-                controller = new ClientController(modello);
-                client = new ClientGUI(args[0], controller);
-                modello.registraOsservatoreEAggiornaEmail(client);
-            } catch (RemoteException ex) {
-                Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
     @Override
     public void update(Observable o, Object arg) {
         switch((String)arg) {
             case ClientGUI.RICEVUTI: {
-                if (this.inVisualizzazione.equals(ClientGUI.RICEVUTI)) {
-                    this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
-                    this.listaEmail.forEach(email -> {
-                        this.modelListaEmail.addElement(email);
-                    });
-                    if (this.listaEmail.size() > 0) {
-                        this.emailDaVisualizzare = this.listaEmail.get(0);
-                    }
+                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
+                this.listaEmail.forEach(email -> {
+                    this.modelListaEmail.addElement(email);
+                });
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
+                this.inVisualizzazione = ClientGUI.RICEVUTI;
                 break;
             }
             case ClientGUI.INVIATI: {
-                if (this.inVisualizzazione.equals(ClientGUI.INVIATI)) {
-                    
+                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
+                this.listaEmail.forEach(email -> {
+                    this.modelListaEmail.addElement(email);
+                });
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
+                this.inVisualizzazione = ClientGUI.INVIATI;
                 break;
             }
             default: {
                 break;
+            }
+        }
+    }
+    
+    public static void main (String[] args) {
+        ClientImplementation modello;
+        ClientGUI client;
+        if (args.length == 1) {
+            try {
+                modello = new ClientImplementation(args[0]);
+                client = new ClientGUI(args[0], modello);
+                modello.registraOsservatoreEAggiornaEmail(client);
+            } catch (RemoteException ex) {
+                Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

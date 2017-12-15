@@ -14,7 +14,7 @@ public class Email {
     ArrayList<Utente> destinatari;
     String oggetto;
     String corpo;
-    java.sql.Date data;
+    Date data;
     int priorita;
     int letto;
 
@@ -25,7 +25,7 @@ public class Email {
         this.destinatari = destinatari;
         this.oggetto = oggetto;
         this.corpo = corpo;
-        this.data = new java.sql.Date(currentTimeMillis());
+        this.data = new Date();
         this.priorita = 3;
         this.letto = 0;
                 
@@ -99,7 +99,7 @@ public class Email {
         this.corpo = corpo;
     }
 
-    public void setData(java.sql.Date data) {
+    public void setData(Date data) {
         this.data = data;
     }
 
