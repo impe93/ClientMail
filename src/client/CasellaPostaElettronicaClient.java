@@ -273,9 +273,10 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 email.setDestinatari(recuperaUtentiDestinatari(rs.getInt("id_email"), isInviate));
                 email.setOggetto(rs.getString("oggetto"));
                 email.setCorpo(rs.getString("corpo"));
+                //java.util.Date dataEmail = rs.getTimestamp("data");
                 email.setData(new Date(rs.getDate("data").getTime()));
                 email.setPriorita(rs.getInt("priorita"));
-                email.setLetto(rs.getBoolean("letto"));
+                email.setLetto(rs.getInt("letto"));
                 if(isInviate){
                     if(!this.emailInviate.contains(email)){
                         this.emailInviate.add(email);
@@ -431,7 +432,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                         email.getCorpo(), 
                         email.getData(), 
                         email.getPriorita(), 
-                        (email.getLetto() ? 1:0));
+                        email.getLetto());
                 ps.executeUpdate();
             } else{
                 for(Utente utente : email.getDestinatari()){
@@ -443,7 +444,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                             email.getCorpo(),
                             email.getData(),
                             email.getPriorita(),
-                            (email.getLetto() ? 1:0));
+                            email.getLetto());
                     ps.executeUpdate();
                 }
             }    
