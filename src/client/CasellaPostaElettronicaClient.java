@@ -220,19 +220,10 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     }
     
     /**
-     * Recupera tutte le email (inviate e ricevute) contenute nella casella 
-     * postale dell'utente
-     */
-    public void recuperaTutteEmail(){
-        recuperaEmailInviate();
-        recuperaEmailRicevute();
-    }
-    
-    /**
      * Recupera tutte le email inviate dall'utente proprietario della casella
      * di posta elettronica
      */
-    private synchronized void recuperaEmailInviate(){
+    public synchronized void recuperaEmailInviate(){
         this.emailInviate = new ArrayList<>();
         String queryEmailRicevute = 
                 "SELECT * " + 
@@ -247,7 +238,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * Recupera tutte le email ricevute dall'utente proprietario della casella
      * di posta elettronica
      */
-    private synchronized void recuperaEmailRicevute(){
+    public synchronized void recuperaEmailRicevute(){
         this.emailRicevute = new ArrayList<>();
         String queryEmailRicevute = 
                 "SELECT * " + 

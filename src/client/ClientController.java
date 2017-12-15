@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 public class ClientController implements ActionListener {
     
     private ClientImplementation model;
+    NuovaEmailGUI nuovaEmailGUI;
     
     public ClientController(ClientImplementation model) {
         this.model = model;
@@ -25,7 +26,7 @@ public class ClientController implements ActionListener {
         Component fonte = (Component)e.getSource();
         switch (fonte.getName()) {
             case "emailInviate": {
-                System.out.println("Sono entrato in emailInviate!");
+                
                 break;
             }
             case "emailRicevute": {
@@ -33,7 +34,7 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "nuova": {
-                System.out.println("Sono entrato in nuova!");
+                this.nuovaEmailGUI = new NuovaEmailGUI(this);
                 break;
             }
             case "elimina": {
@@ -42,6 +43,16 @@ public class ClientController implements ActionListener {
             }
             case "inoltra": {
                 System.out.println("Sono entrato in inoltra!");
+                break;
+            }
+            case "invia": {
+                System.out.println("Sono entrato in invia!");
+                this.nuovaEmailGUI.setVisible(false);
+                break;
+            }
+            case "cancella": {
+                System.out.println("Sono entrato in cancella!");
+                this.nuovaEmailGUI.setVisible(false);
                 break;
             }
             default: {
