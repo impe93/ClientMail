@@ -22,6 +22,7 @@ import modelli.Utente;
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
 public class CasellaPostaElettronicaClient extends Observable implements CasellaPostaElettronica{
+    
     private final String urlDB;
     private final Utente utenteProprietario;
     private ArrayList<Email> emailInviate;
@@ -331,7 +332,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                     "FROM utente " +
                     "WHERE email = '(SELECT destinatario FROM email_ricevute WHERE id_email= " + idEmail+ ")'";
         }
-         try {
+        try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
             rs = st.executeQuery(queryUtentiDestinatari);
@@ -519,35 +520,68 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param par6: oggetto di tipo Date rappresentante la data dell'email
      * @param par7: intero compreso tra 1 e 10 rappresentante la priorità
      * @param par8: intero di valore 0 o 1
-     * @throws SQLException 
      */
-    private void inserisciValoriInPS(PreparedStatement ps, int par1, String par2, String par3, String par4, String par5, Date par6, int par7, int par8) throws SQLException{
-        ps.setInt(1, par1);
-        ps.setString(2, par2);
-        ps.setString(3, par3);
-        ps.setString(4, par4);
-        ps.setString(5, par5);
-        java.sql.Date par6sql = new java.sql.Date(par6.getTime());
-        ps.setDate(6, par6sql);
-        ps.setInt(7, par7);
-        ps.setInt(8, par8);
+    private void inserisciValoriInPS(PreparedStatement ps, int par1, String par2, String par3, String par4, String par5, Date par6, int par7, int par8){
+        try{
+            ps.setInt(1, par1);
+            ps.setString(2, par2);
+            ps.setString(3, par3);
+            ps.setString(4, par4);
+            ps.setString(5, par5);
+            java.sql.Date par6sql = new java.sql.Date(par6.getTime());
+            ps.setDate(6, par6sql);
+            ps.setInt(7, par7);
+            ps.setInt(8, par8);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
     
-    
-    
-    
+    /**
+     * Elimina l'email passata come parametro dalle email inviate oppure da 
+     * quelle ricevute dell'utenteProprietario a seconda che questo sia il 
+     * mittente o il distinatario dell'email da eliminare
+     * @param email: oggetto Email che si desidera rimuove da DB
+     */
     private void eliminaEmailDaDB(Email email){
-        //1)copire se il mio utente è il mittente o un destinatario della mail
-        //cosi so in che tabella andare ad agire
+        // il mio utenteProprietario è il mittente dell'email
+        if(this.utenteProprietario.getEmail().equals(email.getMittente().getEmail())){
+            eliminaEmail(email, "email_inviate");
+        } else{ // il mio utenteProprietario è il destinatario dell'email
+            eliminaEmail(email, "email_ricevute");
+        }
     }
     
-    
-    
-    
-    //TODO
-    public void inoltraEmail(Email emailDaInoltrare){
-        
+    /**
+     * Rimuove l'email passata come parametro dalla tabella in cui è situata 
+     * (indicata dal parametro nomeTabellaDB)
+     * @param emailDaEliminare: email che si desidera rimuovere
+     * @param nomeTabellaDB: nome della tabella dalla quale cancellare l'email
+     */
+    private void eliminaEmail(Email emailDaEliminare, String nomeTabellaDB){
+        String queryEliminazioneEmailInviata = "DELETE FROM "+ nomeTabellaDB +" WHERE id_email = " + emailDaEliminare.getId();
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            st.executeUpdate(queryEliminazioneEmailInviata);
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }     
     }
+    
     
     @Override
     public void inserisciInInviati(Email email) {

@@ -155,8 +155,18 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         return this.casellaPostaleClient.getUltimaInviata();
     }
     
-    //public boolean inoltraEmail(Email emailDaInoltrare){}
+    /**
+     * Inoltra un email
+     * @param emailDaInoltrare: email che si desidera inoltrare
+     */
+    public void inoltraEmail(Email emailDaInoltrare){
+        inviaEmail(emailDaInoltrare);
+    }
     
+    /**
+     * Invia una nuova email
+     * @param emailDaInviare: email che si desidera inviare
+     */
     public void inviaEmail(Email emailDaInviare){
         try {
             int idEmailInviata = this.server.inviaEmail(emailDaInviare);
@@ -172,6 +182,11 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         }
     }
     
+    /**
+     * Elimina un email dal database del server e poi da quello del client se 
+     * non si sono verificati errori
+     * @param emailDaEliminare: email che si desidera eliminare
+     */
     public void eliminaEmail(Email emailDaEliminare){
         try {
             if(this.server.eliminaEmail(emailDaEliminare, this.utente)){
