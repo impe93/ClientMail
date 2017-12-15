@@ -20,8 +20,9 @@ import modelli.Utente;
  */
 public class ServerImplementation extends UnicastRemoteObject implements Server{
     
-    Client client;
+    Client[] client = new Client[3];
     CasellaServer casella;
+    int clientConnessi;
     
     public ServerImplementation() throws RemoteException{
         /* 
@@ -38,6 +39,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
         
         casella = new CasellaServer();
+        clientConnessi = 0;
     
     }
 
@@ -57,7 +59,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     }
 
     @Override
-    public boolean inviaEmail(Email emailDaInviare) throws RemoteException {
+    public int inviaEmail(Email emailDaInviare) throws RemoteException {
         return casella.inviaEmail(emailDaInviare);
     }
     
@@ -80,7 +82,8 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
         try {
-            this.client = (Client)Naming.lookup("//localhost/Client/" + emailClient);
+            this.client[clientConnessi] = (Client)Naming.lookup("//localhost/Client/" + emailClient);
+            clientConnessi++;
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }    
