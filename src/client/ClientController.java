@@ -6,8 +6,11 @@
 package client;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import javax.swing.JRootPane;
 /**
  *
  * @author lorenzo
@@ -15,10 +18,11 @@ import java.awt.event.ActionListener;
 public class ClientController implements ActionListener {
     
     private ClientImplementation model;
-    NuovaEmailGUI nuovaEmailGUI;
+    private ArrayList<NuovaEmailGUI> schermateNuoveEmail;
     
     public ClientController(ClientImplementation model) {
         this.model = model;
+        this.schermateNuoveEmail = new ArrayList<>();
     }
     
     @Override
@@ -34,7 +38,7 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "nuova": {
-                this.nuovaEmailGUI = new NuovaEmailGUI(this);
+                this.schermateNuoveEmail.add(new NuovaEmailGUI(this, this.schermateNuoveEmail.size()));
                 break;
             }
             case "elimina": {
@@ -46,13 +50,17 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "invia": {
-                System.out.println("Sono entrato in invia!");
-                this.nuovaEmailGUI.setVisible(false);
+                
+                if (e.getSource() instanceof NuovaEmailGUI.BottoneInviaCancella) {
+                    this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione()).setVisible(false);
+                }
                 break;
             }
             case "cancella": {
                 System.out.println("Sono entrato in cancella!");
-                this.nuovaEmailGUI.setVisible(false);
+                if (e.getSource() instanceof NuovaEmailGUI.BottoneInviaCancella) {
+                    this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione()).setVisible(false);
+                }
                 break;
             }
             default: {

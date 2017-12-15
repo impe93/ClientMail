@@ -155,16 +155,56 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         return this.casellaPostaleClient.getUltimaInviata();
     }
     
-    
-    
-    //public boolean inoltraEmail(Email emailDaInoltrare){}
-    
-    @Override
-    public boolean riceviEmail(Email emailRicevuta) throws RemoteException{
-        
-        return true;
+    /**
+     * Inoltra un email
+     * @param emailDaInoltrare: email che si desidera inoltrare
+     */
+    public void inoltraEmail(Email emailDaInoltrare){
+        inviaEmail(emailDaInoltrare);
     }
     
+    /**
+     * Invia una nuova email
+     * @param emailDaInviare: email che si desidera inviare
+     */
+    public void inviaEmail(Email emailDaInviare){
+        try {
+            int idEmailInviata = this.server.inviaEmail(emailDaInviare);
+            if(idEmailInviata == -1){
+                System.out.println("Invio dell'email non riuscito!");
+            } else{
+                System.out.println("Email inviata con successo!");
+                emailDaInviare.setId(idEmailInviata);
+                this.casellaPostaleClient.inserisciInInviati(emailDaInviare);
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
+    /**
+     * Elimina un email dal database del server e poi da quello del client se 
+     * non si sono verificati errori
+     * @param emailDaEliminare: email che si desidera eliminare
+     */
+    public void eliminaEmail(Email emailDaEliminare){
+        try {
+            if(this.server.eliminaEmail(emailDaEliminare, this.utente)){
+                System.out.println("Email eliminata con successo!");
+                this.casellaPostaleClient.elimina(emailDaEliminare);
+            } else{
+                System.out.println("Si è verificato un errore durante l'eliminazione dell'email, riprovare più tardi!");
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
+    @Override
+    public void riceviEmail(Email emailRicevuta) throws RemoteException{
+        if(emailRicevuta != null){
+            this.casellaPostaleClient.inserisciInRicevuti(emailRicevuta);
+        }
+    }
+  
 }

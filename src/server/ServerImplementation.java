@@ -74,12 +74,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     }
     
     @Override
-    public boolean ciao() throws RemoteException{
-        System.out.println("ciao Impe, suca");
-        return true;
-    }
-
-    @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
         try {
             this.client[clientConnessi] = (Client)Naming.lookup("//localhost/Client/" + emailClient);
