@@ -60,8 +60,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public Email inviaEmail(Email emailDaInviare) throws RemoteException {
-        //return casella.inviaEmail(emailDaInviare);
-        return new Email();
+        return casella.inviaEmail(emailDaInviare);
     }
     
     public static void lanciaRMIRegistry() {
