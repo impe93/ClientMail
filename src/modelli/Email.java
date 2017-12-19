@@ -1,6 +1,5 @@
 package modelli;
 
-import static java.lang.System.currentTimeMillis;
 import java.util.ArrayList;
 import java.util.Date;
 
