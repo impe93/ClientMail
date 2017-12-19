@@ -39,6 +39,10 @@ public class ClientGUI extends JFrame implements Observer{
     
     public static final String RICEVUTI = "ricevuti";
     public static final String INVIATI = "inviati";
+    public static final String INVIATE_PER_PRIORITA ="inviatePerPriorita";
+    public static final String INVIATE_PER_DATA ="inviatePerData";
+    public static final String RICEVUTE_PER_PRIORITA ="ricevutePerPriorita";
+    public static final String RICEVUTE_PER_DATA ="ricevutePerData";
     
     private Email emailDaVisualizzare;
     private final ClientImplementation modello;
@@ -241,10 +245,12 @@ public class ClientGUI extends JFrame implements Observer{
         
         this.prioritaOrdineButton = new JButton("Per priorità");
         this.prioritaOrdineButton.setName("perPrioritaRicevuti");
+        this.prioritaOrdineButton.addActionListener(controller);
         this.ordinePanel.add(this.prioritaOrdineButton, BorderLayout.WEST);
         
         this.dataOrdineButton = new JButton("Per data");
         this.dataOrdineButton.setName("perDataRicevuti");
+        this.dataOrdineButton.addActionListener(controller);
         this.ordinePanel.add(this.dataOrdineButton, BorderLayout.EAST);
         
         this.panelSinistro.add(this.ordinePanel, BorderLayout.NORTH);
@@ -274,28 +280,83 @@ public class ClientGUI extends JFrame implements Observer{
     public void update(Observable o, Object arg) {
         switch((String)arg) {
             case ClientGUI.RICEVUTI: {
+                this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
+                this.modelListaEmail.clear();
                 this.listaEmail.forEach(email -> {
                     this.modelListaEmail.addElement(email);
                 });
                 if (this.listaEmail.size() > 0) {
                     this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
+                this.dataOrdineButton.setName("perDataRicevuti");
+                this.prioritaOrdineButton.setName("perPrioritaRicevuti");
                 this.inVisualizzazione = ClientGUI.RICEVUTI;
                 break;
             }
             case ClientGUI.INVIATI: {
+                this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
+                this.modelListaEmail.clear();
                 this.listaEmail.forEach(email -> {
                     this.modelListaEmail.addElement(email);
                 });
                 if (this.listaEmail.size() > 0) {
                     this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
+                this.dataOrdineButton.setName("perDataInviati");
+                this.prioritaOrdineButton.setName("perPrioritaInviati");
                 this.inVisualizzazione = ClientGUI.INVIATI;
                 break;
             }
-            
+            case ClientGUI.INVIATE_PER_DATA: {
+                this.listaEmail.clear();
+                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
+                this.modelListaEmail.clear();
+                this.listaEmail.forEach(email -> {
+                    this.modelListaEmail.addElement(email);
+                });
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                }
+                break;
+            }
+            case ClientGUI.INVIATE_PER_PRIORITA: {
+                this.listaEmail.clear();
+                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
+                this.modelListaEmail.clear();
+                this.listaEmail.forEach(email -> {
+                    this.modelListaEmail.addElement(email);
+                });
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                }
+                break;
+            }
+            case ClientGUI.RICEVUTE_PER_PRIORITA: {
+                this.listaEmail.clear();
+                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
+                this.modelListaEmail.clear();
+                this.listaEmail.forEach(email -> {
+                    this.modelListaEmail.addElement(email);
+                });
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                }
+                break;
+            }
+            case ClientGUI.RICEVUTE_PER_DATA: {
+                this.listaEmail.clear();
+                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
+                this.modelListaEmail.clear();
+                this.listaEmail.forEach(email -> {
+                    this.modelListaEmail.addElement(email);
+                });
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                }
+                break;
+            }
             default: {
                 break;
             }

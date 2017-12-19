@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Observable;
 import java.util.logging.Level;
@@ -125,56 +124,36 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * Ordina le email inviate per priorità decrescente
      */
     public void ordinaInviatePerPriorita(){
-        Collections.sort(this.emailInviate, new Comparator<Email>() {
-            @Override
-            public int compare(Email email1, Email email2) {
-                return email1.getPriorita() - email2.getPriorita();
-            }
-        });
+        Collections.sort(this.emailInviate, (Email email1, Email email2) -> email1.getPriorita() - email2.getPriorita());
         setChanged();
-        notifyObservers();
+        notifyObservers(ClientGUI.INVIATE_PER_PRIORITA);
     }
     
     /**
      * Ordina le email ricevute per priorità decrescente
      */
     public void ordinaRicevutePerPriorita(){
-        Collections.sort(this.emailRicevute, new Comparator<Email>() {
-            @Override
-            public int compare(Email email1, Email email2) {
-                return email1.getPriorita() - email2.getPriorita();
-            }
-        });
+        Collections.sort(this.emailRicevute, (Email email1, Email email2) -> email1.getPriorita() - email2.getPriorita());
         setChanged();
-        notifyObservers();
+        notifyObservers(ClientGUI.RICEVUTE_PER_PRIORITA);
     }
     
     /**
      * Ordina le email inviate per data decrescente
      */
     public void ordinaInviatePerData(){
-        Collections.sort(this.emailInviate, new Comparator<Email>() {
-            @Override
-            public int compare(Email email1, Email email2) {
-                return email1.getData().compareTo(email2.getData());
-            }
-        });
+        Collections.sort(this.emailInviate, (Email email1, Email email2) -> email1.getData().compareTo(email2.getData()));
         setChanged();
-        notifyObservers();
+        notifyObservers(ClientGUI.INVIATE_PER_DATA);
     }
     
     /**
      * Ordina le email ricevute per data decrescente
      */
     public void ordinaRicevutePerData(){
-        Collections.sort(this.emailRicevute, new Comparator<Email>() {
-            @Override
-            public int compare(Email email1, Email email2) {
-                return email1.getData().compareTo(email2.getData());
-            }
-        });
+        Collections.sort(this.emailRicevute, (Email email1, Email email2) -> email1.getData().compareTo(email2.getData()));
         setChanged();
-        notifyObservers();
+        notifyObservers(ClientGUI.RICEVUTE_PER_DATA);
     }
     
     /**
@@ -247,7 +226,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, false);
         System.out.println("Entro Nel Metodo");
-        this.getEmailRicevute().forEach(email -> System.out.println("EMAIL" + email));
         setChanged();
         notifyObservers(ClientGUI.RICEVUTI);
     }
@@ -366,9 +344,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      *      email_inviate
      */
     public void inserisciNuoveEmailInviate(ArrayList<Email> nuoveEmailInviate){
-        for(Email email: nuoveEmailInviate){
+        nuoveEmailInviate.forEach((email) -> {
             inserisciNuovaEmailInviata(email);
-        }
+        });
         this.emailInviate.addAll(nuoveEmailInviate);
         setChanged();
         notifyObservers();
@@ -380,9 +358,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      *      email_ricevute
      */
     public void inserisciNuoveEmailRicevute(ArrayList<Email> nuoveEmailRicevute){
-        for(Email email: nuoveEmailRicevute){
+        nuoveEmailRicevute.forEach((email) -> {
             inserisciNuovaEmailRicevuta(email);
-        }
+        });
         this.emailRicevute.addAll(nuoveEmailRicevute);
         setChanged();
         notifyObservers();
