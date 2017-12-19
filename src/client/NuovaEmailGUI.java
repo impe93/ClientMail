@@ -7,6 +7,7 @@ package client;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -165,10 +166,23 @@ public class NuovaEmailGUI extends JFrame {
                 if(!corpo.equals("")){
                     emailDaInviare.setCorpo(corpo);
                     emailDaInviare.setOggetto(oggetto);
-                    //emailDaInviare.setDestinatari(destinatari);
+                    emailDaInviare.setDestinatari(this.prendiDestinatari(destinatari));
                 }
             }
         }
         return null;
+    }
+    
+    private ArrayList<String> prendiDestinatari (String destinatari) {
+        String destinatario = "";
+        ArrayList<String> valoreDaRitornare = new ArrayList<>();
+        for (int i = 0; i < destinatari.length(); i++) {
+            if(!(destinatari.charAt(i) == ' ')) {
+                destinatario += String.valueOf(destinatari.charAt(i));
+            } else {
+                valoreDaRitornare.add(destinatario);
+            }
+        }
+        return valoreDaRitornare;
     }
 }
