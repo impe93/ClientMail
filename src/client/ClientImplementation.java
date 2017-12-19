@@ -103,7 +103,9 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         
     }
     
-    
+    /**
+     * Mostra al Client le sue email inviate
+     */
     public void getInviate(){
         ArrayList<Email> nuoveEmailInviate = null;
         if(this.server != null){
@@ -116,15 +118,26 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
             }
         }
-        
-        
+        this.casellaPostaleClient.mostraEmailInviate();
     }
     
+    /**
+     * Mostra al Client le sue email ricevute
+     */
     public void getRicevute(){
-        
+        ArrayList<Email> nuoveEmailInviate = null;
+        if(this.server != null){
+            try {
+                nuoveEmailInviate = this.server.getInviate(getUltimaInviata(), this.utente);
+            } catch (RemoteException ex) {
+                Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
+                this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
+            }
+        }
+        this.casellaPostaleClient.mostraEmailRicevute();
     }
-    
-    
     
     /**
      * Ordina le email inviate nella casella postale dell'utente proprietario
@@ -188,7 +201,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      */
     public void inviaEmail(Email emailDaInviare){
         try {
-            //emailDaInviare.setMittente(this.utente);
+            emailDaInviare.setMittente(this.utente);
             Email emailInviata = this.server.inviaEmail(emailDaInviare);
             if(emailInviata == null){
                 System.out.println("Invio dell'email non riuscito!");

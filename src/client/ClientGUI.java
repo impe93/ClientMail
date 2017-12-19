@@ -43,6 +43,9 @@ public class ClientGUI extends JFrame implements Observer{
     public static final String INVIATE_PER_DATA ="inviatePerData";
     public static final String RICEVUTE_PER_PRIORITA ="ricevutePerPriorita";
     public static final String RICEVUTE_PER_DATA ="ricevutePerData";
+    public static final String EMAIL_INVIATA = "emailInviata";
+    public static final String EMAIL_RICEVUTA = "emailRicevuta";
+    public static final String EMAIL_ELIMINATA = "emailEliminata";
     
     private Email emailDaVisualizzare;
     private final ClientImplementation modello;

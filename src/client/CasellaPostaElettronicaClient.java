@@ -242,11 +242,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM email_ricevute " +
                 "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, false);
-<<<<<<< HEAD
-        System.out.println("Entro Nel Metodo");
-=======
         
->>>>>>> origin/master
         setChanged();
         notifyObservers(ClientGUI.RICEVUTI);
     }
@@ -589,7 +585,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         inserisciNuovaEmailInviata(email);
         this.emailInviate.add(email);
         setChanged();
-        notifyObservers();
+        notifyObservers(ClientGUI.EMAIL_INVIATA);
     }
 
     @Override
@@ -597,11 +593,13 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         inserisciNuovaEmailRicevuta(email);
         this.emailRicevute.add(email);
         setChanged();
-        notifyObservers();
+        notifyObservers(ClientGUI.EMAIL_RICEVUTA);
     }
 
     @Override
     public void elimina(Email email) {
         eliminaEmailDaDB(email);
+        setChanged();
+        notifyObservers(ClientGUI.EMAIL_ELIMINATA);
     }
 }
