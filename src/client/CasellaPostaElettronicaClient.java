@@ -231,6 +231,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM email_inviate " +
                 "WHERE mittente = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, true);
+        
         setChanged();
         notifyObservers(ClientGUI.INVIATI);
     }
@@ -246,8 +247,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM email_ricevute " +
                 "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, false);
-        System.out.println("Entro Nel Metodo");
-        this.getEmailRicevute().forEach(email -> System.out.println("EMAIL" + email));
+        
         setChanged();
         notifyObservers(ClientGUI.RICEVUTI);
     }
@@ -260,6 +260,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * le email è email_inviate, false se la tabella è email_ricevute
      */
     private void recuperaEmailUtente(String query, boolean isInviate){
+        
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -271,10 +272,15 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 Email email = new Email();
                 email.setId(rs.getInt("id_email"));
                 email.setMittente(recuperaDatiUtente(rs.getString("mittente")));
-                email.setDestinatari(recuperaUtentiDestinatari(rs.getInt("id_email"), isInviate));
+                
+                ArrayList<Utente> destinatariEmail = recuperaUtentiDestinatari(rs.getInt("id_email"), isInviate);
+                for(Utente u: destinatariEmail){
+                    System.out.println(u);
+                }
+                
+                email.setDestinatari(destinatariEmail);
                 email.setOggetto(rs.getString("oggetto"));
                 email.setCorpo(rs.getString("corpo"));
-                //java.util.Date dataEmail = rs.getTimestamp("data");
                 email.setData(new Date(rs.getDate("data").getTime()));
                 email.setPriorita(rs.getInt("priorita"));
                 email.setLetto(rs.getInt("letto"));
@@ -325,12 +331,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             queryUtentiDestinatari =
                     "SELECT * " + 
                     "FROM utente " +
-                    "WHERE email = '(SELECT destinatario FROM email_inviate WHERE id_email= " + idEmail+ ")'";
+                    "WHERE email = (SELECT destinatario FROM email_inviate WHERE id_email= " + idEmail+ ")";
         } else{
             queryUtentiDestinatari =
                     "SELECT * " + 
                     "FROM utente " +
-                    "WHERE email = '(SELECT destinatario FROM email_ricevute WHERE id_email= " + idEmail+ ")'";
+                    "WHERE email = (SELECT destinatario FROM email_ricevute WHERE id_email= " + idEmail+ ")";
         }
         try {
             conn = DriverManager.getConnection(urlDB);
@@ -370,6 +376,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmailInviata(email);
         }
         this.emailInviate.addAll(nuoveEmailInviate);
+        
         setChanged();
         notifyObservers();
     }
@@ -384,6 +391,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmailRicevuta(email);
         }
         this.emailRicevute.addAll(nuoveEmailRicevute);
+        
         setChanged();
         notifyObservers();
     }
