@@ -215,13 +215,14 @@ public class CasellaServer {
         int idMax = -1;
         
         String queryIdMax = 
-                    "SELECT MAX(id_email) FROM email)";
+                    "SELECT MAX(id_email) FROM email";
          try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
             rs = st.executeQuery(queryIdMax);
-            idMax = rs.getInt("id_email");
-            
+            if(rs.next()){
+                idMax = rs.getInt(1);
+            }
         } catch(SQLException e) {
             System.out.println(e.getMessage());
         } finally {
@@ -258,6 +259,10 @@ public class CasellaServer {
         String emailDestinatario;
        
         int nuovoId = recuperaIdMax()+1;
+        
+        System.out.println("Il nuovo id è "+nuovoId);
+        System.out.println("email passata dal client: " + emailDaInviare);
+        
         
         try {
             
@@ -303,6 +308,8 @@ public class CasellaServer {
         }
         Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
                 destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo());
+        
+        System.out.println("email ottenuta da SERVER: " + email);
             
         return email;
     }

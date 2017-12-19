@@ -79,5 +79,17 @@ public class EmailDaInviare implements Serializable{
     public void setCorpo(String corpo) {
         this.corpo = corpo;
     }
+
+    @Override
+    public String toString() {
+        String stringaDestinatari = "";
+        for(String d: destinatari){
+            stringaDestinatari = stringaDestinatari.concat(d + " ");
+        }
+        return "EmailDaInviare{" + "destinatari=" + stringaDestinatari + 
+                ", mittente=" + mittente.getEmail() + ", oggetto=" + oggetto + ", data=" + data + ", priorita=" + priorita + ", corpo=" + corpo + ", letto=" + letto + '}';
+    }
+    
+    
     
 }
