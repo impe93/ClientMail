@@ -181,19 +181,23 @@ public class ClientGUI extends JFrame implements Observer{
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
         this.listaEmailList.addListSelectionListener((ListSelectionEvent e) -> {
-            emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
-            mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
-            String destinatari = "";
-            for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
-                if (i == 0) {
-                    destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
-                } else {
-                    destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
+            if (!e.getValueIsAdjusting()) {
+                if (((JList<Email>)e.getSource()).getSelectedValue() != null) {
+                    emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
+                    mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
+                    String destinatari = "";
+                    for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
+                        if (i == 0) {
+                            destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
+                        } else {
+                            destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
+                        }
+                    }
+                    destinatariEmailLabel.setText(destinatari);
+                    oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
+                    corpoTextArea.setText(emailDaVisualizzare.getCorpo());
                 }
             }
-            destinatariEmailLabel.setText(destinatari);
-            oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
-            corpoTextArea.setText(emailDaVisualizzare.getCorpo());
         });
         this.listaEmailScrollPane = new JScrollPane(this.listaEmailList);
 /* ------ Fine Lista Email Panel ------ */
