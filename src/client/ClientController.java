@@ -6,21 +6,19 @@
 package client;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
 import modelli.Email;
 /**
  *
- * @author lorenzo
+ * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
  */
 public class ClientController implements ActionListener {
     
-    private ClientImplementation model;
-    private ArrayList<NuovaEmailGUI> schermateNuoveEmail;
+    private final ClientImplementation model;
+    private final ArrayList<NuovaEmailGUI> schermateNuoveEmail;
     
     public ClientController(ClientImplementation model) {
         this.model = model;
@@ -31,12 +29,28 @@ public class ClientController implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Component fonte = (Component)e.getSource();
         switch (fonte.getName()) {
+            case "perPrioritaRicevuti": {
+                model.ordinaRicevutePerPriorita();
+                break;
+            }
+            case "perPrioritaInviati": {
+                model.ordinaInviatePerPriorità();
+                break;
+            }
+            case "perDataInviati": {
+                model.ordinaInviatePerData();
+                break;
+            }
+            case "perDataRicevuti": {
+                model.ordinaRicevutePerData();
+                break;
+            }
             case "emailInviate": {
                 
                 break;
             }
             case "emailRicevute": {
-                System.out.println("Sono entrato in emailRicevute!");
+                
                 break;
             }
             case "nuova": {
@@ -44,11 +58,9 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "elimina": {
-                System.out.println("Sono entrato in elimina!");
                 break;
             }
             case "inoltra": {
-                System.out.println("Sono entrato in inoltra!");
                 break;
             }
             case "invia": {
@@ -65,7 +77,6 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "cancella": {
-                System.out.println("Sono entrato in cancella!");
                 if (e.getSource() instanceof NuovaEmailGUI.BottoneInviaCancella) {
                     this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione()).setVisible(false);
                 }

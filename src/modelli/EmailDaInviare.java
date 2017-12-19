@@ -11,7 +11,7 @@ import java.util.Date;
 public class EmailDaInviare implements Serializable{
     
     private ArrayList<String> destinatari;
-    private String mittente;
+    private Utente mittente;
     private String oggetto;
     private Date data;
     private int priorita;
@@ -23,7 +23,7 @@ public class EmailDaInviare implements Serializable{
         this.data = new Date();
     }
     
-    public EmailDaInviare(ArrayList<String> destinatari, String mittente, String oggetto, Date data, int priorita, String corpo) {
+    public EmailDaInviare(ArrayList<String> destinatari, String oggetto, Date data, int priorita, String corpo) {
         this.destinatari = destinatari;
         this.mittente = mittente;
         this.oggetto = oggetto;
@@ -40,11 +40,11 @@ public class EmailDaInviare implements Serializable{
         this.destinatari = destinatari;
     }
 
-    public String getMittente() {
+    public Utente getMittente() {
         return mittente;
     }
 
-    public void setMittente(String mittente) {
+    public void setMittente(Utente mittente) {
         this.mittente = mittente;
     }
 

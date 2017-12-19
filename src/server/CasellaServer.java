@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.sql.Date;
 import java.util.ArrayList;
 import modelli.Email;
+import modelli.EmailDaInviare;
 import modelli.Utente;
 
 /**
@@ -208,14 +209,14 @@ public class CasellaServer {
     
     
     //OK
-    public Email inviaEmail(Email emailDaInviare){
+    public Email inviaEmail(EmailDaInviare emailDaInviare){
         
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
         int[] val = new int[emailDaInviare.getDestinatari().size()];
       
-        Utente destinatario;
+        String destinatario;
         try {
             
         for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
@@ -226,9 +227,9 @@ public class CasellaServer {
                 + "corpo,data,priorita,letto)"
                 + "VALUES"
                 + "(" + emailDaInviare.getId() + ",'" + emailDaInviare.getMittente().getEmail()
-                + "','" + destinatario.getEmail()+ "','" + emailDaInviare.getOggetto() + "','"
+                + "','" + destinatario+ "','" + emailDaInviare.getOggetto() + "','"
                 + emailDaInviare.getCorpo() + "','" + emailDaInviare.getData() +"'," + emailDaInviare.getPriorita() + ","
-                + emailDaInviare.getLetto() +");";
+                + "0);";
         
         
             conn = DriverManager.getConnection(urlDB);
