@@ -167,17 +167,6 @@ public class InizializzazioneDBServer {
         String corpo="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
                 + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
                 + "laoreet vitae urna.";
-        java.sql.Date[] data = {
-            new java.sql.Date(1507586400000l),
-            new java.sql.Date(1507672800000l),
-            new java.sql.Date(1506895200000l),
-            new java.sql.Date(1507413600000l),
-            new java.sql.Date(1486508400000l),
-            new java.sql.Date(1488236400000l),
-            new java.sql.Date(1511823600000l),
-            new java.sql.Date(1509577200000l),
-            new java.sql.Date(1495490400000l),
-        };
         
         
         int priorita = 3;
@@ -198,7 +187,9 @@ public class InizializzazioneDBServer {
                 pst.setString(3,destinatario[i]);
                 pst.setString(4,oggetto);
                 pst.setString(5,corpo);
-                pst.setDate(6,data[i]);
+                Date data = new Date();
+                java.sql.Date dataSql = new java.sql.Date(data.getTime());
+                pst.setDate(6, dataSql);
                 pst.setInt(7,priorita);
                 pst.setInt(8,letto);
                 pst.executeUpdate();

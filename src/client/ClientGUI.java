@@ -42,6 +42,7 @@ public class ClientGUI extends JFrame implements Observer{
     
     private Email emailDaVisualizzare;
     private final ClientImplementation modello;
+    private final ClientController controller;
     private final ArrayList<Email> listaEmail;
     private String inVisualizzazione;
     
@@ -92,6 +93,7 @@ public class ClientGUI extends JFrame implements Observer{
         this.listaEmail = new ArrayList<>();
         this.inVisualizzazione = ClientGUI.RICEVUTI;
         this.modello = modello;
+        this.controller = new ClientController(this.modello);
         initGUI();
     }
     
@@ -198,17 +200,17 @@ public class ClientGUI extends JFrame implements Observer{
         
         this.creaEmail = new JButton("Nuova Email");
         this.creaEmail.setName("nuova");
-        this.creaEmail.addActionListener(new ClientController(modello));
+        this.creaEmail.addActionListener(this.controller);
         this.toolbarDestraPanel.add(this.creaEmail);
         
         this.eliminaSelezionata = new JButton("Elimina selezionata");
         this.eliminaSelezionata.setName("elimina");
-        this.eliminaSelezionata.addActionListener(new ClientController(modello));
+        this.eliminaSelezionata.addActionListener(this.controller);
         this.toolbarDestraPanel.add(this.eliminaSelezionata);
         
         this.inoltraSelezionata = new JButton("Inoltra selezionata");
         this.inoltraSelezionata.setName("inoltra");
-        this.inoltraSelezionata.addActionListener(new ClientController(modello));
+        this.inoltraSelezionata.addActionListener(this.controller);
         this.toolbarDestraPanel.add(this.inoltraSelezionata);
  /* ------ Fine Toolbar Destra Panel ------ */
  
@@ -218,7 +220,7 @@ public class ClientGUI extends JFrame implements Observer{
         
         this.ricevuteButton = new JButton("Ricevute");
         this.ricevuteButton.setName("emailRicevute");
-        this.ricevuteButton.addActionListener(new ClientController(modello));
+        this.ricevuteButton.addActionListener(this.controller);
         this.toolbarSinistraPanel.add(this.ricevuteButton);
         
         this.inviateButton = new JButton("Inviate");
@@ -293,6 +295,7 @@ public class ClientGUI extends JFrame implements Observer{
                 this.inVisualizzazione = ClientGUI.INVIATI;
                 break;
             }
+            
             default: {
                 break;
             }

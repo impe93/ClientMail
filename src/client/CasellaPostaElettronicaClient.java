@@ -320,7 +320,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        String queryUtentiDestinatari = "";
+        String queryUtentiDestinatari;
         if(inInviate){
             queryUtentiDestinatari =
                     "SELECT * " + 
@@ -418,8 +418,8 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "INSERT INTO " + nomeTabella + " (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
-        Connection conn = null;
-        PreparedStatement ps = null;
+        Connection conn;
+        PreparedStatement ps;
         
         try {
             conn = DriverManager.getConnection(urlDB);
