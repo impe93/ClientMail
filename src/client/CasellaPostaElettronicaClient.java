@@ -267,12 +267,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 Email email = new Email();
                 email.setId(rs.getInt("id_email"));
                 email.setMittente(recuperaDatiUtente(rs.getString("mittente")));
-                
                 ArrayList<Utente> destinatariEmail = recuperaUtentiDestinatari(rs.getInt("id_email"), isInviate);
-                for(Utente u: destinatariEmail){
-                    System.out.println(u);
-                }
-                
                 email.setDestinatari(destinatariEmail);
                 email.setOggetto(rs.getString("oggetto"));
                 email.setCorpo(rs.getString("corpo"));
