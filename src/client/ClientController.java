@@ -10,7 +10,9 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
+import modelli.Email;
 /**
  *
  * @author lorenzo
@@ -50,9 +52,15 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "invia": {
-                
                 if (e.getSource() instanceof NuovaEmailGUI.BottoneInviaCancella) {
-                    this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione()).setVisible(false);
+                    NuovaEmailGUI schermataEvento = this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione());
+                    Email emailDaInviare = this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione()).getEmail();
+                    if (emailDaInviare != null) {
+                        this.model.inviaEmail(emailDaInviare);
+                        schermataEvento.setVisible(false);
+                    } else {
+                        JOptionPane.showMessageDialog(schermataEvento, "Si è verificato un problema con l'email, verificare che tutti i campi siano stati compilati correttamente", "Errore email", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
                 break;
             }
