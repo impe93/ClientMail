@@ -100,7 +100,31 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
                 this.casellaPostaleClient.inserisciNuoveEmailRicevute(nuoveEmailRicevute);
             }
         }
+        
     }
+    
+    
+    public void getInviate(){
+        ArrayList<Email> nuoveEmailInviate = null;
+        if(this.server != null){
+            try {
+                nuoveEmailInviate = this.server.getInviate(getUltimaInviata(), this.utente);
+            } catch (RemoteException ex) {
+                Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
+                this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
+            }
+        }
+        
+        
+    }
+    
+    public void getRicevute(){
+        
+    }
+    
+    
     
     /**
      * Ordina le email inviate nella casella postale dell'utente proprietario
@@ -164,6 +188,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      */
     public void inviaEmail(Email emailDaInviare){
         try {
+            //emailDaInviare.setMittente(this.utente);
             Email emailInviata = this.server.inviaEmail(emailDaInviare);
             if(emailInviata == null){
                 System.out.println("Invio dell'email non riuscito!");

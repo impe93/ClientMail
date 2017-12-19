@@ -48,6 +48,22 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     }
     
     /**
+     * Mostra all'utente le sue email inviate
+     */
+    public void mostraEmailInviate(){
+        setChanged();
+        notifyObservers(ClientGUI.INVIATI);
+    }
+    
+    /**
+     * Mostra all'utente le sue email ricevute
+     */
+    public void mostraEmailRicevute(){
+        setChanged();
+        notifyObservers(ClientGUI.RICEVUTI);
+    }
+    
+    /**
      * Registrazione del driver
      */
     private void registraDriver(){
@@ -376,9 +392,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmailInviata(email);
         }
         this.emailInviate.addAll(nuoveEmailInviate);
-        
-        setChanged();
-        notifyObservers();
     }
     
     /**
@@ -391,9 +404,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmailRicevuta(email);
         }
         this.emailRicevute.addAll(nuoveEmailRicevute);
-        
-        setChanged();
-        notifyObservers();
     }
     
     /**
