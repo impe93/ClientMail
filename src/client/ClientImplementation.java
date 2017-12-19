@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import modelli.Email;
+import modelli.EmailDaInviare;
 import modelli.Utente;
 import server.Server;
 
@@ -191,7 +192,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      * Inoltra un email
      * @param emailDaInoltrare: email che si desidera inoltrare
      */
-    public void inoltraEmail(Email emailDaInoltrare){
+    public void inoltraEmail(EmailDaInviare emailDaInoltrare){
         inviaEmail(emailDaInoltrare);
     }
     
@@ -199,7 +200,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      * Invia una nuova email
      * @param emailDaInviare: email che si desidera inviare
      */
-    public void inviaEmail(Email emailDaInviare){
+    public void inviaEmail(EmailDaInviare emailDaInviare){
         try {
             emailDaInviare.setMittente(this.utente);
             Email emailInviata = this.server.inviaEmail(emailDaInviare);
