@@ -207,6 +207,44 @@ public class CasellaServer {
         return utentiDestinatari;        
     }
     
+    private int recuperaIdMax() {
+        
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        int idMax = -1;
+        
+        String queryIdMax = 
+                    "SELECT MAX(id_email) FROM email)";
+         try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            rs = st.executeQuery(queryIdMax);
+            idMax = rs.getInt("id_email");
+            
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(rs != null){
+                    rs.close();
+                }
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+            
+         }
+            
+            return idMax;
+        
+    }
+    
     
     //OK
     public Email inviaEmail(EmailDaInviare emailDaInviare){
@@ -214,29 +252,36 @@ public class CasellaServer {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        int[] val = new int[emailDaInviare.getDestinatari().size()];
+        ArrayList<Utente> destinatari = new ArrayList<>();
+        
       
-        String destinatario;
+        String emailDestinatario;
+       
+        int nuovoId = recuperaIdMax()+1;
+        
         try {
             
-        for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
-            destinatario = emailDaInviare.getDestinatari().get(i);
+            for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
+                emailDestinatario = emailDaInviare.getDestinatari().get(i);
+                Utente destinatario = new Utente();
+                destinatario = recuperaDatiUtente(emailDestinatario);
+                destinatari.add(destinatario);
         
-        String inserisciEmail =
+                String inserisciEmail =
                 "INSERT INTO email (id_email,mittente,destinatario,oggetto,"
                 + "corpo,data,priorita,letto)"
                 + "VALUES"
-                + "(" + emailDaInviare.getId() + ",'" + emailDaInviare.getMittente().getEmail()
-                + "','" + destinatario+ "','" + emailDaInviare.getOggetto() + "','"
+                + "(" + nuovoId + ",'" + emailDaInviare.getMittente().getEmail()
+                + "','" + emailDestinatario+ "','" + emailDaInviare.getOggetto() + "','"
                 + emailDaInviare.getCorpo() + "','" + emailDaInviare.getData() +"'," + emailDaInviare.getPriorita() + ","
                 + "0);";
         
         
-            conn = DriverManager.getConnection(urlDB);
-            st = conn.createStatement();
-            st.executeUpdate(inserisciEmail);
+                conn = DriverManager.getConnection(urlDB);
+                st = conn.createStatement();
+                st.executeUpdate(inserisciEmail);
         
-    }
+            }
         } catch(SQLException e) {
             System.out.println(e.getMessage());
         } 
@@ -256,30 +301,10 @@ public class CasellaServer {
                 System.out.println(ex.getMessage());
             }
         }
-        
-        Email email = new Email();
+        Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
+                destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo());
             
         return email;
     }
-    
-    public static void main (String[] args){
-        CasellaServer casella = new CasellaServer();
-        
-        Utente mittente = new Utente("Lorenzo","Imperatrice","lorenzo.imperatrice@edu.unito.it");
-        Utente uno = new Utente("Alessio","Berger","alessio.berger@edu.unito.it");
-        Utente due = new Utente("Francesca","Riddone","francesca.riddone@edu.unito.it");
-        ArrayList<Utente> destinatari = new ArrayList();
-        destinatari.add(uno);
-        destinatari.add(due);
-        
-        Email email = new Email(10,mittente,destinatari,"lorem ipsum","Lorem ipsum lorem ipsum");
-        
-        casella.inviaEmail(email);
-        
-        ArrayList<Email> impeEmail = casella.recuperaEmailRicevuteUtente(0, mittente);
-        
-        
-        
-        impeEmail.forEach(emails -> System.out.println(emails.toString()));
-    }
+
 }
