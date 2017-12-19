@@ -181,19 +181,23 @@ public class ClientGUI extends JFrame implements Observer{
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
         this.listaEmailList.addListSelectionListener((ListSelectionEvent e) -> {
-            emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
-            mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
-            String destinatari = "";
-            for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
-                if (i == 0) {
-                    destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
-                } else {
-                    destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
+            if (!e.getValueIsAdjusting()) {
+                if (((JList<Email>)e.getSource()).getSelectedValue() != null) {
+                    emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
+                    mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
+                    String destinatari = "";
+                    for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
+                        if (i == 0) {
+                            destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
+                        } else {
+                            destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
+                        }
+                    }
+                    destinatariEmailLabel.setText(destinatari);
+                    oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
+                    corpoTextArea.setText(emailDaVisualizzare.getCorpo());
                 }
             }
-            destinatariEmailLabel.setText(destinatari);
-            oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
-            corpoTextArea.setText(emailDaVisualizzare.getCorpo());
         });
         this.listaEmailScrollPane = new JScrollPane(this.listaEmailList);
 /* ------ Fine Lista Email Panel ------ */
@@ -285,13 +289,13 @@ public class ClientGUI extends JFrame implements Observer{
             case ClientGUI.RICEVUTI: {
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                }
                 this.modelListaEmail.clear();
                 this.listaEmail.forEach(email -> {
                     this.modelListaEmail.addElement(email);
                 });
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
-                }
                 this.dataOrdineButton.setName("perDataRicevuti");
                 this.prioritaOrdineButton.setName("perPrioritaRicevuti");
                 this.inVisualizzazione = ClientGUI.RICEVUTI;
@@ -300,13 +304,13 @@ public class ClientGUI extends JFrame implements Observer{
             case ClientGUI.INVIATI: {
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                }
                 this.modelListaEmail.clear();
                 this.listaEmail.forEach(email -> {
                     this.modelListaEmail.addElement(email);
                 });
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
-                }
                 this.dataOrdineButton.setName("perDataInviati");
                 this.prioritaOrdineButton.setName("perPrioritaInviati");
                 this.inVisualizzazione = ClientGUI.INVIATI;
@@ -315,13 +319,13 @@ public class ClientGUI extends JFrame implements Observer{
             case ClientGUI.INVIATE_PER_DATA: {
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                }
                 this.modelListaEmail.clear();
                 this.listaEmail.forEach(email -> {
                     this.modelListaEmail.addElement(email);
                 });
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
-                }
                 break;
             }
             case ClientGUI.INVIATE_PER_PRIORITA: {

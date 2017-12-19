@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import modelli.Email;
 import modelli.EmailDaInviare;
 /**
  *
@@ -47,11 +46,11 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "emailInviate": {
-                
+                model.getInviate();
                 break;
             }
             case "emailRicevute": {
-                
+                model.getRicevute();
                 break;
             }
             case "nuova": {
