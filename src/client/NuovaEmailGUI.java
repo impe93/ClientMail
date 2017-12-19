@@ -184,6 +184,7 @@ public class NuovaEmailGUI extends JFrame {
                 valoreDaRitornare.add(destinatario);
             }
         }
+        valoreDaRitornare.add(destinatario);
         return valoreDaRitornare;
     }
 }

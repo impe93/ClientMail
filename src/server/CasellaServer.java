@@ -260,16 +260,16 @@ public class CasellaServer {
        
         int nuovoId = recuperaIdMax()+1;
         
-        System.out.println("Il nuovo id è "+nuovoId);
-        System.out.println("email passata dal client: " + emailDaInviare);
-        
-        
         try {
             
             for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
                 emailDestinatario = emailDaInviare.getDestinatari().get(i);
                 Utente destinatario = new Utente();
                 destinatario = recuperaDatiUtente(emailDestinatario);
+                /*
+                bisogna fare in modo che se il destinatario non è nella tabella 
+                degli utenti non faccia l'inserimento poi
+                */
                 destinatari.add(destinatario);
         
                 String inserisciEmail =
@@ -309,8 +309,6 @@ public class CasellaServer {
         Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
                 destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo());
         
-        System.out.println("email ottenuta da SERVER: " + email);
-            
         return email;
     }
 
