@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import modelli.Email;
+import modelli.EmailDaInviare;
 /**
  *
  * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
@@ -67,7 +68,7 @@ public class ClientController implements ActionListener {
             case "invia": {
                 if (e.getSource() instanceof NuovaEmailGUI.BottoneInviaCancella) {
                     NuovaEmailGUI schermataEvento = this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione());
-                    Email emailDaInviare = this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione()).getEmail();
+                    EmailDaInviare emailDaInviare = this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione()).getEmail();
                     if (emailDaInviare != null) {
                         this.model.inviaEmail(emailDaInviare);
                         schermataEvento.setVisible(false);

@@ -156,7 +156,7 @@ public class NuovaEmailGUI extends JFrame {
         }
     }
     
-    public Email getEmail() {
+    public EmailDaInviare getEmail() {
         EmailDaInviare emailDaInviare = new EmailDaInviare();
         String destinatari = this.destinatariTextField.getText();
         String oggetto = this.oggettoTextField.getText();
@@ -167,6 +167,7 @@ public class NuovaEmailGUI extends JFrame {
                     emailDaInviare.setCorpo(corpo);
                     emailDaInviare.setOggetto(oggetto);
                     emailDaInviare.setDestinatari(this.prendiDestinatari(destinatari));
+                    return emailDaInviare;
                 }
             }
         }
