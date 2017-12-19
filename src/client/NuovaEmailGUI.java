@@ -18,6 +18,8 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import modelli.Email;
+import modelli.EmailDaInviare;
 
 /**
  *
@@ -151,5 +153,22 @@ public class NuovaEmailGUI extends JFrame {
         public int getPosizione() {
             return this.posizione;
         }
+    }
+    
+    public Email getEmail() {
+        EmailDaInviare emailDaInviare = new EmailDaInviare();
+        String destinatari = this.destinatariTextField.getText();
+        String oggetto = this.oggettoTextField.getText();
+        String corpo = this.corpoTextArea.getText();
+        if (!destinatari.equals("")) {
+            if (!oggetto.equals("")) {
+                if(!corpo.equals("")){
+                    emailDaInviare.setCorpo(corpo);
+                    emailDaInviare.setOggetto(oggetto);
+                    //emailDaInviare.setDestinatari(destinatari);
+                }
+            }
+        }
+        return null;
     }
 }

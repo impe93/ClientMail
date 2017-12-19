@@ -38,7 +38,7 @@ public class Email {
         this.oggetto = null;
         this.corpo = null;
         this.data = null;
-        this.priorita = 0;
+        this.priorita = 3;
         this.letto = 0;
                 
     }
