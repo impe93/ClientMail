@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.sql.Date;
 import java.util.ArrayList;
 import modelli.Email;
+import modelli.EmailDaInviare;
 import modelli.Utente;
 
 /**
@@ -21,6 +22,8 @@ public class CasellaServer {
         this.urlDB = "jdbc:sqlite:Server.db";
     }
     
+    
+    //OK
     public ArrayList<Email> recuperaEmailRicevuteUtente(int ultimaRicevuta, Utente utente)
    {
         ArrayList<Email> emailRicevuteUtente = new ArrayList<>();
@@ -126,6 +129,8 @@ public class CasellaServer {
         
     }
     
+    
+    //OK
     public Utente recuperaDatiUtente(String emailUtente){
         Utente utente = null;
         Connection conn = null;
@@ -162,6 +167,8 @@ public class CasellaServer {
         return utente;
     }
     
+    
+    //OK
     private synchronized ArrayList<Utente> recuperaUtentiDestinatari(int idEmail){
         ArrayList<Utente> utentiDestinatari = new ArrayList<>();
         Connection conn = null;
@@ -200,7 +207,9 @@ public class CasellaServer {
         return utentiDestinatari;        
     }
     
-    public int inviaEmail(Email emailDaInviare){
+    
+    //OK
+    public Email inviaEmail(EmailDaInviare emailDaInviare){
         
         Connection conn = null;
         Statement st = null;
@@ -247,8 +256,10 @@ public class CasellaServer {
                 System.out.println(ex.getMessage());
             }
         }
+        
+        Email email = new Email();
             
-        return emailDaInviare.getId();
+        return email;
     }
     
     public static void main (String[] args){

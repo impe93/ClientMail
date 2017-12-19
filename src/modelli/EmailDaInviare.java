@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package modelli;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -12,10 +8,10 @@ import java.util.Date;
  * Classe da utilizzare quando si sta effettuando l'invio
  * @author Lorenzo Imperatrice, Francesca Riddone, Berger Alessio
  */
-public class EmailDaInviare {
+public class EmailDaInviare implements Serializable{
     
     private ArrayList<String> destinatari;
-    private String mittente;
+    private Utente mittente;
     private String oggetto;
     private Date data;
     private int priorita;
@@ -27,7 +23,7 @@ public class EmailDaInviare {
         this.data = new Date();
     }
     
-    public EmailDaInviare(ArrayList<String> destinatari, String mittente, String oggetto, Date data, int priorita, String corpo) {
+    public EmailDaInviare(ArrayList<String> destinatari, String oggetto, Date data, int priorita, String corpo) {
         this.destinatari = destinatari;
         this.mittente = mittente;
         this.oggetto = oggetto;
@@ -44,11 +40,11 @@ public class EmailDaInviare {
         this.destinatari = destinatari;
     }
 
-    public String getMittente() {
+    public Utente getMittente() {
         return mittente;
     }
 
-    public void setMittente(String mittente) {
+    public void setMittente(Utente mittente) {
         this.mittente = mittente;
     }
 

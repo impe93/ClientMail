@@ -1,5 +1,6 @@
 package modelli;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -7,7 +8,7 @@ import java.util.Date;
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public class Email {
+public class Email implements Serializable{
     int id;
     Utente mittente;
     ArrayList<Utente> destinatari;

@@ -1,12 +1,12 @@
 package modelli;
 
-import java.util.Objects;
+import java.io.Serializable;
 
 /**
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public class Utente {
+public class Utente implements Serializable{
     private final String nome;
     private final String cognome;
     private final String email;
