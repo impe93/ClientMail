@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.sql.Date;
 import java.util.ArrayList;
 import modelli.Email;
+import modelli.EmailDaInviare;
 import modelli.Utente;
 
 /**
@@ -208,7 +209,7 @@ public class CasellaServer {
     
     
     //OK
-    public Email inviaEmail(Email emailDaInviare){
+    public Email inviaEmail(EmailDaInviare emailDaInviare){
         
         Connection conn = null;
         Statement st = null;
