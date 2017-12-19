@@ -226,11 +226,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM email_ricevute " +
                 "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, false);
-<<<<<<< HEAD
-        System.out.println("Entro Nel Metodo");
-=======
         
->>>>>>> origin/master
         setChanged();
         notifyObservers(ClientGUI.RICEVUTI);
     }
