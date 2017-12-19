@@ -169,13 +169,12 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      */
     public void inviaEmail(Email emailDaInviare){
         try {
-            int idEmailInviata = this.server.inviaEmail(emailDaInviare);
-            if(idEmailInviata == -1){
+            Email emailInviata = this.server.inviaEmail(emailDaInviare);
+            if(emailInviata == null){
                 System.out.println("Invio dell'email non riuscito!");
             } else{
                 System.out.println("Email inviata con successo!");
-                emailDaInviare.setId(idEmailInviata);
-                this.casellaPostaleClient.inserisciInInviati(emailDaInviare);
+                this.casellaPostaleClient.inserisciInInviati(emailInviata);
             }
         } catch (RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
