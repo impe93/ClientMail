@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import modelli.Email;
 import modelli.Utente;
+import modelli.EmailDaInviare;
 
 /**
  *
@@ -59,7 +60,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     }
 
     @Override
-    public Email inviaEmail(Email emailDaInviare) throws RemoteException {
+    public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
         return casella.inviaEmail(emailDaInviare);
     }
     
@@ -81,22 +82,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }    
-    }
-    
-    public static void main(String[] args) throws RemoteException{
-        
-        ServerImplementation server = new ServerImplementation();
-        Utente uno = new Utente("alessio","berger","alessio.berger@edu.unito.it");
-        Utente due = new Utente("lorenzo","imperatrice","lorenzo.imperatrice@edu.unito.it");
-        ArrayList<Utente> destinatari = new ArrayList();
-        destinatari.add(uno);
-        destinatari.add(due);
-        
-        
-        
-    Email emailInviare = new Email(10,uno,destinatari,"ciao","ciao ciao");
-        
-        server.casella.inviaEmail(emailInviare);
     }
     
 }
