@@ -1,6 +1,5 @@
 package modelli;
 
-import static java.lang.System.currentTimeMillis;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -114,8 +113,8 @@ public class Email {
      @Override
     public String toString() {
         return "Email{" + "id=" + id + ", mittente=" 
-                + mittente + ", destinatari=" + destinatari + ", oggetto=" 
-                + oggetto + ", corpo=" + corpo + ", data=" + data + ", priorita=" 
+                + mittente.getEmail() + ", destinatari=" + destinatari.get(0).getEmail() + ", oggetto=" 
+                + oggetto + ", corpo=" + corpo + ", data=" + data.toString() + ", priorita=" 
                 + priorita + ", letto=" + letto + '}';
     }
 }
