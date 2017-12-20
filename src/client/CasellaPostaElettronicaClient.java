@@ -405,6 +405,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     private void inserisciNuovaEmail(Email email, String nomeTabella){
         ArrayList<Utente> utentiPerControllo = utentiInEmail(email);
+        
+        System.out.println("Utenti per controllo: ");
+        for(Utente u: utentiPerControllo){
+            System.out.println(u.getEmail());
+        }
+        
         controllaPresenzaUtentiInDB(utentiPerControllo);
         String inserimentoNuovaEmail = 
                 "INSERT INTO " + nomeTabella + " (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
@@ -416,18 +422,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         try {
             conn = DriverManager.getConnection(urlDB);
             ps = conn.prepareStatement(inserimentoNuovaEmail);
-            if(email.getDestinatari() == null){
-                inserisciValoriInPS(
-                        ps, email.getId(), 
-                        email.getMittente().getEmail(), 
-                        email.getDestinatari().get(0).getEmail(), 
-                        email.getOggetto(), 
-                        email.getCorpo(), 
-                        email.getData(), 
-                        email.getPriorita(), 
-                        email.getLetto());
-                ps.executeUpdate();
-            } else{
+            if(email.getDestinatari() != null){
                 for(Utente utente : email.getDestinatari()){
                     inserisciValoriInPS(
                             ps, email.getId(),
@@ -471,22 +466,41 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     private void controllaPresenzaUtentiInDB(ArrayList<Utente> utenti){
         if(utenti != null){
+            String controlloPresenzaUtente;
             String inserimentoUtente = "INSERT INTO utente (email, nome, cognome) VALUES (?, ?, ?)";
             Connection conn = null;
+            Statement st = null;
             PreparedStatement pst = null;
+            ResultSet rs = null;
             try{
                 conn = DriverManager.getConnection(urlDB);
-                pst = conn.prepareStatement(inserimentoUtente);
+                
                 for(Utente utente: utenti){
-                    pst.setString(1, utente.getEmail());
-                    pst.setString(2, utente.getNome());
-                    pst.setString(3, utente.getCognome());
-                    pst.executeUpdate();
+                    boolean utentePresente = false;
+                    controlloPresenzaUtente = "SELECT * FROM utente WHERE email = '" + utente.getEmail() + "'";
+                    st = conn.createStatement();
+                    rs = st.executeQuery(controlloPresenzaUtente);
+                    if(rs.next()){
+                        utentePresente = true;
+                    }
+                    if(!utentePresente){
+                        pst = conn.prepareStatement(inserimentoUtente);
+                        pst.setString(1, utente.getEmail());
+                        pst.setString(2, utente.getNome());
+                        pst.setString(3, utente.getCognome());
+                        pst.executeUpdate();
+                    }
                 }
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             } finally {
                 try {
+                    if(rs != null){
+                        rs.close();
+                    }
+                    if(st != null){
+                        st.close();
+                    }
                     if(pst != null){
                         pst.close();
                     }
