@@ -597,4 +597,5 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         setChanged();
         notifyObservers(ClientGUI.EMAIL_ELIMINATA);
     }
+    
 }
