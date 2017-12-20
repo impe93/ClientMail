@@ -84,8 +84,8 @@ public class ClientGUI extends JFrame implements Observer{
     private JButton ricevuteButton;
     private JPanel toolbarDestraPanel;
     private JButton creaEmail;
-    private JButton eliminaSelezionata;
-    private JButton inoltraSelezionata;
+    private EliminaInoltraButton eliminaSelezionata;
+    private EliminaInoltraButton inoltraSelezionata;
     
     private JPanel panelSinistro;
     
@@ -174,34 +174,6 @@ public class ClientGUI extends JFrame implements Observer{
 
 /* ------ Fine Email Panel ------ */
  
-/* ------ Lista Email Panel ------ */
-        this.listaEmailList = new JList();
-        this.listaEmailList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.modelListaEmail = new DefaultListModel<>();
-        this.listaEmailList.setModel(this.modelListaEmail);
-        this.listaEmailList.setCellRenderer(new EmailCellRenderer());
-        this.listaEmailList.addListSelectionListener((ListSelectionEvent e) -> {
-            if (!e.getValueIsAdjusting()) {
-                if (((JList<Email>)e.getSource()).getSelectedValue() != null) {
-                    emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
-                    mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
-                    String destinatari = "";
-                    for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
-                        if (i == 0) {
-                            destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
-                        } else {
-                            destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
-                        }
-                    }
-                    destinatariEmailLabel.setText(destinatari);
-                    oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
-                    corpoTextArea.setText(emailDaVisualizzare.getCorpo());
-                }
-            }
-        });
-        this.listaEmailScrollPane = new JScrollPane(this.listaEmailList);
-/* ------ Fine Lista Email Panel ------ */
-
 /* ------ Toolbar Panel ------ */
         this.toolbarPanel = new JPanel();
         this.toolbarPanel.setLayout(new BorderLayout());
@@ -214,12 +186,12 @@ public class ClientGUI extends JFrame implements Observer{
         this.creaEmail.addActionListener(this.controller);
         this.toolbarDestraPanel.add(this.creaEmail);
         
-        this.eliminaSelezionata = new JButton("Elimina selezionata");
+        this.eliminaSelezionata = new EliminaInoltraButton("Elimina selezionata");
         this.eliminaSelezionata.setName("elimina");
         this.eliminaSelezionata.addActionListener(this.controller);
         this.toolbarDestraPanel.add(this.eliminaSelezionata);
         
-        this.inoltraSelezionata = new JButton("Inoltra selezionata");
+        this.inoltraSelezionata = new EliminaInoltraButton("Inoltra selezionata");
         this.inoltraSelezionata.setName("inoltra");
         this.inoltraSelezionata.addActionListener(this.controller);
         this.toolbarDestraPanel.add(this.inoltraSelezionata);
@@ -243,6 +215,36 @@ public class ClientGUI extends JFrame implements Observer{
         this.toolbarPanel.add(this.toolbarSinistraPanel, BorderLayout.WEST);
         this.toolbarPanel.add(this.toolbarDestraPanel, BorderLayout.EAST);
 /* ------ Fine Toolbar Panel ------ */
+
+/* ------ Lista Email Panel ------ */
+        this.listaEmailList = new JList();
+        this.listaEmailList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.modelListaEmail = new DefaultListModel<>();
+        this.listaEmailList.setModel(this.modelListaEmail);
+        this.listaEmailList.setCellRenderer(new EmailCellRenderer());
+        this.listaEmailList.addListSelectionListener((ListSelectionEvent e) -> {
+            if (!e.getValueIsAdjusting()) {
+                if (((JList<Email>)e.getSource()).getSelectedValue() != null) {
+                    this.emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
+                    this.eliminaSelezionata.setEmailDaInoltrareEliminare(this.emailDaVisualizzare);
+                    this.inoltraSelezionata.setEmailDaInoltrareEliminare(this.emailDaVisualizzare);
+                    this.mittenteEmailLabel.setText(this.emailDaVisualizzare.getMittente().getEmail());
+                    String destinatari = "";
+                    for(int i = 0; i < this.emailDaVisualizzare.getDestinatari().size(); i++) {
+                        if (i == 0) {
+                            destinatari = this.emailDaVisualizzare.getDestinatari().get(0).getEmail();
+                        } else {
+                            destinatari += ", " + this.emailDaVisualizzare.getDestinatari().get(i).getEmail();
+                        }
+                    }
+                    this.destinatariEmailLabel.setText(destinatari);
+                    this.oggettoEmailLabel.setText(this.emailDaVisualizzare.getOggetto());
+                    this.corpoTextArea.setText(this.emailDaVisualizzare.getCorpo());
+                }
+            }
+        });
+        this.listaEmailScrollPane = new JScrollPane(this.listaEmailList);
+/* ------ Fine Lista Email Panel ------ */
         
         this.panelSinistro = new JPanel();
         this.panelSinistro.setLayout(new BorderLayout());
@@ -368,6 +370,25 @@ public class ClientGUI extends JFrame implements Observer{
                 break;
             }
         }
+    }
+    
+    public class EliminaInoltraButton extends JButton {
+        
+        private Email emailDaInoltrareEliminare;
+        
+        public EliminaInoltraButton (String nome) {
+            super(nome);
+            this.emailDaInoltrareEliminare = null;
+        }
+        
+        public void setEmailDaInoltrareEliminare(Email email) {
+            this.emailDaInoltrareEliminare = email;
+        }
+        
+        public Email getEmailDaInoltrareEliminare() {
+            return this.emailDaInoltrareEliminare;
+        }
+        
     }
     
     public static void main (String[] args) {
