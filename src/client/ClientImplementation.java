@@ -239,5 +239,6 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             this.casellaPostaleClient.inserisciInRicevuti(emailRicevuta);
         }
     }
-  
+    
+    
 }
