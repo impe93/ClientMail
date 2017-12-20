@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import modelli.Email;
 import modelli.EmailDaInviare;
 /**
  *
@@ -58,10 +59,17 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "elimina": {
-                
+                if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
+                    Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
+                    this.model.eliminaEmail(emailDaEliminare);
+                }
                 break;
             }
             case "inoltra": {
+                if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
+                    Email emailDaInoltrare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
+                    this.schermateNuoveEmail.add(new NuovaEmailGUI(this, this.schermateNuoveEmail.size(), emailDaInoltrare));
+                }
                 break;
             }
             case "invia": {

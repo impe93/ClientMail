@@ -21,10 +21,11 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import modelli.Email;
 import modelli.EmailDaInviare;
+import modelli.Utente;
 
 /**
  *
- * @author lorenzo
+ * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
  */
 public class NuovaEmailGUI extends JFrame {
     
@@ -56,6 +57,30 @@ public class NuovaEmailGUI extends JFrame {
         this.controller = controller;
         this.posizione = posizione;
         this.initGUI();
+    }
+    
+    /**
+     * Utilizzato quando viene inoltrata una email,
+     * @param controller: Il controller di riferimento
+     * @param posizione: La posizione all'interno dell'arrayList di nuovaEmailGUI sul controller
+     * @param email: email che si vuole inoltrare
+     */
+    public NuovaEmailGUI(ClientController controller, int posizione, Email email) {
+        this.controller = controller;
+        this.posizione = posizione;
+        this.initGUI();
+        this.oggettoTextField.setText("Fwd: " + email.getOggetto());
+        String destinatari = "";
+        int i = 0;
+        for(Utente destinatario : email.getDestinatari()) {
+            if (i == 0) {
+                destinatari += destinatario.getEmail() + " <" + destinatario.getNome() + destinatario.getCognome() + ">";
+            } else {
+                destinatari += ", " + destinatario.getEmail() + " <" + destinatario.getNome() + destinatario.getCognome() + ">";
+            }
+            i++;
+        }
+        this.corpoTextArea.setText("Inizio messaggio inoltrato\n\nDa: " + email.getMittente().getEmail() + "<" + "\nA: " + destinatari + "\nOggetto: " + email.getOggetto() + "\n\n" + email.getCorpo());
     }
     
     public int getPosizione() {
