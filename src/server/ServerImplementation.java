@@ -58,7 +58,9 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     public boolean eliminaEmail(Email emailDaEliminare, Utente utente) throws RemoteException {
     return false;
     }
-
+    
+    /* TODO: Controllare che il email ritorno non sia null e chiamare il metodo
+    ricevi email sui giusti destinatari utilizzando l'hash map (vedere todo in connettiAlClient per info) */
     @Override
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
         return casella.inviaEmail(emailDaInviare);
@@ -74,6 +76,9 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
     }
     
+    /* TODO: Mettere la registrazione dei client come HashMap e non come array se no il client
+    è irrintracciabile all'interno dell'array, non avendo alcun nome, utilizzare come chiave dell'hash map
+    emailClient */
     @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
         try {
