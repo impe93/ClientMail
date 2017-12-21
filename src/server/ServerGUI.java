@@ -27,6 +27,12 @@ public class ServerGUI implements Observer{
     
     ServerImplementation model;
     ServerController controller = new ServerController(model);
+    JFrame frame = new JFrame("Server");
+    JPanel panel = new JPanel();
+    JLabel lblIntestazione = new JLabel("Log delle operazioni:");
+    JTextArea logArea = new JTextArea("* [SERVER START - " + (new Date()).toString() + " ]");
+    JPanel footer = new JPanel();
+    JButton chiudi = new JButton("Chiudi il server");
     
     /*
     *   Costruttore dell'interfaccia del server
@@ -38,34 +44,29 @@ public class ServerGUI implements Observer{
         } catch (RemoteException ex) {
             Logger.getLogger(ServerGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-    
-        JFrame frame = new JFrame("Server");
-        
-        
-        JPanel panel = new JPanel();
+   
         panel.setLayout(new BorderLayout());
-        panel.setPreferredSize(new Dimension(800, 400));
+        panel.setPreferredSize(new Dimension(1200, 400));
         Border bordoTrenta = BorderFactory.createEmptyBorder(30, 30, 30, 30);
         panel.setBorder(bordoTrenta);
         frame.add(panel);
      
-        JLabel lblIntestazione = new JLabel("Log delle operazioni:");
+        
         Border bordoDieci = BorderFactory.createEmptyBorder(10, 10, 10, 10);
         lblIntestazione.setBorder(bordoDieci);
         panel.add(lblIntestazione, BorderLayout.PAGE_START);
         lblIntestazione.setHorizontalAlignment( JLabel.CENTER );
         
-        JTextArea log = new JTextArea("- [SERVER START - " + (new Date()).toString() + " ]");
-        log.setLineWrap(true);
-        log.setBorder(bordoDieci);
-        log.setEditable(false);
-        JScrollPane sp = new JScrollPane(log);
+        
+        logArea.setLineWrap(true);
+        logArea.setBorder(bordoDieci);
+        logArea.setEditable(false);
+        JScrollPane sp = new JScrollPane(logArea);
         
         panel.add(sp, BorderLayout.CENTER);
         
-        JPanel footer = new JPanel();
+        
         footer.setBorder(bordoDieci);
-        JButton chiudi = new JButton("Chiudi il server");
         chiudi.setName("chiudi");
         chiudi.addActionListener(controller);
         footer.add(chiudi);
@@ -78,16 +79,18 @@ public class ServerGUI implements Observer{
         
     }
     
+    @Override
+    public void update(Observable o, Object arg) {
+        String logOperazione = (String) arg;
+        logArea.setText(logArea.getText() + "\n" + logOperazione);
+    }
+    
     public static void main(String[] args) throws RemoteException{
         
         ServerGUI gui = new ServerGUI();
         ServerImplementation server = new ServerImplementation();
+        server.aggiungiObserver(gui);
     
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
      /*

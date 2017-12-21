@@ -11,15 +11,29 @@ import java.util.Date;
 import modelli.Email;
 import modelli.EmailDaInviare;
 import modelli.Utente;
+import java.util.Observable;
 
 /**
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public class CasellaServer {
+public class CasellaServer extends Observable {
     private final String urlDB;
+    private String operazioneEseguita;
+
+    public String getOperazioneEseguita() {
+        return operazioneEseguita;
+    }
+
+    public void setOperazioneEseguita(String operazioneEseguita) {
+        this.operazioneEseguita = operazioneEseguita;
+    }
     
-     /*
+    public void logUltimaOperazione(){
+        setChanged();
+        notifyObservers(getOperazioneEseguita());
+    }
+    /*
     *   Costruttore CasellaServer
     */
     public CasellaServer(){
@@ -281,6 +295,11 @@ public class CasellaServer {
         String emailDestinatario;
         int nuovoId = recuperaIdMax()+1;
         
+        setOperazioneEseguita("* [RICEVUTA RICHIESTA DI INVIO EMAIL DA " + emailDaInviare.getMittente().getEmail() + ""
+                        + " A " + emailDaInviare.getDestinatari().toString() + " - " + 
+                        new Date().toString() + "]");
+        logUltimaOperazione();
+        
         if(nuovoId == 0){
             System.err.println("Errore nel recuperare l ID massimo");
             return null;
@@ -304,6 +323,11 @@ public class CasellaServer {
                 conn = DriverManager.getConnection(urlDB);
                 st = conn.createStatement();
                 st.executeUpdate(inserisciEmail);
+                
+                setOperazioneEseguita("* [INVIATA EMAIL A " + emailDestinatario + ""
+                        + " DA " + emailDaInviare.getMittente().getEmail() + " - " + 
+                        new Date().toString() + "]");
+                logUltimaOperazione();
             }
         } catch(SQLException e) {
             System.out.println(e.getMessage());
@@ -326,7 +350,7 @@ public class CasellaServer {
         
         Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
                 destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo());
-           
+        
         return email;
     }
 

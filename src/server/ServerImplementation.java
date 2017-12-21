@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import modelli.Email;
@@ -45,6 +46,10 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         casella = new CasellaServer();
         clientConnessi = 0;
     
+    }
+    
+    public void aggiungiObserver(ServerGUI serverGui){
+        this.casella.addObserver(serverGui);
     }
 
     @Override
@@ -87,6 +92,10 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         try {
             this.client[clientConnessi] = (Client)Naming.lookup("//localhost/Client/" + emailClient);
             clientConnessi++;
+            
+            casella.setOperazioneEseguita("* [NUOVO CLIENT CONNESSO: " + emailClient + " - " + 
+                        new Date().toString() + "]");
+            casella.logUltimaOperazione();
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }    
