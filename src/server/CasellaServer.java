@@ -5,8 +5,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Date;
 import modelli.Email;
 import modelli.EmailDaInviare;
 import modelli.Utente;
@@ -210,17 +211,20 @@ public class CasellaServer {
     private int recuperaIdMax() {
         
         Connection conn = null;
-        Statement st = null;
+        PreparedStatement ps = null;
         ResultSet rs = null;
         int idMax = -1;
         
         String queryIdMax = 
-                    "SELECT MAX(id_email) FROM email)";
+                    "SELECT MAX(id_email) FROM email";
          try {
             conn = DriverManager.getConnection(urlDB);
-            st = conn.createStatement();
-            rs = st.executeQuery(queryIdMax);
-            idMax = rs.getInt("id_email");
+            ps = conn.prepareStatement(queryIdMax);
+            rs = ps.executeQuery();
+            if(rs.next())
+                idMax = rs.getInt("MAX(id_email)");
+            else
+                idMax=0;
             
         } catch(SQLException e) {
             System.out.println(e.getMessage());
@@ -229,8 +233,8 @@ public class CasellaServer {
                 if(rs != null){
                     rs.close();
                 }
-                if(st != null){
-                    st.close();
+                if(ps != null){
+                    ps.close();
                 }
                 if (conn != null) {
                     conn.close();
@@ -253,11 +257,20 @@ public class CasellaServer {
         Statement st = null;
         ResultSet rs = null;
         ArrayList<Utente> destinatari = new ArrayList<>();
+        Date data = new Date();
+        data = emailDaInviare.getData();
+        java.sql.Date dataSql = new java.sql.Date(data.getTime());
         
       
         String emailDestinatario;
        
         int nuovoId = recuperaIdMax()+1;
+        
+        if(nuovoId == 0){
+            System.err.println("Errore nel recuperare l ID massimo");
+            return null;
+        }
+        System.out.println(nuovoId);
         
         try {
             
@@ -266,6 +279,7 @@ public class CasellaServer {
                 Utente destinatario = new Utente();
                 destinatario = recuperaDatiUtente(emailDestinatario);
                 destinatari.add(destinatario);
+                
         
                 String inserisciEmail =
                 "INSERT INTO email (id_email,mittente,destinatario,oggetto,"
@@ -273,7 +287,7 @@ public class CasellaServer {
                 + "VALUES"
                 + "(" + nuovoId + ",'" + emailDaInviare.getMittente().getEmail()
                 + "','" + emailDestinatario+ "','" + emailDaInviare.getOggetto() + "','"
-                + emailDaInviare.getCorpo() + "','" + emailDaInviare.getData() +"'," + emailDaInviare.getPriorita() + ","
+                + emailDaInviare.getCorpo() + "','" + dataSql +"'," + emailDaInviare.getPriorita() + ","
                 + "0);";
         
         
@@ -301,9 +315,11 @@ public class CasellaServer {
                 System.out.println(ex.getMessage());
             }
         }
+        
         Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
                 destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo());
             
+        
         return email;
     }
 
