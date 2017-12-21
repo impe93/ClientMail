@@ -47,11 +47,11 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "emailInviate": {
-                
+                model.getInviate();
                 break;
             }
             case "emailRicevute": {
-                
+                model.getRicevute();
                 break;
             }
             case "nuova": {
@@ -59,10 +59,17 @@ public class ClientController implements ActionListener {
                 break;
             }
             case "elimina": {
-                
+                if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
+                    Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
+                    this.model.eliminaEmail(emailDaEliminare);
+                }
                 break;
             }
             case "inoltra": {
+                if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
+                    Email emailDaInoltrare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
+                    this.schermateNuoveEmail.add(new NuovaEmailGUI(this, this.schermateNuoveEmail.size(), emailDaInoltrare));
+                }
                 break;
             }
             case "invia": {

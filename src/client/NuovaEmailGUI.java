@@ -6,10 +6,11 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,10 +22,11 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import modelli.Email;
 import modelli.EmailDaInviare;
+import modelli.Utente;
 
 /**
  *
- * @author lorenzo
+ * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
  */
 public class NuovaEmailGUI extends JFrame {
     
@@ -39,8 +41,13 @@ public class NuovaEmailGUI extends JFrame {
     
     private JPanel oggettoPanel;
     private JLabel oggettoLabel;
-    private JPanel textFieldPanel;
     private JTextField oggettoTextField;
+    
+    private JPanel prioritaPanel;
+    private JLabel prioritaLabel;
+    private JComboBox prioritaComboBox;
+    
+    private JPanel pannelloLivelloMedio;
     
     private JPanel corpoPanel;
     private JLabel corpoLabel;
@@ -56,6 +63,30 @@ public class NuovaEmailGUI extends JFrame {
         this.controller = controller;
         this.posizione = posizione;
         this.initGUI();
+    }
+    
+    /**
+     * Utilizzato quando viene inoltrata una email,
+     * @param controller: Il controller di riferimento
+     * @param posizione: La posizione all'interno dell'arrayList di nuovaEmailGUI sul controller
+     * @param email: email che si vuole inoltrare
+     */
+    public NuovaEmailGUI(ClientController controller, int posizione, Email email) {
+        this.controller = controller;
+        this.posizione = posizione;
+        this.initGUI();
+        this.oggettoTextField.setText("Fwd: " + email.getOggetto());
+        String destinatari = "";
+        int i = 0;
+        for(Utente destinatario : email.getDestinatari()) {
+            if (i == 0) {
+                destinatari += destinatario.getEmail() + " <" + destinatario.getNome() + " " + destinatario.getCognome() + ">";
+            } else {
+                destinatari += ", " + destinatario.getEmail() + " <" + destinatario.getNome() + " " +  destinatario.getCognome() + ">";
+            }
+            i++;
+        }
+        this.corpoTextArea.setText("Inizio messaggio inoltrato\n\nDa: " + email.getMittente().getEmail() + " <" + email.getMittente().getNome() + " " + email.getMittente().getCognome() + ">\nA: " + destinatari + "\nOggetto: " + email.getOggetto() + "\n\n" + email.getCorpo());
     }
     
     public int getPosizione() {
@@ -79,10 +110,15 @@ public class NuovaEmailGUI extends JFrame {
         }
         this.destinatariLabel = new JLabel("Destinatario/i: ");
         this.destinatariPanel.add(this.destinatariLabel, BorderLayout.WEST);
-        this.destinatariTextField = new JTextField(20);
-        this.destinatariPanel.add(this.destinatariTextField, BorderLayout.EAST);
+        this.destinatariTextField = new JTextField();
+        this.destinatariPanel.add(this.destinatariTextField, BorderLayout.CENTER);
         this.panelSuperiore.add(this.destinatariPanel, BorderLayout.NORTH);
         /* ----- Fine Destinatari Panel ----- */
+        
+        /* ----- Pannello di livello medio ----- */
+        this.pannelloLivelloMedio = new JPanel();
+        this.pannelloLivelloMedio.setLayout(new BorderLayout());
+        /* ----- Fine Pannello di livello medio ----- */
         
         /* ----- Oggetto Panel ----- */
         this.oggettoPanel = new JPanel();
@@ -94,14 +130,29 @@ public class NuovaEmailGUI extends JFrame {
         }
         this.oggettoLabel = new JLabel("Oggetto: ");
         this.oggettoPanel.add(this.oggettoLabel, BorderLayout.WEST);
-        this.textFieldPanel = new JPanel();
-        this.textFieldPanel.setLayout(new BoxLayout(this.textFieldPanel, BoxLayout.X_AXIS));
-        this.oggettoTextField = new JTextField(20);
-        this.textFieldPanel.add(this.oggettoTextField);
-        this.oggettoPanel.add(this.textFieldPanel, BorderLayout.EAST);
-        this.panelSuperiore.add(this.oggettoPanel, BorderLayout.CENTER);
+        this.oggettoTextField = new JTextField();
+        this.oggettoPanel.add(this.oggettoTextField, BorderLayout.CENTER);
+        this.pannelloLivelloMedio.add(this.oggettoPanel, BorderLayout.NORTH);
         /* ----- Fine Oggetto Panel ----- */
         
+        /* ----- Priorità Panel ----- */
+        this.prioritaPanel = new JPanel();
+        this.prioritaPanel.setLayout(new BorderLayout());
+        if (this.getContentPane() == null) {
+            this.prioritaPanel.setBorder(empty);
+        } else {
+            this.prioritaPanel.setBorder(new CompoundBorder(empty, this.prioritaPanel.getBorder()));
+        }
+        this.prioritaLabel = new JLabel("Priorità");
+        this.prioritaPanel.add(this.prioritaLabel, BorderLayout.WEST);
+        String [] listaNumeriPriorita = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+        this.prioritaComboBox = new JComboBox(listaNumeriPriorita);
+        this.prioritaComboBox.setSelectedIndex(2);
+        this.prioritaPanel.add(this.prioritaComboBox, BorderLayout.CENTER);
+        this.pannelloLivelloMedio.add(this.prioritaPanel, BorderLayout.SOUTH);
+        /* ----- Fine Priorità Panel ----- */
+        
+        this.panelSuperiore.add(this.pannelloLivelloMedio, BorderLayout.CENTER);
         this.add(this.panelSuperiore, BorderLayout.NORTH);
         
         /* ----- Text Area ----- */
@@ -136,6 +187,7 @@ public class NuovaEmailGUI extends JFrame {
         /* ----- Fine Bottoni Panel ----- */
         
         this.add(this.bottoniPanel, BorderLayout.SOUTH);
+        this.setSize(new Dimension(300, 300));
         
         this.pack();
         this.setVisible(true);
@@ -184,6 +236,8 @@ public class NuovaEmailGUI extends JFrame {
                 valoreDaRitornare.add(destinatario);
             }
         }
+        
+        valoreDaRitornare.add(destinatario);
         return valoreDaRitornare;
     }
 }
