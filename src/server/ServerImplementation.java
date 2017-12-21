@@ -25,6 +25,9 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     CasellaServer casella;
     int clientConnessi;
     
+    /*
+    *  Costruttore di ServerImplementation
+    */
     public ServerImplementation() throws RemoteException{
         /* 
         registrazione dell'oggetto ServerImplementation presso il registro di 

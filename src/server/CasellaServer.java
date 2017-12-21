@@ -19,12 +19,18 @@ import modelli.Utente;
 public class CasellaServer {
     private final String urlDB;
     
+     /*
+    *   Costruttore CasellaServer
+    */
     public CasellaServer(){
         this.urlDB = "jdbc:sqlite:Server.db";
     }
+   
+    /*
+    *   Recupera le Email ricevute di un utente a partire dall'Email con id ultimaRicevuta
+    *   che viene passato come parametro, e le resttuisce in un ArrayList
+    */
     
-    
-    //OK
     public ArrayList<Email> recuperaEmailRicevuteUtente(int ultimaRicevuta, Utente utente)
    {
         ArrayList<Email> emailRicevuteUtente = new ArrayList<>();
@@ -78,6 +84,10 @@ public class CasellaServer {
         
     }
     
+    /*
+    *   Recupera le Email inviatee di un utente a partire dall'Email con id ultimaInviata
+    *   che viene passato come parametro, e le resttuisce in un ArrayList
+    */
     public ArrayList<Email> recuperaEmailInviateUtente(int ultimaInviata, Utente utente){
         ArrayList<Email> emailInviateUtente = new ArrayList<>();
         
@@ -129,9 +139,12 @@ public class CasellaServer {
         return emailInviateUtente;
         
     }
-    
-    
-    //OK
+   
+     /*
+    *   A partire dall'email utente accede al database utenti e recupera 
+    *   tutti i dati del relativo utente: nome, cognome e email e restituisce un istanza
+    *   dell'utente.
+    */
     public Utente recuperaDatiUtente(String emailUtente){
         Utente utente = null;
         Connection conn = null;
@@ -168,9 +181,11 @@ public class CasellaServer {
         return utente;
     }
     
-    
-    //OK
-    private synchronized ArrayList<Utente> recuperaUtentiDestinatari(int idEmail){
+     /*
+    *   A partire dall'idEmail passato come parametro, accede al database e recupera tutti gli 
+    *   utenti destinatari dell'email in questione e li restituisce sottoforma di ArrayList
+    */
+    private ArrayList<Utente> recuperaUtentiDestinatari(int idEmail){
         ArrayList<Utente> utentiDestinatari = new ArrayList<>();
         Connection conn = null;
         Statement st = null;
@@ -208,8 +223,10 @@ public class CasellaServer {
         return utentiDestinatari;        
     }
     
+    /*
+    *   Accede al database e recupera l'idEmail più alto e lo restituisce
+    */
     private int recuperaIdMax() {
-        
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -249,10 +266,11 @@ public class CasellaServer {
         
     }
     
-    
-    //OK
-    public Email inviaEmail(EmailDaInviare emailDaInviare){
-        
+    /*
+    *   A partire da un istanza di EmailDaInviare crea un'istanza di tipo Email che viene
+    *   inserita all'interno del database e poi la restituisce al chiamante
+    */
+    public Email inviaEmail(EmailDaInviare emailDaInviare){   
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -260,27 +278,20 @@ public class CasellaServer {
         Date data = new Date();
         data = emailDaInviare.getData();
         java.sql.Date dataSql = new java.sql.Date(data.getTime());
-        
-      
         String emailDestinatario;
-       
         int nuovoId = recuperaIdMax()+1;
         
         if(nuovoId == 0){
             System.err.println("Errore nel recuperare l ID massimo");
             return null;
         }
-        System.out.println(nuovoId);
-        
-        try {
-            
+        try {   
             for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
                 emailDestinatario = emailDaInviare.getDestinatari().get(i);
                 Utente destinatario = new Utente();
                 destinatario = recuperaDatiUtente(emailDestinatario);
                 destinatari.add(destinatario);
                 
-        
                 String inserisciEmail =
                 "INSERT INTO email (id_email,mittente,destinatario,oggetto,"
                 + "corpo,data,priorita,letto)"
@@ -290,16 +301,13 @@ public class CasellaServer {
                 + emailDaInviare.getCorpo() + "','" + dataSql +"'," + emailDaInviare.getPriorita() + ","
                 + "0);";
         
-        
                 conn = DriverManager.getConnection(urlDB);
                 st = conn.createStatement();
                 st.executeUpdate(inserisciEmail);
-        
             }
         } catch(SQLException e) {
             System.out.println(e.getMessage());
-        } 
-        
+        }
         finally {
             try {
                 if(rs != null){
@@ -318,8 +326,7 @@ public class CasellaServer {
         
         Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
                 destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo());
-            
-        
+           
         return email;
     }
 

@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.rmi.RemoteException;
 import java.util.Date;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -21,10 +23,14 @@ import javax.swing.border.Border;
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public class ServerGUI {
+public class ServerGUI implements Observer{
     
     ServerImplementation model;
     ServerController controller = new ServerController(model);
+    
+    /*
+    *   Costruttore dell'interfaccia del server
+    */
     
     public ServerGUI(){
         try {
@@ -78,8 +84,16 @@ public class ServerGUI {
         ServerImplementation server = new ServerImplementation();
     
     }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
-    
+     /*
+    *   Classe MyQuitDialog per la finestra a comparsa che compare 
+    *   quando si vuole chiudere il server
+    */
     public class MyQuitDialog extends JOptionPane{
     int risposta;
     
