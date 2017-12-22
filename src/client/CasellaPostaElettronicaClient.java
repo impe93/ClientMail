@@ -363,7 +363,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     public void inserisciNuoveEmailInviate(ArrayList<Email> nuoveEmailInviate){
         nuoveEmailInviate.forEach((email) -> {
-            inserisciNuovaEmailInviata(email);
+            inserisciNuovaEmail(email, "email_inviate");
         });
         this.emailInviate.addAll(nuoveEmailInviate);
     }
@@ -375,27 +375,11 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     public void inserisciNuoveEmailRicevute(ArrayList<Email> nuoveEmailRicevute){
         nuoveEmailRicevute.forEach((email) -> {
-            inserisciNuovaEmailRicevuta(email);
+            inserisciNuovaEmail(email, "email_ricevute");
         });
         this.emailRicevute.addAll(nuoveEmailRicevute);
     }
-    
-    /**
-     * Inserisce una nuova email in table email_inviate
-     * @param email: email da aggiungere a email inviate in DB
-     */
-    private void inserisciNuovaEmailInviata(Email email){
-        inserisciNuovaEmail(email, "email_inviate");
-    }
-    
-    /**
-     * Inserisce una nuova email in table email_ricevute
-     * @param email: email da aggiungere a email ricevute in DB
-     */
-    private void inserisciNuovaEmailRicevuta(Email email){
-        inserisciNuovaEmail(email, "email_ricevute");
-    }
-    
+
     /**
      * Inserisce una nuova email in email_ricevute o in email_inviate a seconda
      * del contenuto del paramentro nomeTabella
@@ -405,12 +389,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     private void inserisciNuovaEmail(Email email, String nomeTabella){
         ArrayList<Utente> utentiPerControllo = utentiInEmail(email);
-        
-        System.out.println("Utenti per controllo: ");
-        for(Utente u: utentiPerControllo){
-            System.out.println(u.getEmail());
-        }
-        
         controllaPresenzaUtentiInDB(utentiPerControllo);
         String inserimentoNuovaEmail = 
                 "INSERT INTO " + nomeTabella + " (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
@@ -591,7 +569,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     
     @Override
     public void inserisciInInviati(Email email) {
-        inserisciNuovaEmailInviata(email);
+        inserisciNuovaEmail(email, "email_inviate");
         this.emailInviate.add(email);
         setChanged();
         notifyObservers(ClientGUI.EMAIL_INVIATA);
@@ -599,7 +577,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
 
     @Override
     public void inserisciInRicevuti(Email email) {
-        inserisciNuovaEmailRicevuta(email);
+        inserisciNuovaEmail(email, "email_ricevute");
         this.emailRicevute.add(email);
         setChanged();
         notifyObservers(ClientGUI.EMAIL_RICEVUTA);
