@@ -187,7 +187,9 @@ public class NuovaEmailGUI extends JFrame {
         /* ----- Fine Bottoni Panel ----- */
         
         this.add(this.bottoniPanel, BorderLayout.SOUTH);
-        this.setSize(new Dimension(300, 300));
+        Dimension d = new Dimension(600, 600);
+        this.setSize(d);
+        this.setPreferredSize(d);
         
         this.pack();
         this.setVisible(true);
