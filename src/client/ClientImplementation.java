@@ -82,8 +82,8 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      *      modello
      */
     public void registraOsservatoreEAggiornaEmail(ClientGUI osservatore){
-        this.casellaPostaleClient.addObserver(osservatore);
         this.casellaPostaleClient.recuperaEmailInviate();
+        this.casellaPostaleClient.addObserver(osservatore);
         this.casellaPostaleClient.recuperaEmailRicevute();
         ArrayList<Email> nuoveEmailInviate = null;
         ArrayList<Email> nuoveEmailRicevute = null;
@@ -248,5 +248,12 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         }
     }
     
+    //bisogna segnalare al server che ci stiamo disconnettendo
+    
+    //fare letto non letto
+    
+    //popup per ogni messaggio
+    
+    //verificare se funziona eliminazione
     
 }
