@@ -15,6 +15,9 @@ import java.util.Observable;
 import client.Client;
 import java.rmi.RemoteException;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
@@ -23,6 +26,9 @@ import java.util.Map;
 public class CasellaServer extends Observable {
     private final String urlDB;
     private String operazioneEseguita;
+    private final ReadWriteLock rw1;
+    private final Lock r1;
+    private final Lock w1;
 
     public String getOperazioneEseguita() {
         return operazioneEseguita;
@@ -41,6 +47,9 @@ public class CasellaServer extends Observable {
     */
     public CasellaServer(){
         this.urlDB = "jdbc:sqlite:Server.db";
+        rw1 = new ReentrantReadWriteLock();
+        r1 = rw1.readLock();
+        w1 = rw1.writeLock();
     }
    
     /*
@@ -61,6 +70,7 @@ public class CasellaServer extends Observable {
                 "WHERE destinatario = '" + utente.getEmail() 
                 + "' AND id_email >" + ultimaRicevuta ;
         
+        r1.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -95,6 +105,8 @@ public class CasellaServer extends Observable {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            
+            r1.unlock();
         }
         
         return emailRicevuteUtente;
@@ -116,7 +128,7 @@ public class CasellaServer extends Observable {
                 "FROM email " +
                 "WHERE mittente = '" + utente.getEmail() 
                 + "' AND id_email >" + ultimaInviata;
-        
+        r1.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -151,6 +163,7 @@ public class CasellaServer extends Observable {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            r1.unlock();
         }
         
         return emailInviateUtente;
@@ -171,6 +184,7 @@ public class CasellaServer extends Observable {
                 "SELECT * " + 
                 "FROM utenti " +
                 "WHERE email = '" + emailUtente + "'";
+        r1.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -194,6 +208,7 @@ public class CasellaServer extends Observable {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            r1.unlock();
         }
         return utente;
     }
@@ -212,6 +227,7 @@ public class CasellaServer extends Observable {
                     "FROM utenti " +
                     "WHERE email IN (SELECT destinatario FROM email "
                 + "WHERE id_email= " + idEmail+ ")";
+        r1.lock();
          try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -236,6 +252,7 @@ public class CasellaServer extends Observable {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            r1.unlock();
         }
         return utentiDestinatari;        
     }
@@ -251,6 +268,7 @@ public class CasellaServer extends Observable {
         
         String queryIdMax = 
                     "SELECT MAX(id_email) FROM email";
+        r1.lock();
          try {
             conn = DriverManager.getConnection(urlDB);
             ps = conn.prepareStatement(queryIdMax);
@@ -276,10 +294,10 @@ public class CasellaServer extends Observable {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-            
+            r1.unlock();
          }
             
-            return idMax;
+        return idMax;
         
     }
     
@@ -292,7 +310,7 @@ public class CasellaServer extends Observable {
         Statement st = null;
         ResultSet rs = null;
         ArrayList<Utente> destinatari = new ArrayList<>();
-        Date data = new Date();
+        Date data;
         data = emailDaInviare.getData();
         java.sql.Date dataSql = new java.sql.Date(data.getTime());
         String emailDestinatario;
@@ -308,10 +326,11 @@ public class CasellaServer extends Observable {
             System.err.println("Errore nel recuperare l ID massimo");
             return null;
         }
+        w1.lock();
         try {   
             for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
                 emailDestinatario = emailDaInviare.getDestinatari().get(i);
-                Utente destinatario = new Utente();
+                Utente destinatario;
                 destinatario = recuperaDatiUtente(emailDestinatario);
                 destinatari.add(destinatario);
                 
@@ -360,10 +379,11 @@ public class CasellaServer extends Observable {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            w1.unlock();
         }
         
         Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
-                destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo());
+                destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),emailDaInviare.getPriorita());
         
          return email;
     }

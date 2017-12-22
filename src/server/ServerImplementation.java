@@ -73,9 +73,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     return false;
     }
     
-    /* TODO: Controllare che il email ritorno non sia null e chiamare il metodo
-    ricevi email sui giusti destinatari utilizzando l'hash map (vedere todo in connettiAlClient per info) */
-    
     /*il metodo riceviEmail sul client viene chiamato all'interno del metodo inviaEmail di CasellaServer*/
     @Override
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
@@ -98,10 +95,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             System.out.println("java RMI registry già esistente!");
         }
     }
-    
-    /* TODO: Mettere la registrazione dei client come HashMap e non come array se no il client
-    è irrintracciabile all'interno dell'array, non avendo alcun nome, utilizzare come chiave dell'hash map
-    emailClient */          /*FATTO*/       /*FATTO*/       /*FATTO*/       /*FATTO*/       /*FATTO*/
     
     @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
