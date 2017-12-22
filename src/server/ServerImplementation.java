@@ -81,7 +81,16 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException {
-        return casella.recuperaEmailRicevuteUtente(ultimaRicevuta, utente);
+         FutureTask<ArrayList<Email>> ft = new FutureTask<>(() -> casella.recuperaEmailRicevuteUtente(ultimaRicevuta, utente));
+        exec.execute(ft);
+        ArrayList<Email> ricevute = null;
+        try{
+            ricevute = ft.get();
+        }catch(InterruptedException | ExecutionException e){
+            System.out.println(e.getMessage());
+        }
+        
+        return ricevute;
     }
 
     @Override
@@ -92,12 +101,20 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     /*il metodo riceviEmail sul client viene chiamato all'interno del metodo inviaEmail di CasellaServer*/
     @Override
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
-        Email emailRitorno = casella.inviaEmail(emailDaInviare, clientConnessi);
+        FutureTask<Email> ft = new FutureTask<>(() -> casella.inviaEmail(emailDaInviare, clientConnessi));
+        Email emailRitorno = null;
+        exec.execute(ft);
+        try{
+            emailRitorno = ft.get();
+        }
+        catch(InterruptedException | ExecutionException e){
+            System.out.println(e.getMessage());
+        }
         if(emailRitorno != null){
             return emailRitorno;
         }
         else{
-            System.out.println("Si è verificato un problema con l'invio dell'email");
+            System.out.println("Si è verificato un problema con l'invio dell'email (server)");
             return null;
         }
     }
