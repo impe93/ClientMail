@@ -203,6 +203,10 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     public void inviaEmail(EmailDaInviare emailDaInviare){
         try {
             emailDaInviare.setMittente(this.utente);
+            
+            System.out.println(emailDaInviare.getPriorita());
+            
+            
             Email emailInviata = this.server.inviaEmail(emailDaInviare);
             
             System.out.println(emailDaInviare.getPriorita());

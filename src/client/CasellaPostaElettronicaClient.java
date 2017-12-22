@@ -150,6 +150,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     public void ordinaRicevutePerPriorita(){
         Collections.sort(this.emailRicevute, (Email email1, Email email2) -> email1.getPriorita() - email2.getPriorita());
+        
         setChanged();
         notifyObservers(ClientGUI.RICEVUTE_PER_PRIORITA);
     }
