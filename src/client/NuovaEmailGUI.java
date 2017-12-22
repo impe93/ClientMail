@@ -213,12 +213,14 @@ public class NuovaEmailGUI extends JFrame {
         String destinatari = this.destinatariTextField.getText();
         String oggetto = this.oggettoTextField.getText();
         String corpo = this.corpoTextArea.getText();
+        int priorita = Integer.parseInt((String)this.prioritaComboBox.getSelectedItem());
         if (!destinatari.equals("")) {
             if (!oggetto.equals("")) {
                 if(!corpo.equals("")){
                     emailDaInviare.setCorpo(corpo);
                     emailDaInviare.setOggetto(oggetto);
                     emailDaInviare.setDestinatari(this.prendiDestinatari(destinatari));
+                    emailDaInviare.setPriorita(priorita);
                     return emailDaInviare;
                 }
             }
