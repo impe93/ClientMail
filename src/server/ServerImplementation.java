@@ -17,6 +17,10 @@ import modelli.Utente;
 import modelli.EmailDaInviare;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 /**
  *
@@ -26,7 +30,9 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     
     
     private Map<String, Client> clientConnessi = new HashMap<>();
+    private final int NUM_THREAD = 3;
     CasellaServer casella;
+    Executor exec;
 
     public Map<String, Client> getClientConnessi() {
         return clientConnessi;
@@ -51,6 +57,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
         
         casella = new CasellaServer();
+        exec = Executors.newFixedThreadPool(NUM_THREAD);
     
     }
     
@@ -60,20 +67,39 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public ArrayList<Email> getInviate(int ultimaInviata, Utente utente) throws RemoteException {
-        return casella.recuperaEmailInviateUtente(ultimaInviata, utente);
+       FutureTask<ArrayList<Email>> ft = new FutureTask<>(() -> casella.recuperaEmailInviateUtente(ultimaInviata, utente));
+        exec.execute(ft);
+        ArrayList<Email> inviate = null;
+        try{
+            inviate = ft.get();
+        }catch(InterruptedException | ExecutionException e){
+            System.out.println(e.getMessage());
+        }
+        
+        return inviate;
     }
 
     @Override
     public ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException {
-        return casella.recuperaEmailRicevuteUtente(ultimaRicevuta, utente);
+        FutureTask<ArrayList<Email>> ft = new FutureTask<>(() -> casella.recuperaEmailRicevuteUtente(ultimaRicevuta, utente));
+        exec.execute(ft);
+        ArrayList<Email> ricevute = null;
+        try{
+            ricevute = ft.get();
+        }catch(InterruptedException | ExecutionException e){
+            System.out.println(e.getMessage());
+        }
+        
+        return ricevute;
     }
 
     @Override
     public boolean eliminaEmail(Email emailDaEliminare, Utente utente) throws RemoteException {
-    return false;
+        return false;
     }
     
     /*il metodo riceviEmail sul client viene chiamato all'interno del metodo inviaEmail di CasellaServer*/
+    /*DA IMPLEMENARE CON I RUNNABLE*/
     @Override
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
         Email emailRitorno = casella.inviaEmail(emailDaInviare, clientConnessi);
