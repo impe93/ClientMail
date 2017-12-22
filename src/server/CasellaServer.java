@@ -12,6 +12,9 @@ import modelli.Email;
 import modelli.EmailDaInviare;
 import modelli.Utente;
 import java.util.Observable;
+import client.Client;
+import java.rmi.RemoteException;
+import java.util.Map;
 
 /**
  *
@@ -284,7 +287,7 @@ public class CasellaServer extends Observable {
     *   A partire da un istanza di EmailDaInviare crea un'istanza di tipo Email che viene
     *   inserita all'interno del database e poi la restituisce al chiamante
     */
-    public Email inviaEmail(EmailDaInviare emailDaInviare){   
+    public Email inviaEmail(EmailDaInviare emailDaInviare, Map<String, Client> clientConnessi) throws RemoteException{   
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -294,6 +297,7 @@ public class CasellaServer extends Observable {
         java.sql.Date dataSql = new java.sql.Date(data.getTime());
         String emailDestinatario;
         int nuovoId = recuperaIdMax()+1;
+        Client clientRicevente;
         
         setOperazioneEseguita("* [RICEVUTA RICHIESTA DI INVIO EMAIL DA " + emailDaInviare.getMittente().getEmail() + ""
                         + " A " + emailDaInviare.getDestinatari().toString() + " - " + 
@@ -328,6 +332,16 @@ public class CasellaServer extends Observable {
                         + " DA " + emailDaInviare.getMittente().getEmail() + " - " + 
                         new Date().toString() + "]");
                 logUltimaOperazione();
+                ArrayList<Utente> destinatarioEmail= new ArrayList<>();
+                destinatarioEmail.add(recuperaDatiUtente(emailDestinatario));
+                
+                
+                Email emailRicevuta = new Email(nuovoId,recuperaDatiUtente(emailDaInviare.getMittente().getEmail())
+                        ,destinatarioEmail,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),
+                        emailDaInviare.getPriorita());
+                
+                clientRicevente = clientConnessi.get(emailDestinatario);
+                clientRicevente.riceviEmail(emailRicevuta);
             }
         } catch(SQLException e) {
             System.out.println(e.getMessage());
@@ -351,7 +365,7 @@ public class CasellaServer extends Observable {
         Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
                 destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo());
         
-        return email;
+         return email;
     }
 
 }

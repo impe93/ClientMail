@@ -1,10 +1,12 @@
 package server;
 
+import client.Client;
 import java.util.ArrayList;
 import modelli.Email;
 import modelli.Utente;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Map;
 import modelli.EmailDaInviare;
 
 /**

@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 import modelli.Email;
 import modelli.Utente;
 import modelli.EmailDaInviare;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -22,9 +24,14 @@ import modelli.EmailDaInviare;
  */
 public class ServerImplementation extends UnicastRemoteObject implements Server{
     
-    Client[] client = new Client[3];
+    
+    private Map<String, Client> clientConnessi = new HashMap<>();
     CasellaServer casella;
-    int clientConnessi;
+
+    public Map<String, Client> getClientConnessi() {
+        return clientConnessi;
+    }
+    
     
     /*
     *  Costruttore di ServerImplementation
@@ -44,7 +51,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
         
         casella = new CasellaServer();
-        clientConnessi = 0;
     
     }
     
@@ -69,9 +75,18 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     
     /* TODO: Controllare che il email ritorno non sia null e chiamare il metodo
     ricevi email sui giusti destinatari utilizzando l'hash map (vedere todo in connettiAlClient per info) */
+    
+    /*il metodo riceviEmail sul client viene chiamato all'interno del metodo inviaEmail di CasellaServer*/
     @Override
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
-        return casella.inviaEmail(emailDaInviare);
+        Email emailRitorno = casella.inviaEmail(emailDaInviare, clientConnessi);
+        if(emailRitorno != null){
+            return emailRitorno;
+        }
+        else{
+            System.out.println("Si è verificato un problema con l'invio dell'email");
+            return null;
+        }
     }
     
     public static void lanciaRMIRegistry() {
@@ -86,12 +101,12 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     
     /* TODO: Mettere la registrazione dei client come HashMap e non come array se no il client
     è irrintracciabile all'interno dell'array, non avendo alcun nome, utilizzare come chiave dell'hash map
-    emailClient */
+    emailClient */          /*FATTO*/       /*FATTO*/       /*FATTO*/       /*FATTO*/       /*FATTO*/
+    
     @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
         try {
-            this.client[clientConnessi] = (Client)Naming.lookup("//localhost/Client/" + emailClient);
-            clientConnessi++;
+            clientConnessi.put(emailClient, (Client)Naming.lookup("//localhost/Client/" + emailClient));
             
             casella.setOperazioneEseguita("* [NUOVO CLIENT CONNESSO: " + emailClient + " - " + 
                         new Date().toString() + "]");

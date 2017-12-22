@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.border.Border;
 
 /**
@@ -30,14 +31,13 @@ public class ServerGUI implements Observer{
     JFrame frame = new JFrame("Server");
     JPanel panel = new JPanel();
     JLabel lblIntestazione = new JLabel("Log delle operazioni:");
-    JTextArea logArea = new JTextArea("* [SERVER START - " + (new Date()).toString() + " ]");
     JPanel footer = new JPanel();
     JButton chiudi = new JButton("Chiudi il server");
+    JTextArea logArea = new JTextArea("* [SERVER START - " + (new Date()).toString() + " ]");
     
     /*
     *   Costruttore dell'interfaccia del server
     */
-    
     public ServerGUI(){
         try {
             this.model = new ServerImplementation();
