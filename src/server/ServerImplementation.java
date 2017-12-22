@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import modelli.Email;
@@ -25,6 +26,9 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     CasellaServer casella;
     int clientConnessi;
     
+    /*
+    *  Costruttore di ServerImplementation
+    */
     public ServerImplementation() throws RemoteException{
         /* 
         registrazione dell'oggetto ServerImplementation presso il registro di 
@@ -43,6 +47,10 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         clientConnessi = 0;
     
     }
+    
+    public void aggiungiObserver(ServerGUI serverGui){
+        this.casella.addObserver(serverGui);
+    }
 
     @Override
     public ArrayList<Email> getInviate(int ultimaInviata, Utente utente) throws RemoteException {
@@ -58,7 +66,9 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     public boolean eliminaEmail(Email emailDaEliminare, Utente utente) throws RemoteException {
     return false;
     }
-
+    
+    /* TODO: Controllare che il email ritorno non sia null e chiamare il metodo
+    ricevi email sui giusti destinatari utilizzando l'hash map (vedere todo in connettiAlClient per info) */
     @Override
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
         return casella.inviaEmail(emailDaInviare);
@@ -74,11 +84,18 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
     }
     
+    /* TODO: Mettere la registrazione dei client come HashMap e non come array se no il client
+    è irrintracciabile all'interno dell'array, non avendo alcun nome, utilizzare come chiave dell'hash map
+    emailClient */
     @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
         try {
             this.client[clientConnessi] = (Client)Naming.lookup("//localhost/Client/" + emailClient);
             clientConnessi++;
+            
+            casella.setOperazioneEseguita("* [NUOVO CLIENT CONNESSO: " + emailClient + " - " + 
+                        new Date().toString() + "]");
+            casella.logUltimaOperazione();
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }    

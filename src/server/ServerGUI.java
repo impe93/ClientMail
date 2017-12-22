@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.rmi.RemoteException;
 import java.util.Date;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -21,10 +23,20 @@ import javax.swing.border.Border;
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public class ServerGUI {
+public class ServerGUI implements Observer{
     
     ServerImplementation model;
     ServerController controller = new ServerController(model);
+    JFrame frame = new JFrame("Server");
+    JPanel panel = new JPanel();
+    JLabel lblIntestazione = new JLabel("Log delle operazioni:");
+    JTextArea logArea = new JTextArea("* [SERVER START - " + (new Date()).toString() + " ]");
+    JPanel footer = new JPanel();
+    JButton chiudi = new JButton("Chiudi il server");
+    
+    /*
+    *   Costruttore dell'interfaccia del server
+    */
     
     public ServerGUI(){
         try {
@@ -32,34 +44,29 @@ public class ServerGUI {
         } catch (RemoteException ex) {
             Logger.getLogger(ServerGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-    
-        JFrame frame = new JFrame("Server");
-        
-        
-        JPanel panel = new JPanel();
+   
         panel.setLayout(new BorderLayout());
-        panel.setPreferredSize(new Dimension(800, 400));
+        panel.setPreferredSize(new Dimension(1200, 400));
         Border bordoTrenta = BorderFactory.createEmptyBorder(30, 30, 30, 30);
         panel.setBorder(bordoTrenta);
         frame.add(panel);
      
-        JLabel lblIntestazione = new JLabel("Log delle operazioni:");
+        
         Border bordoDieci = BorderFactory.createEmptyBorder(10, 10, 10, 10);
         lblIntestazione.setBorder(bordoDieci);
         panel.add(lblIntestazione, BorderLayout.PAGE_START);
         lblIntestazione.setHorizontalAlignment( JLabel.CENTER );
         
-        JTextArea log = new JTextArea("- [SERVER START - " + (new Date()).toString() + " ]");
-        log.setLineWrap(true);
-        log.setBorder(bordoDieci);
-        log.setEditable(false);
-        JScrollPane sp = new JScrollPane(log);
+        
+        logArea.setLineWrap(true);
+        logArea.setBorder(bordoDieci);
+        logArea.setEditable(false);
+        JScrollPane sp = new JScrollPane(logArea);
         
         panel.add(sp, BorderLayout.CENTER);
         
-        JPanel footer = new JPanel();
+        
         footer.setBorder(bordoDieci);
-        JButton chiudi = new JButton("Chiudi il server");
         chiudi.setName("chiudi");
         chiudi.addActionListener(controller);
         footer.add(chiudi);
@@ -72,14 +79,24 @@ public class ServerGUI {
         
     }
     
+    @Override
+    public void update(Observable o, Object arg) {
+        String logOperazione = (String) arg;
+        logArea.setText(logArea.getText() + "\n" + logOperazione);
+    }
+    
     public static void main(String[] args) throws RemoteException{
         
         ServerGUI gui = new ServerGUI();
         ServerImplementation server = new ServerImplementation();
+        server.aggiungiObserver(gui);
     
     }
     
-    
+     /*
+    *   Classe MyQuitDialog per la finestra a comparsa che compare 
+    *   quando si vuole chiudere il server
+    */
     public class MyQuitDialog extends JOptionPane{
     int risposta;
     
