@@ -204,13 +204,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         try {
             emailDaInviare.setMittente(this.utente);
             
-            System.out.println(emailDaInviare.getPriorita());
-            
-            
             Email emailInviata = this.server.inviaEmail(emailDaInviare);
-            
-            System.out.println(emailDaInviare.getPriorita());
-            System.out.println(emailInviata);
             
             if(emailInviata == null){
                 System.out.println("Invio dell'email non riuscito!");
@@ -241,19 +235,51 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         }
     }
     
+    //bisogna segnalare al server che ci stiamo disconnettendo OK
+    
+    //fare letto non letto-->attenzione!!!! solo email ricevute possono essere lette!!!
+    //???ma devo notificare alla view la lettura o semplicemente le casella dell'email si colora 
+    //diversamente o viene segnata in qualche modo quando la clicchi per leggerla
+    
+    //popup per ogni messaggio
+    
+    //verificare se funziona eliminazione
+    
+    /**
+     * Notifica al server che il client si vuole disconnettere
+     * @return true nel caso in cui la disconnessione sia avvenuta con successo,
+     *      false altrimenti
+     * @throws RemoteException 
+     */
+    public boolean disconnettiClientDaServer() throws RemoteException{
+        if(this.server.disconnettiClient(this.utente.getEmail())){
+            System.out.println("disconnessione del client dal server riuscita");
+            return true;
+        }
+        System.out.println("disconnessione del client dal server fallita");
+        return false;
+    }
+    
+    /**
+     * Notifica la lettura di un'email al server e alla casella di posta locale
+     * @param emailLetta: email da segnare come già letta
+     * @throws RemoteException 
+     */
+    public void segnaLetturaEmail(Email emailLetta) throws RemoteException{
+        if(this.server.segnaEmailComeLetta(emailLetta)){
+            System.out.println("lettura email riuscita");
+            this.casellaPostaleClient.segnaLetturaEmail(emailLetta);
+        } else{
+            System.out.println("lettura email fallita");
+        }
+    }
+    
+    
     @Override
     public void riceviEmail(Email emailRicevuta) throws RemoteException{
         if(emailRicevuta != null){
             this.casellaPostaleClient.inserisciInRicevuti(emailRicevuta);
         }
     }
-    
-    //bisogna segnalare al server che ci stiamo disconnettendo
-    
-    //fare letto non letto
-    
-    //popup per ogni messaggio
-    
-    //verificare se funziona eliminazione
-    
+   
 }
