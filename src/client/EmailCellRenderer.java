@@ -9,17 +9,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Insets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
 import modelli.Email;
 
 /**
@@ -37,6 +33,7 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
     private final JPanel centralePanel;
     private final JLabel corpoLabel;
     private final JLabel oggettoLabel;
+    private final JLabel prioritaLabel;
     
     EmailCellRenderer() {
         this.pannelloEmail = new JPanel();
@@ -56,12 +53,14 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         pannelloHeader.add(labelData, BorderLayout.EAST);
         
         this.centralePanel = new JPanel();
-        this.centralePanel.setLayout(new BoxLayout(this.centralePanel, BoxLayout.Y_AXIS));
+        this.centralePanel.setLayout(new BorderLayout());
         this.corpoLabel = new JLabel();
         this.corpoLabel.setForeground(new Color(124, 124, 124));
         this.oggettoLabel = new JLabel();
-        this.centralePanel.add(this.oggettoLabel);
-        this.centralePanel.add(this.corpoLabel);
+        this.prioritaLabel = new JLabel();
+        this.centralePanel.add(this.oggettoLabel, BorderLayout.WEST);
+        this.centralePanel.add(this.prioritaLabel, BorderLayout.EAST);
+        this.centralePanel.add(this.corpoLabel, BorderLayout.SOUTH);
         
         this.pannelloEmail.add(this.pannelloHeader, BorderLayout.PAGE_START);
         this.pannelloEmail.add(this.centralePanel, BorderLayout.CENTER);
@@ -91,6 +90,7 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         this.labelData.setText(formatter.format(email.getData()));
         
         oggettoLabel.setText(formattaOggetto(email.getOggetto()));
+        this.prioritaLabel.setText("Priorità: " + email.getPriorita());
         corpoLabel.setText("<html>" + formattaCorpo(email.getCorpo()) + "</html>");
         
         
@@ -102,14 +102,22 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
             this.labelData.setBackground(Color.lightGray);
             this.oggettoLabel.setBackground(Color.lightGray);
             this.corpoLabel.setBackground(Color.lightGray);
-        } else {
-            this.pannelloEmail.setBackground(Color.lightGray);
+        } else if(email.getLetto() == 1) {
+            this.pannelloEmail.setBackground(Color.white);
             this.pannelloHeader.setBackground(Color.white);
             this.centralePanel.setBackground(Color.white);
             this.labelTitolo.setBackground(Color.white);
             this.labelData.setBackground(Color.white);
             this.oggettoLabel.setBackground(Color.white);
             this.corpoLabel.setBackground(Color.white);
+        } else if (email.getLetto() == 0) {
+            this.pannelloEmail.setBackground(Color.yellow);
+            this.pannelloHeader.setBackground(Color.yellow);
+            this.centralePanel.setBackground(Color.yellow);
+            this.labelTitolo.setBackground(Color.yellow);
+            this.labelData.setBackground(Color.yellow);
+            this.oggettoLabel.setBackground(Color.yellow);
+            this.corpoLabel.setBackground(Color.yellow);
         }
         
         return this.pannelloEmail;
@@ -121,7 +129,9 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
             stringaFormattata += corpo.charAt(i);
         }
         stringaFormattata = stringaFormattata.trim();
-        stringaFormattata += "...";
+        if (corpo.length() > 30) {
+            stringaFormattata += "...";
+        }
         return stringaFormattata;
     }
     
@@ -131,7 +141,9 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
             stringaFormattata += oggetto.charAt(i);
         }
         stringaFormattata = stringaFormattata.trim();
-        stringaFormattata += "...";
+        if(oggetto.length() > 17) {
+            stringaFormattata += "...";
+        }
         return stringaFormattata;
     }
     
