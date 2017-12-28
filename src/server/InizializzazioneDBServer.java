@@ -28,8 +28,8 @@ public class InizializzazioneDBServer {
         }
         try {
             creaDBServer();
-            creaTabellaUtenti(urlDB);
-            creaTabellaEmail(urlDB);
+            creaTabellaUtenti();
+            creaTabellaEmail();
             inserisciUtentiInTabellaUtenti();
             inserisciEmailInTabellaEmail();
         } catch (SQLException e) {
@@ -50,7 +50,7 @@ public class InizializzazioneDBServer {
             }  
     }
     
-    private static void creaTabellaUtenti(String nomeDB) throws SQLException{
+    private static void creaTabellaUtenti() throws SQLException{
         String creazioneTabellaUtenti 
                 = "create table utenti ("
                 + "email text primary key,"
@@ -63,7 +63,7 @@ public class InizializzazioneDBServer {
         eseguiQueryDB(urlDB, creazioneTabellaUtenti, eliminazioneTabellaUtenti);
     }
     
-    private static void creaTabellaEmail(String nomeDB) throws SQLException{
+    private static void creaTabellaEmail() throws SQLException{
         String creaTabellaEmail
                 = "create table email ("
                 + "id_email integer not null,"

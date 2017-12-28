@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Observable;
 import java.util.logging.Level;
@@ -140,7 +139,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * Ordina le email inviate per priorità decrescente
      */
     public void ordinaInviatePerPriorita(){
-        Collections.sort(this.emailInviate, (Email email1, Email email2) -> email1.getPriorita() - email2.getPriorita());
+        ordinaPerPriorita(true);
         setChanged();
         notifyObservers(ClientGUI.INVIATE_PER_PRIORITA);
     }
@@ -149,16 +148,77 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * Ordina le email ricevute per priorità decrescente
      */
     public void ordinaRicevutePerPriorita(){
-        Collections.sort(this.emailRicevute, (Email email1, Email email2) -> email1.getPriorita() - email2.getPriorita());
+        ordinaPerPriorita(false);
         setChanged();
         notifyObservers(ClientGUI.RICEVUTE_PER_PRIORITA);
+    }
+    
+    /**
+     * Esegue una query di ordinamento per priorità decrescente nella tabella
+     * del DB desiderata (email_inviate o email_ricevute a seconda del valore
+     * del parametro isInviate)
+     * @param isInviate: valore booleano che determina in quale tabella va 
+     *      effettuato un ordinamento delle tuple
+     */
+    private void ordinaPerPriorita(boolean isInviate){
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        String queryOrdinamentoPerPriorita = "";
+        if(isInviate){
+            queryOrdinamentoPerPriorita = "SELECT * FROM email_inviate ORDER BY priorita DESC";
+            this.emailInviate.clear();
+        } else{
+            queryOrdinamentoPerPriorita = "SELECT * FROM email_ricevute ORDER BY priorita DESC";
+            this.emailRicevute.clear();
+        }
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            rs = st.executeQuery(queryOrdinamentoPerPriorita);
+            while(rs.next()){
+                Email email = new Email();
+                email.setId(rs.getInt("id_email"));
+                email.setMittente(recuperaDatiUtente(rs.getString("mittente")));
+                ArrayList<Utente> destinatariEmail = recuperaUtentiDestinatari(rs.getInt("id_email"), isInviate);
+                email.setDestinatari(destinatariEmail);
+                email.setOggetto(rs.getString("oggetto"));
+                email.setCorpo(rs.getString("corpo"));
+                email.setData(new Date(rs.getDate("data").getTime()));
+                email.setPriorita(rs.getInt("priorita"));
+                email.setLetto(rs.getInt("letto"));
+                if(isInviate){
+                    if(!this.emailInviate.contains(email)){
+                        this.emailInviate.add(email);
+                    }
+                } else{
+                    this.emailRicevute.add(email);
+                }
+            }
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(rs != null){
+                    rs.close();
+                }
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
     }
     
     /**
      * Ordina le email inviate per data decrescente
      */
     public void ordinaInviatePerData(){
-        Collections.sort(this.emailInviate, (Email email1, Email email2) -> email1.getData().compareTo(email2.getData()));
+        ordinaPerData(true);
         setChanged();
         notifyObservers(ClientGUI.INVIATE_PER_DATA);
     }
@@ -167,9 +227,70 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * Ordina le email ricevute per data decrescente
      */
     public void ordinaRicevutePerData(){
-        Collections.sort(this.emailRicevute, (Email email1, Email email2) -> email1.getData().compareTo(email2.getData()));
+        ordinaPerData(false);
         setChanged();
         notifyObservers(ClientGUI.RICEVUTE_PER_DATA);
+    }
+    
+    /**
+     * Esegue una query di ordinamento per data decrescente nella tabella
+     * del DB desiderata (email_inviate o email_ricevute a seconda del valore
+     * del parametro isInviate)
+     * @param isInviate: valore booleano che determina in quale tabella va 
+     *      effettuato un ordinamento delle tuple
+     */
+    private void ordinaPerData(boolean isInviate){
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        String queryOrdinamentoPerPriorita = "";
+        if(isInviate){
+            queryOrdinamentoPerPriorita = "SELECT * FROM email_inviate ORDER BY data DESC";
+            this.emailInviate.clear();
+        } else{
+            queryOrdinamentoPerPriorita = "SELECT * FROM email_ricevute ORDER BY data DESC";
+            this.emailRicevute.clear();
+        }
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            rs = st.executeQuery(queryOrdinamentoPerPriorita);
+            while(rs.next()){
+                Email email = new Email();
+                email.setId(rs.getInt("id_email"));
+                email.setMittente(recuperaDatiUtente(rs.getString("mittente")));
+                ArrayList<Utente> destinatariEmail = recuperaUtentiDestinatari(rs.getInt("id_email"), isInviate);
+                email.setDestinatari(destinatariEmail);
+                email.setOggetto(rs.getString("oggetto"));
+                email.setCorpo(rs.getString("corpo"));
+                email.setData(new Date(rs.getDate("data").getTime()));
+                email.setPriorita(rs.getInt("priorita"));
+                email.setLetto(rs.getInt("letto"));
+                if(isInviate){
+                    if(!this.emailInviate.contains(email)){
+                        this.emailInviate.add(email);
+                    }
+                } else{
+                    this.emailRicevute.add(email);
+                }
+            }
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(rs != null){
+                    rs.close();
+                }
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
     }
     
     /**
@@ -219,32 +340,26 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * Recupera tutte le email inviate dall'utente proprietario della casella
      * di posta elettronica
      */
-    public synchronized void recuperaEmailInviate(){
+    public void recuperaEmailInviate(){
         this.emailInviate = new ArrayList<>();
         String queryEmailRicevute = 
                 "SELECT * " + 
                 "FROM email_inviate " +
                 "WHERE mittente = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, true);
-        
-        setChanged();
-        notifyObservers(ClientGUI.INVIATI);
     }
     
     /**
      * Recupera tutte le email ricevute dall'utente proprietario della casella
      * di posta elettronica
      */
-    public synchronized void recuperaEmailRicevute(){
+    public void recuperaEmailRicevute(){
         this.emailRicevute = new ArrayList<>();
         String queryEmailRicevute = 
                 "SELECT * " + 
                 "FROM email_ricevute " +
                 "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, false);
-        
-        setChanged();
-        notifyObservers(ClientGUI.RICEVUTI);
     }
     
     /**
@@ -311,7 +426,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @return: un ArrayList di Utente contenente tutti gli utenti destinatari 
      * dell'email
      */
-    private synchronized ArrayList<Utente> recuperaUtentiDestinatari(int idEmail, boolean inInviate){
+    private ArrayList<Utente> recuperaUtentiDestinatari(int idEmail, boolean inInviate){
         ArrayList<Utente> utentiDestinatari = new ArrayList<>();
         Connection conn = null;
         Statement st = null;
@@ -366,6 +481,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmail(email, "email_inviate");
         });
         this.emailInviate.addAll(nuoveEmailInviate);
+        
+        setChanged();
+        notifyObservers(ClientGUI.INVIATI);
     }
     
     /**
@@ -378,6 +496,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmail(email, "email_ricevute");
         });
         this.emailRicevute.addAll(nuoveEmailRicevute);
+        
+        setChanged();
+        notifyObservers(ClientGUI.RICEVUTI);
     }
 
     /**
@@ -564,6 +685,34 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 System.out.println(ex.getMessage());
             }
         }     
+    }
+    
+    /**
+     * Segna l'email passata come parametro come già letta
+     * @param emailLetta : email che si desidera contrassegnare come già letta
+     */
+    public void segnaLetturaEmail(Email emailLetta){
+        String queryLetturaEmail = "UPDATE email_ricevute SET letto = 1 WHERE id_email = " + emailLetta.getId();
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            st.executeUpdate(queryLetturaEmail);
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } 
     }
     
     
