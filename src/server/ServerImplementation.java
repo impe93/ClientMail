@@ -169,8 +169,9 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     }
 
     @Override
-    public boolean segnaEmailComeLetta(Email emailLetta) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean segnaEmailComeLetta(String emailClient, Email emailLetta) throws RemoteException {
+        casella.setLetta(emailClient, emailLetta);
+        return true;
     }
     
 }

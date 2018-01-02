@@ -385,5 +385,38 @@ public class CasellaServer extends Observable {
         
          return email;
     }
+    
+    public boolean setLetta(String emailClient, Email emailLetta){
+        Connection conn = null;
+        Statement st = null;
+        
+        String querySetLetta = 
+                  "UPDATE email"
+                + "SET letto=1"
+                + "WHERE id_email=" + emailLetta.getId() + "AND destinatario = '" + emailClient +"';";
+        r1.lock();
+         try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            st.executeUpdate(querySetLetta);
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+            r1.unlock();
+         }
+        //valore ritorno??
+        return true;
+    
+    }
 
 }

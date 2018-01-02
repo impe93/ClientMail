@@ -49,5 +49,5 @@ public interface Server extends Remote{
     /*
     *  Segna l'email passata come parametro come già letta 
     */
-    boolean segnaEmailComeLetta(Email emailLetta) throws RemoteException;
+    boolean segnaEmailComeLetta(String emailClient, Email emailLetta) throws RemoteException;
 }
