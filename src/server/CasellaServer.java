@@ -315,7 +315,6 @@ public class CasellaServer extends Observable {
         java.sql.Date dataSql = new java.sql.Date(data.getTime());
         String emailDestinatario;
         int nuovoId = recuperaIdMax()+1;
-        Client clientRicevente;
         
         setOperazioneEseguita("* [RICEVUTA RICHIESTA DI INVIO EMAIL DA " + emailDaInviare.getMittente().getEmail() + ""
                         + " A " + emailDaInviare.getDestinatari().toString() + " - " + 
@@ -359,8 +358,7 @@ public class CasellaServer extends Observable {
                         ,destinatarioEmail,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),
                         emailDaInviare.getPriorita());
                 
-                clientRicevente = clientConnessi.get(emailDestinatario);
-                clientRicevente.riceviEmail(emailRicevuta);
+                
             }
         } catch(SQLException e) {
             System.out.println(e.getMessage());

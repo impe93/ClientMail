@@ -103,6 +103,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
         FutureTask<Email> ft = new FutureTask<>(() -> casella.inviaEmail(emailDaInviare, clientConnessi));
         Email emailRitorno = null;
+        
         exec.execute(ft);
         try{
             emailRitorno = ft.get();
@@ -111,6 +112,20 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             System.out.println(e.getMessage());
         }
         if(emailRitorno != null){
+            ArrayList<Utente> destinatari = new ArrayList<>();
+            destinatari.addAll(emailRitorno.getDestinatari());
+            for(Utente destinatario : destinatari){
+                Client clientRicevente = clientConnessi.get(destinatario.getEmail());
+                if(clientRicevente != null){
+                    try{
+                        clientRicevente.riceviEmail(emailRitorno);
+                    }
+                    catch(RemoteException e){
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+            
             return emailRitorno;
         }
         else{
@@ -140,6 +155,22 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }    
+    }
+
+    @Override
+    public boolean disconnettiClient(String emailClient) throws RemoteException {
+        clientConnessi.remove(emailClient);
+        casella.setOperazioneEseguita("* [CLIENT DISCONNESSO: " + emailClient + " - " + 
+                        new Date().toString() + "]");
+        casella.logUltimaOperazione();
+        //valore di ritorno??
+        return true;
+        
+    }
+
+    @Override
+    public boolean segnaEmailComeLetta(Email emailLetta) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
