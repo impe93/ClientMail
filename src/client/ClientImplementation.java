@@ -203,7 +203,6 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     public void inviaEmail(EmailDaInviare emailDaInviare){
         try {
             emailDaInviare.setMittente(this.utente);
-            
             Email emailInviata = this.server.inviaEmail(emailDaInviare);
             
             if(emailInviata == null){
@@ -249,31 +248,37 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      * Notifica al server che il client si vuole disconnettere
      * @return true nel caso in cui la disconnessione sia avvenuta con successo,
      *      false altrimenti
-     * @throws RemoteException 
      */
-    public boolean disconnettiClientDaServer() throws RemoteException{
-        if(this.server.disconnettiClient(this.utente.getEmail())){
-            System.out.println("disconnessione del client dal server riuscita");
-            return true;
+    public boolean disconnettiClientDaServer(){
+        try {
+            if(this.server.disconnettiClient(this.utente.getEmail())){
+                System.out.println("disconnessione del client dal server riuscita");
+                return true;
+            } else{
+                System.out.println("disconnessione del client dal server fallita");
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("disconnessione del client dal server fallita");
         return false;
     }
     
     /**
      * Notifica la lettura di un'email al server e alla casella di posta locale
      * @param emailLetta: email da segnare come già letta
-     * @throws RemoteException 
      */
-    public void segnaLetturaEmail(Email emailLetta) throws RemoteException{
-        if(this.server.segnaEmailComeLetta(utente.getEmail(),emailLetta)){
-            System.out.println("lettura email riuscita");
-            this.casellaPostaleClient.segnaLetturaEmail(emailLetta);
-        } else{
-            System.out.println("lettura email fallita");
+    public void segnaLetturaEmail(Email emailLetta){
+        try {
+            if(this.server.segnaEmailComeLetta(utente.getEmail(),emailLetta)){
+                System.out.println("lettura email riuscita");
+                this.casellaPostaleClient.segnaLetturaEmail(emailLetta);
+            } else{
+                System.out.println("lettura email fallita");
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
     
     @Override
     public void riceviEmail(Email emailRicevuta) throws RemoteException{
