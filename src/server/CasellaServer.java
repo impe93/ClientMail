@@ -315,6 +315,7 @@ public class CasellaServer extends Observable {
         java.sql.Date dataSql = new java.sql.Date(data.getTime());
         String emailDestinatario;
         int nuovoId = recuperaIdMax()+1;
+        Email email = null;
         
         setOperazioneEseguita("* [RICEVUTA RICHIESTA DI INVIO EMAIL DA " + emailDaInviare.getMittente().getEmail() + ""
                         + " A " + emailDaInviare.getDestinatari().toString() + " - " + 
@@ -325,22 +326,26 @@ public class CasellaServer extends Observable {
             System.err.println("Errore nel recuperare l ID massimo");
             return null;
         }
+        ArrayList<String> utentiAccreditati = recuperaEmailUtenti();
+        
+        
         w1.lock();
         try {   
             for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
                 emailDestinatario = emailDaInviare.getDestinatari().get(i);
+                if(utentiAccreditati.contains(emailDestinatario)){
                 Utente destinatario;
                 destinatario = recuperaDatiUtente(emailDestinatario);
                 destinatari.add(destinatario);
                 
                 String inserisciEmail =
                 "INSERT INTO email (id_email,mittente,destinatario,oggetto,"
-                + "corpo,data,priorita,letto,0,0)"
+                + "corpo,data,priorita,letto,eliminataDaMittente,eliminataDaDestinatario)"
                 + "VALUES"
                 + "(" + nuovoId + ",'" + emailDaInviare.getMittente().getEmail()
                 + "','" + emailDestinatario+ "','" + emailDaInviare.getOggetto() + "','"
                 + emailDaInviare.getCorpo() + "','" + dataSql +"'," + emailDaInviare.getPriorita() + ","
-                + "0);";
+                + "0,0,0);";
         
                 conn = DriverManager.getConnection(urlDB);
                 st = conn.createStatement();
@@ -353,12 +358,17 @@ public class CasellaServer extends Observable {
                 ArrayList<Utente> destinatarioEmail= new ArrayList<>();
                 destinatarioEmail.add(recuperaDatiUtente(emailDestinatario));
                 
+                email = new Email(nuovoId, emailDaInviare.getMittente(), 
+                destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),emailDaInviare.getPriorita());
                 
-                Email emailRicevuta = new Email(nuovoId,recuperaDatiUtente(emailDaInviare.getMittente().getEmail())
-                        ,destinatarioEmail,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),
-                        emailDaInviare.getPriorita());
-                
-                
+                }
+                else{
+                    //METODO CLIENT PER SEGNALARE L'ERRORE DI DESTINATARIO NON ESISTENTE
+                    setOperazioneEseguita("* [INVIO EMAIL A " + emailDestinatario 
+                        + " DA " + emailDaInviare.getMittente().getEmail() + " NON ESEGUITO,"
+                        + " DESTINATARIO INESISTENTE - " + new Date().toString() + "]");
+                    logUltimaOperazione();
+                }
             }
         } catch(SQLException e) {
             System.out.println(e.getMessage());
@@ -379,9 +389,6 @@ public class CasellaServer extends Observable {
             }
             w1.unlock();
         }
-        
-        Email email = new Email(nuovoId, emailDaInviare.getMittente(), 
-                destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),emailDaInviare.getPriorita());
         
          return email;
     }
@@ -461,8 +468,8 @@ public class CasellaServer extends Observable {
     
     }
 
-    private ArrayList<Utente> recuperaUtenti(){
-        ArrayList<Utente> utenti = new ArrayList<>();
+    private ArrayList<String> recuperaEmailUtenti(){
+        ArrayList<String> utenti = new ArrayList<>();
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -475,8 +482,7 @@ public class CasellaServer extends Observable {
             st = conn.createStatement();
             rs = st.executeQuery(queryUtenti);
             while(rs.next()){
-                Utente utente = new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"));
-                utenti.add(utente);
+                utenti.add(rs.getString("email"));
             }
         } catch(SQLException e) {
             System.out.println(e.getMessage());
