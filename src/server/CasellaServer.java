@@ -335,7 +335,7 @@ public class CasellaServer extends Observable {
                 
                 String inserisciEmail =
                 "INSERT INTO email (id_email,mittente,destinatario,oggetto,"
-                + "corpo,data,priorita,letto)"
+                + "corpo,data,priorita,letto,0,0)"
                 + "VALUES"
                 + "(" + nuovoId + ",'" + emailDaInviare.getMittente().getEmail()
                 + "','" + emailDestinatario+ "','" + emailDaInviare.getOggetto() + "','"
@@ -461,4 +461,41 @@ public class CasellaServer extends Observable {
     
     }
 
+    private ArrayList<Utente> recuperaUtenti(){
+        ArrayList<Utente> utenti = new ArrayList<>();
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        String queryUtenti = 
+                    "SELECT email " + 
+                    "FROM utenti";
+        r1.lock();
+         try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            rs = st.executeQuery(queryUtenti);
+            while(rs.next()){
+                Utente utente = new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"));
+                utenti.add(utente);
+            }
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(rs != null){
+                    rs.close();
+                }
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+            r1.unlock();
+        }
+        return utenti;        
+    }
 }
