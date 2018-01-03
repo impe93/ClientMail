@@ -266,7 +266,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      * @throws RemoteException 
      */
     public void segnaLetturaEmail(Email emailLetta) throws RemoteException{
-        if(this.server.segnaEmailComeLetta(emailLetta)){
+        if(this.server.segnaEmailComeLetta(utente.getEmail(),emailLetta)){
             System.out.println("lettura email riuscita");
             this.casellaPostaleClient.segnaLetturaEmail(emailLetta);
         } else{
