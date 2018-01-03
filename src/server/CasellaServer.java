@@ -68,7 +68,7 @@ public class CasellaServer extends Observable {
                 "SELECT * " + 
                 "FROM email " +
                 "WHERE destinatario = '" + utente.getEmail() 
-                + "' AND id_email >" + ultimaRicevuta ;
+                + "' AND id_email >" + ultimaRicevuta +" AND eliminataDaDestinatario=0";
         
         r1.lock();
         try {
@@ -127,7 +127,7 @@ public class CasellaServer extends Observable {
                 "SELECT * " + 
                 "FROM email " +
                 "WHERE mittente = '" + utente.getEmail() 
-                + "' AND id_email >" + ultimaInviata;
+                + "' AND id_email >" + ultimaInviata +" AND eliminataDaMittente=0";
         r1.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
