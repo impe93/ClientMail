@@ -74,6 +74,8 @@ public class InizializzazioneDBServer {
                 + "data date not null,"
                 + "priorita integer not null check(priorita >= 1 and priorita <= 10),"
                 + "letto integer not null check(letto = 0 or letto = 1),"
+                + "eliminataDaMittente integer not null check(eliminataDaMittente = 0 or eliminataDaMittente = 1),"
+                + "eliminataDaDestinatario integer not null check(eliminataDaDestinatario = 0 or eliminataDaDestinatario = 1),"
                 + "primary key (id_email, destinatario)"
                 + ")";
         String eliminaTabellaEmail 
@@ -173,7 +175,7 @@ public class InizializzazioneDBServer {
         int letto = 0;
        
         String inserimentoEmail = "INSERT INTO email (id_email, mittente, destinatario, oggetto, corpo,"
-                + "data, priorita,letto) VALUES (?,?,?,?,?,?,?,?)";
+                + "data, priorita,letto,eliminataDaMittente,eliminataDaDestinatario) VALUES (?,?,?,?,?,?,?,?,?,?)";
         
         Connection conn = null;
         PreparedStatement pst = null;
@@ -192,6 +194,8 @@ public class InizializzazioneDBServer {
                 pst.setDate(6, dataSql);
                 pst.setInt(7,priorita);
                 pst.setInt(8,letto);
+                pst.setInt(9,0);
+                pst.setInt(10,0);
                 pst.executeUpdate();
             }
         } catch (SQLException e) {
