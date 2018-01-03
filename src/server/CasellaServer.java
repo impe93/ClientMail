@@ -418,5 +418,47 @@ public class CasellaServer extends Observable {
         return true;
     
     }
+    
+    public boolean eliminaEmail(Email email, String clientRichiedente){
+        Connection conn = null;
+        Statement st = null;
+        String queryEliminaEmail="";
+        
+        if(email.getMittente().equals(clientRichiedente)){
+                queryEliminaEmail = 
+                  "UPDATE email"
+                + "SET eliminataDaMittente=1"
+                + "WHERE id_email=" + email.getId() + "AND mittente = '" + clientRichiedente +"';";
+        }
+        else{
+                queryEliminaEmail = 
+                  "UPDATE email"
+                + "SET eliminataDaDestinatario=1"
+                + "WHERE id_email=" + email.getId() + "AND destinatario = '" + clientRichiedente +"';";
+        }
+        r1.lock();
+         try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            st.executeUpdate(queryEliminaEmail);
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+            r1.unlock();
+         }
+        //valore ritorno??
+        return true;
+    
+    }
 
 }

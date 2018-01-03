@@ -95,7 +95,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public boolean eliminaEmail(Email emailDaEliminare, Utente utente) throws RemoteException {
-    return false;
+    return casella.eliminaEmail(emailDaEliminare, utente.getEmail());
     }
     
     /*il metodo riceviEmail sul client viene chiamato all'interno del metodo inviaEmail di CasellaServer*/
