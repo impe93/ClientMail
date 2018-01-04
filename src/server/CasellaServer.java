@@ -432,14 +432,14 @@ public class CasellaServer extends Observable {
         String queryEliminaEmail="";
         
         if(email.getMittente().equals(clientRichiedente)){
-            System.out.println("eliminata da mittente");
+            //System.out.println("eliminata da mittente");
                 queryEliminaEmail = 
                   "UPDATE email "
                 + "SET eliminataDaMittente=1 "
                 + "WHERE id_email= " + email.getId() + " AND mittente = '" + clientRichiedente +"';";
         }
         else{
-            System.out.println("eliminata da destinatario");
+            //System.out.println("eliminata da destinatario");
                 queryEliminaEmail = 
                   "UPDATE email "
                 + "SET eliminataDaDestinatario=1 "
