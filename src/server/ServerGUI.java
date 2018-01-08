@@ -6,8 +6,6 @@ import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -88,30 +86,4 @@ public class ServerGUI implements Observer{
         server.aggiungiObserver(gui);
     
     }
-    
-     /*
-    *   Classe MyQuitDialog per la finestra a comparsa che compare 
-    *   quando si vuole chiudere il server
-    */
-    public class MyQuitDialog extends JOptionPane{
-    int risposta;
-    
-    public void MyQuitDialog(){
-    
-    this.risposta = JOptionPane.showOptionDialog(this,
-                    "Sei sicuro di voler chiudere il server?",
-                    "Attenzione",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE,
-                    null,null,null);
-    setVisible(true);
-    
-
-   if (risposta == JOptionPane.YES_OPTION) {
-                    // option 1
-    } else if (risposta == JOptionPane.NO_OPTION) {
-                    // option 2
-    }
-   }
-}
 }

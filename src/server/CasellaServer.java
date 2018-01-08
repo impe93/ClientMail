@@ -57,8 +57,7 @@ public class CasellaServer extends Observable {
     *   che viene passato come parametro, e le resttuisce in un ArrayList
     */
     
-    public ArrayList<Email> recuperaEmailRicevuteUtente(int ultimaRicevuta, Utente utente)
-   {
+    public ArrayList<Email> recuperaEmailRicevuteUtente(int ultimaRicevuta, Utente utente){
         ArrayList<Email> emailRicevuteUtente = new ArrayList<>();
         
         Connection conn = null;
@@ -147,9 +146,11 @@ public class CasellaServer extends Observable {
                 emailInviateUtente.add(email);
                 
             }
-        } catch(SQLException e) {
+        } 
+        catch(SQLException e){
             System.out.println(e.getMessage());
-        } finally {
+        } 
+        finally {
             try {
                 if(rs != null){
                     rs.close();
@@ -160,14 +161,14 @@ public class CasellaServer extends Observable {
                 if (conn != null) {
                     conn.close();
                 }
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
             r1.unlock();
         }
         
         return emailInviateUtente;
-        
     }
    
      /*
@@ -192,9 +193,11 @@ public class CasellaServer extends Observable {
             if(rs.next()){
                 utente = new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"));
             }
-        } catch(SQLException e) {
+        }
+        catch(SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
+        }
+        finally {
             try {
                 if(rs != null){
                     rs.close();
@@ -202,10 +205,11 @@ public class CasellaServer extends Observable {
                 if(st != null){
                     st.close();
                 }
-                if (conn != null) {
+                if(conn != null) {
                     conn.close();
                 }
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
             r1.unlock();
@@ -228,7 +232,7 @@ public class CasellaServer extends Observable {
                     "WHERE email IN (SELECT destinatario FROM email "
                 + "WHERE id_email= " + idEmail+ ")";
         r1.lock();
-         try {
+        try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
             rs = st.executeQuery(queryUtentiDestinatari);
@@ -236,9 +240,11 @@ public class CasellaServer extends Observable {
                 Utente utente = new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"));
                 utentiDestinatari.add(utente);
             }
-        } catch(SQLException e) {
+        }
+        catch(SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
+        }
+        finally {
             try {
                 if(rs != null){
                     rs.close();
@@ -269,7 +275,7 @@ public class CasellaServer extends Observable {
         String queryIdMax = 
                     "SELECT MAX(id_email) FROM email";
         r1.lock();
-         try {
+        try {
             conn = DriverManager.getConnection(urlDB);
             ps = conn.prepareStatement(queryIdMax);
             rs = ps.executeQuery();
@@ -278,9 +284,11 @@ public class CasellaServer extends Observable {
             else
                 idMax=0;
             
-        } catch(SQLException e) {
+        }
+        catch(SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
+        }
+        finally {
             try {
                 if(rs != null){
                     rs.close();
@@ -291,7 +299,8 @@ public class CasellaServer extends Observable {
                 if (conn != null) {
                     conn.close();
                 }
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
             r1.unlock();
@@ -328,10 +337,9 @@ public class CasellaServer extends Observable {
         }
         ArrayList<String> utentiAccreditati = recuperaEmailUtenti();
         
-        
         w1.lock();
-        try {   
-            for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
+        try{   
+           for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
                 emailDestinatario = emailDaInviare.getDestinatari().get(i);
                 if(utentiAccreditati.contains(emailDestinatario)){
                 Utente destinatario;
@@ -359,8 +367,7 @@ public class CasellaServer extends Observable {
                 destinatarioEmail.add(recuperaDatiUtente(emailDestinatario));
                 
                 email = new Email(nuovoId, emailDaInviare.getMittente(), 
-                destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),emailDaInviare.getPriorita());
-                
+                destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),emailDaInviare.getPriorita());    
                 }
                 else{
                     //METODO CLIENT PER SEGNALARE L'ERRORE DI DESTINATARIO NON ESISTENTE
@@ -370,27 +377,29 @@ public class CasellaServer extends Observable {
                     logUltimaOperazione();
                 }
             }
-        } catch(SQLException e) {
+        }
+        catch(SQLException e) {
             System.out.println(e.getMessage());
         }
-        finally {
-            try {
-                if(rs != null){
+        finally{
+            try{
+               if(rs != null){
                     rs.close();
-                }
-                if(st != null){
+               }
+               if(st != null){
                     st.close();
-                }
-                if (conn != null) {
+               }
+               if (conn != null) {
                     conn.close();
-                }
-            } catch (SQLException ex) {
+               }
+            }
+            catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
             w1.unlock();
         }
         
-         return email;
+        return email;
     }
     
     public boolean setLetta(String emailClient, Email emailLetta){
@@ -402,21 +411,24 @@ public class CasellaServer extends Observable {
                 + "SET letto=1"
                 + "WHERE id_email=" + emailLetta.getId() + "AND destinatario = '" + emailClient +"';";
         r1.lock();
-         try {
+        try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
             st.executeUpdate(querySetLetta);
-        } catch(SQLException e) {
+        }
+        catch(SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
+        }
+        finally {
             try {
                 if(st != null){
                     st.close();
                 }
-                if (conn != null) {
+                if(conn != null) {
                     conn.close();
                 }
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
             r1.unlock();
@@ -434,39 +446,41 @@ public class CasellaServer extends Observable {
         if(email.getMittente().equals(clientRichiedente)){
             //System.out.println("eliminata da mittente");
                 
-                queryEliminaEmail = 
-                  "UPDATE email "
-                + "SET eliminataDaMittente=1 "
-                + "WHERE id_email= " + email.getId() + " AND mittente = '" + clientRichiedente +"';";
+            queryEliminaEmail = 
+            "UPDATE email "
+            + "SET eliminataDaMittente=1 "
+            + "WHERE id_email= " + email.getId() + " AND mittente = '" 
+            + clientRichiedente +"';";
                 
-                setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente + ""
-                        + " IN CASELLA INVIATE - " + 
-                        new Date().toString() + "]");
-                logUltimaOperazione();
+            setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente +
+            " IN CASELLA INVIATE - " + new Date().toString() + "]");
+            logUltimaOperazione();
                 
         }
         else{
             //System.out.println("eliminata da destinatario");
-                queryEliminaEmail = 
-                  "UPDATE email "
-                + "SET eliminataDaDestinatario=1 "
-                + "WHERE id_email= " + email.getId() + " AND destinatario = '" + clientRichiedente +"';";
+            queryEliminaEmail = 
+            "UPDATE email "
+            + "SET eliminataDaDestinatario=1 "
+            + "WHERE id_email= " + email.getId() + " AND destinatario = '" + 
+            clientRichiedente +"';";
                 
-                setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente + ""
-                        + " IN CASELLA RICEVUTE - " + 
-                        new Date().toString() + "]");
-                logUltimaOperazione();
+            setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente + ""
+            + " IN CASELLA RICEVUTE - " + new Date().toString() + "]");
+            logUltimaOperazione();
                 
         }
         
         r1.lock();
-         try {
+        try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
             st.executeUpdate(queryEliminaEmail);
-        } catch(SQLException e) {
+        }
+        catch(SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
+        }
+        finally {
             try {
                 if(st != null){
                     st.close();
@@ -474,7 +488,8 @@ public class CasellaServer extends Observable {
                 if (conn != null) {
                     conn.close();
                 }
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
             r1.unlock();
@@ -490,19 +505,21 @@ public class CasellaServer extends Observable {
         Statement st = null;
         ResultSet rs = null;
         String queryUtenti = 
-                    "SELECT email " + 
-                    "FROM utenti";
+            "SELECT email " + 
+            "FROM utenti";
         r1.lock();
-         try {
+        try{
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
             rs = st.executeQuery(queryUtenti);
             while(rs.next()){
                 utenti.add(rs.getString("email"));
             }
-        } catch(SQLException e) {
+        }
+        catch(SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
+        }
+        finally {
             try {
                 if(rs != null){
                     rs.close();
@@ -513,7 +530,8 @@ public class CasellaServer extends Observable {
                 if (conn != null) {
                     conn.close();
                 }
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
             r1.unlock();

@@ -77,7 +77,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             }
         });
         
-        
         exec.execute(ft);
         ArrayList<Email> inviate = null;
         try{
@@ -159,7 +158,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
                     }
                     try{
                         clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da " 
-                                + emailRitorno.getMittente()+"!");
+                        + emailRitorno.getMittente()+"!");
                     }
                     catch(RemoteException e){
                         System.out.println(e.getMessage());
@@ -171,7 +170,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             }
             if(destinatariInesistenti.isEmpty()==false){
                 String messaggio = "Non è stato possibile inviare l'email "
-                        + "ai seguenti destinatari:\n";
+                    + "ai seguenti destinatari:\n";
                 for(String utente : destinatariInesistenti){
                     messaggio = messaggio + utente + "\n";
                 }

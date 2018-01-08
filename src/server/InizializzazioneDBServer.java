@@ -166,16 +166,21 @@ public class InizializzazioneDBServer {
             "alessio.berger@edu.unito.it"
         };
         String oggetto="Lorem ipsum";
-        String corpo="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in nulla tincidunt,"
-                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet ac finibus nec, "
+        String corpo="Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+                + "Nam in nulla tincidunt,"
+                + " rutrum mauris sodales, luctus arcu. Sed felis leo, imperdiet"
+                + " ac finibus nec, "
                 + "laoreet vitae urna.";
         
         
         int priorita = 3;
         int letto = 0;
        
-        String inserimentoEmail = "INSERT INTO email (id_email, mittente, destinatario, oggetto, corpo,"
-                + "data, priorita,letto,eliminataDaMittente,eliminataDaDestinatario) VALUES (?,?,?,?,?,?,?,?,?,?)";
+        String inserimentoEmail = "INSERT INTO email (id_email, mittente, "
+                + "destinatario, oggetto, corpo,"
+                + "data, priorita,letto,eliminataDaMittente,"
+                + "eliminataDaDestinatario) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?)";
         
         Connection conn = null;
         PreparedStatement pst = null;
