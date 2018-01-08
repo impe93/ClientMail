@@ -12,4 +12,6 @@ public interface Client extends Remote{
     
     public void riceviEmail(Email emailRicevuta) throws RemoteException;
     
+    public void riceviMessaggio(String messaggio) throws RemoteException;
+    
 }
