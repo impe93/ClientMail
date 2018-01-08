@@ -2,6 +2,7 @@ package server;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.Observable;
@@ -15,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import javax.swing.border.Border;
 
 /**
@@ -68,9 +70,22 @@ public class ServerGUI implements Observer{
         frame.add(footer, BorderLayout.PAGE_END);
         
         
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+        
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(WindowEvent winEvt) {
+            int risposta = JOptionPane.showConfirmDialog(null,"Confermi la "
+                        + "chiusura del server?","Conferma",
+                        JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+                 
+                if(risposta == JOptionPane.YES_OPTION){
+                    System.exit(0);
+                }
+        }
+    });
         
     }
     
