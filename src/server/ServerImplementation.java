@@ -141,7 +141,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         }
         if(emailRitorno != null){
             try{
-                clientConnessi.get(emailRitorno.getMittente()).riceviMessaggio("Email inviata correttamente!");
+                clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("Email inviata correttamente!");
             }
             catch(RemoteException e){
                         System.out.println(e.getMessage());
