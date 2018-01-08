@@ -30,6 +30,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import modelli.Email;
 
 /**
@@ -222,24 +223,27 @@ public class ClientGUI extends JFrame implements Observer{
         this.modelListaEmail = new DefaultListModel<>();
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
-        this.listaEmailList.addListSelectionListener((ListSelectionEvent e) -> {
-            if (!e.getValueIsAdjusting()) {
-                if (((JList<Email>)e.getSource()).getSelectedValue() != null) {
-                    this.emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
-                    this.eliminaSelezionata.setEmailDaInoltrareEliminare(this.emailDaVisualizzare);
-                    this.inoltraSelezionata.setEmailDaInoltrareEliminare(this.emailDaVisualizzare);
-                    this.mittenteEmailLabel.setText(this.emailDaVisualizzare.getMittente().getEmail());
-                    String destinatari = "";
-                    for(int i = 0; i < this.emailDaVisualizzare.getDestinatari().size(); i++) {
-                        if (i == 0) {
-                            destinatari = this.emailDaVisualizzare.getDestinatari().get(0).getEmail();
-                        } else {
-                            destinatari += ", " + this.emailDaVisualizzare.getDestinatari().get(i).getEmail();
+        this.listaEmailList.addListSelectionListener( new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    if (((JList<Email>)e.getSource()).getSelectedValue() != null) {
+                        emailDaVisualizzare = ((JList<Email>)e.getSource()).getSelectedValue();
+                        eliminaSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
+                        inoltraSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
+                        mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
+                        String destinatari = "";
+                        for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
+                            if (i == 0) {
+                                destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
+                            } else {
+                                destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
+                            }
                         }
+                        destinatariEmailLabel.setText(destinatari);
+                        oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
+                        corpoTextArea.setText(emailDaVisualizzare.getCorpo());
                     }
-                    this.destinatariEmailLabel.setText(destinatari);
-                    this.oggettoEmailLabel.setText(this.emailDaVisualizzare.getOggetto());
-                    this.corpoTextArea.setText(this.emailDaVisualizzare.getCorpo());
                 }
             }
         });
@@ -292,9 +296,10 @@ public class ClientGUI extends JFrame implements Observer{
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
                 this.modelListaEmail.clear();
-                this.listaEmail.forEach(email -> {
+                for (Email email : this.listaEmail) {
                     this.modelListaEmail.addElement(email);
-                });
+                }
+                
                 if (this.listaEmail.size() > 0) {
                     this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
@@ -307,9 +312,9 @@ public class ClientGUI extends JFrame implements Observer{
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
                 this.modelListaEmail.clear();
-                this.listaEmail.forEach(email -> {
+                for (Email email : this.listaEmail) {
                     this.modelListaEmail.addElement(email);
-                });
+                }
                 if (this.listaEmail.size() > 0) {
                     this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
@@ -322,9 +327,9 @@ public class ClientGUI extends JFrame implements Observer{
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
                 this.modelListaEmail.clear();
-                this.listaEmail.forEach(email -> {
+                for (Email email : this.listaEmail) {
                     this.modelListaEmail.addElement(email);
-                });
+                }
                 if (this.listaEmail.size() > 0) {
                     this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
@@ -334,9 +339,9 @@ public class ClientGUI extends JFrame implements Observer{
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
                 this.modelListaEmail.clear();
-                this.listaEmail.forEach(email -> {
+                for (Email email : this.listaEmail) {
                     this.modelListaEmail.addElement(email);
-                });
+                }
                 if (this.listaEmail.size() > 0) {
                     this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
@@ -346,9 +351,9 @@ public class ClientGUI extends JFrame implements Observer{
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
                 this.modelListaEmail.clear();
-                this.listaEmail.forEach(email -> {
+                for (Email email : this.listaEmail) {
                     this.modelListaEmail.addElement(email);
-                });
+                }
                 if (this.listaEmail.size() > 0) {
                     this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
@@ -358,9 +363,9 @@ public class ClientGUI extends JFrame implements Observer{
                 this.listaEmail.clear();
                 this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
                 this.modelListaEmail.clear();
-                this.listaEmail.forEach(email -> {
+                for (Email email : this.listaEmail) {
                     this.modelListaEmail.addElement(email);
-                });
+                }
                 if (this.listaEmail.size() > 0) {
                     this.emailDaVisualizzare = this.listaEmail.get(0);
                 }
