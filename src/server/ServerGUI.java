@@ -2,12 +2,11 @@ package server;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import javax.swing.border.Border;
 
 /**
@@ -38,12 +38,9 @@ public class ServerGUI implements Observer{
     /*
     *   Costruttore dell'interfaccia del server
     */
-    public ServerGUI(){
-        try {
-            this.model = new ServerImplementation();
-        } catch (RemoteException ex) {
-            Logger.getLogger(ServerGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public ServerGUI(ServerImplementation server){
+        this.model = server;
+  
    
         panel.setLayout(new BorderLayout());
         panel.setPreferredSize(new Dimension(1200, 400));
@@ -73,9 +70,22 @@ public class ServerGUI implements Observer{
         frame.add(footer, BorderLayout.PAGE_END);
         
         
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+        
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(WindowEvent winEvt) {
+            int risposta = JOptionPane.showConfirmDialog(null,"Confermi la "
+                        + "chiusura del server?","Conferma",
+                        JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+                 
+                if(risposta == JOptionPane.YES_OPTION){
+                    System.exit(0);
+                }
+        }
+    });
         
     }
     
@@ -86,36 +96,9 @@ public class ServerGUI implements Observer{
     }
     
     public static void main(String[] args) throws RemoteException{
-        
-        ServerGUI gui = new ServerGUI();
         ServerImplementation server = new ServerImplementation();
+        ServerGUI gui = new ServerGUI(server);
         server.aggiungiObserver(gui);
     
     }
-    
-     /*
-    *   Classe MyQuitDialog per la finestra a comparsa che compare 
-    *   quando si vuole chiudere il server
-    */
-    public class MyQuitDialog extends JOptionPane{
-    int risposta;
-    
-    public void MyQuitDialog(){
-    
-    this.risposta = JOptionPane.showOptionDialog(this,
-                    "Sei sicuro di voler chiudere il server?",
-                    "Attenzione",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE,
-                    null,null,null);
-    setVisible(true);
-    
-
-   if (risposta == JOptionPane.YES_OPTION) {
-                    // option 1
-    } else if (risposta == JOptionPane.NO_OPTION) {
-                    // option 2
-    }
-   }
-}
 }
