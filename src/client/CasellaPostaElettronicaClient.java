@@ -25,12 +25,15 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     private final Utente utenteProprietario;
     private ArrayList<Email> emailInviate;
     private ArrayList<Email> emailRicevute;
-    
+    private ArrayList<String> messaggi;
     
     public CasellaPostaElettronicaClient(String emailUtente){
         registraDriver();
         this.urlDB = "jdbc:sqlite:" + "DB_" + emailUtente + ".db";   
         this.utenteProprietario = recuperaDatiUtente(emailUtente);
+        this.emailInviate = new ArrayList<>();
+        this.emailRicevute = new ArrayList<>();
+        this.messaggi = new ArrayList<>();
     }
 
     public Utente getUtenteProprietario() {
@@ -715,6 +718,32 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         } 
     }
     
+    /**
+     * Inserisce il nuovo messaggio nella lista di messaggi ricevuti dal server
+     * ma non ancora letti
+     * @param messaggio: stringa contenente un messaggio proveniente dal server
+     */
+    public void inserisciMessaggio(String messaggio){
+        this.messaggi.add(messaggio);
+        setChanged();
+        notifyObservers(ClientGUI.NUOVO_MESSAGGIO);
+    }
+    
+    /**
+     * Recupera e ritorna i messaggi ricevuti dal server se sono presenti, 
+     * altrimenti ritorna null
+     * @return un ArrayList di messaggi ricevuti se presenti, null altrimenti
+     */
+    public ArrayList<String> leggiMessaggi(){
+        if(!this.messaggi.isEmpty()){
+            ArrayList<String> messaggiRicevuti = new ArrayList<>();
+            messaggiRicevuti.addAll(this.messaggi);
+            this.messaggi.clear();
+            return messaggiRicevuti;
+        } else{
+            return null;
+        }
+    }
     
     @Override
     public void inserisciInInviati(Email email) {
