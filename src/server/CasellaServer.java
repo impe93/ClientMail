@@ -418,6 +418,7 @@ public class CasellaServer extends Observable {
         }
         catch(SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
         finally {
             try {
@@ -433,7 +434,7 @@ public class CasellaServer extends Observable {
             }
             r1.unlock();
          }
-        //valore ritorno??
+        
         return true;
     
     }
@@ -479,6 +480,7 @@ public class CasellaServer extends Observable {
         }
         catch(SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
         finally {
             try {
@@ -494,7 +496,6 @@ public class CasellaServer extends Observable {
             }
             r1.unlock();
          }
-        //valore ritorno??
         return true;
     
     }
