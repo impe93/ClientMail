@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.border.Border;
 
 /**
@@ -28,6 +27,7 @@ public class ServerGUI implements Observer{
     
     ServerImplementation model;
     ServerController controller = new ServerController(model);
+    
     JFrame frame = new JFrame("Server");
     JPanel panel = new JPanel();
     JLabel lblIntestazione = new JLabel("Log delle operazioni:");

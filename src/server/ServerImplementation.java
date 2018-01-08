@@ -17,6 +17,7 @@ import modelli.Utente;
 import modelli.EmailDaInviare;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -67,7 +68,16 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public ArrayList<Email> getInviate(int ultimaInviata, Utente utente) throws RemoteException {
-       FutureTask<ArrayList<Email>> ft = new FutureTask<>(() -> casella.recuperaEmailInviateUtente(ultimaInviata, utente));
+        final int ultimaInviataFinal = ultimaInviata;
+        final Utente utenteFinal = utente;
+        FutureTask<ArrayList<Email>> ft = new FutureTask<>(new Callable<ArrayList<Email>>(){
+            @Override
+            public ArrayList<Email> call() {
+                return casella.recuperaEmailInviateUtente(ultimaInviataFinal, utenteFinal);
+            }
+        });
+        
+        
         exec.execute(ft);
         ArrayList<Email> inviate = null;
         try{
@@ -81,7 +91,16 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException {
-         FutureTask<ArrayList<Email>> ft = new FutureTask<>(() -> casella.recuperaEmailRicevuteUtente(ultimaRicevuta, utente));
+        final int ultimaRicevutaFinal = ultimaRicevuta;
+        final Utente utenteFinal = utente;
+        
+        FutureTask<ArrayList<Email>> ft = new FutureTask<>(new Callable<ArrayList<Email>>(){
+            @Override
+            public ArrayList<Email> call() {
+                return casella.recuperaEmailRicevuteUtente(ultimaRicevutaFinal, utenteFinal);
+            }
+        });
+        
         exec.execute(ft);
         ArrayList<Email> ricevute = null;
         try{
@@ -102,7 +121,14 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     /*il metodo riceviEmail sul client viene chiamato all'interno del metodo inviaEmail di CasellaServer*/
     @Override
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
-        FutureTask<Email> ft = new FutureTask<>(() -> casella.inviaEmail(emailDaInviare, clientConnessi));
+        final EmailDaInviare emailDaInviareFinal = emailDaInviare;
+        
+        FutureTask<Email> ft = new FutureTask<>(new Callable<Email>(){
+            @Override
+            public Email call() throws RemoteException {
+                return casella.inviaEmail(emailDaInviareFinal, clientConnessi);
+            }
+        });
         Email emailRitorno = null;
         ArrayList<String> destinatariInesistenti = new ArrayList<>();
         

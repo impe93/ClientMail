@@ -480,9 +480,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      *      email_inviate
      */
     public void inserisciNuoveEmailInviate(ArrayList<Email> nuoveEmailInviate){
-        nuoveEmailInviate.forEach((email) -> {
+        for (Email email : nuoveEmailInviate){
             inserisciNuovaEmail(email, "email_inviate");
-        });
+        }
         this.emailInviate.addAll(nuoveEmailInviate);
         
         setChanged();
@@ -495,9 +495,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      *      email_ricevute
      */
     public void inserisciNuoveEmailRicevute(ArrayList<Email> nuoveEmailRicevute){
-        nuoveEmailRicevute.forEach((email) -> {
+        for(Email email: nuoveEmailRicevute) {
             inserisciNuovaEmail(email, "email_ricevute");
-        });
+        }
         this.emailRicevute.addAll(nuoveEmailRicevute);
         
         setChanged();
