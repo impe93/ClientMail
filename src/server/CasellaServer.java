@@ -433,10 +433,17 @@ public class CasellaServer extends Observable {
         
         if(email.getMittente().equals(clientRichiedente)){
             //System.out.println("eliminata da mittente");
+                
                 queryEliminaEmail = 
                   "UPDATE email "
                 + "SET eliminataDaMittente=1 "
                 + "WHERE id_email= " + email.getId() + " AND mittente = '" + clientRichiedente +"';";
+                
+                setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente + ""
+                        + " IN CASELLA INVIATE - " + 
+                        new Date().toString() + "]");
+                logUltimaOperazione();
+                
         }
         else{
             //System.out.println("eliminata da destinatario");
@@ -444,7 +451,14 @@ public class CasellaServer extends Observable {
                   "UPDATE email "
                 + "SET eliminataDaDestinatario=1 "
                 + "WHERE id_email= " + email.getId() + " AND destinatario = '" + clientRichiedente +"';";
+                
+                setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente + ""
+                        + " IN CASELLA RICEVUTE - " + 
+                        new Date().toString() + "]");
+                logUltimaOperazione();
+                
         }
+        
         r1.lock();
          try {
             conn = DriverManager.getConnection(urlDB);

@@ -95,7 +95,8 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
 
     @Override
     public boolean eliminaEmail(Email emailDaEliminare, Utente utente) throws RemoteException {
-    return casella.eliminaEmail(emailDaEliminare, utente.getEmail());
+        clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+        return casella.eliminaEmail(emailDaEliminare, utente.getEmail());
     }
     
     /*il metodo riceviEmail sul client viene chiamato all'interno del metodo inviaEmail di CasellaServer*/
@@ -103,6 +104,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
         FutureTask<Email> ft = new FutureTask<>(() -> casella.inviaEmail(emailDaInviare, clientConnessi));
         Email emailRitorno = null;
+        ArrayList<String> destinatariInesistenti = new ArrayList<>();
         
         exec.execute(ft);
         try{
@@ -112,6 +114,12 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             System.out.println(e.getMessage());
         }
         if(emailRitorno != null){
+            try{
+                emailRitorno.getMittente().riceviMessaggio("Email inviata correttamente!");
+            }
+            catch(RemoteException e){
+                        System.out.println(e.getMessage());
+            }
             ArrayList<Utente> destinatari = new ArrayList<>();
             destinatari.addAll(emailRitorno.getDestinatari());
             for(Utente destinatario : destinatari){
@@ -123,6 +131,29 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
                     catch(RemoteException e){
                         System.out.println(e.getMessage());
                     }
+                    try{
+                        clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da " 
+                                + emailRitorno.getMittente()+"!");
+                    }
+                    catch(RemoteException e){
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else{
+                    destinatariInesistenti.add(destinatario.getEmail());
+                }
+            }
+            if(destinatariInesistenti.isEmpty()==false){
+                String messaggio = "Non è stato possibile inviare l'email "
+                        + "ai seguenti destinatari:\n";
+                for(String utente : destinatariInesistenti){
+                    messaggio = messaggio + utente + "\n";
+                }
+                try{
+                emailRitorno.getMittente().riceviMessaggio(messaggio);
+                }
+                catch(RemoteException e){
+                        System.out.println(e.getMessage());
                 }
             }
             

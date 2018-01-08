@@ -38,12 +38,9 @@ public class ServerGUI implements Observer{
     /*
     *   Costruttore dell'interfaccia del server
     */
-    public ServerGUI(){
-        try {
-            this.model = new ServerImplementation();
-        } catch (RemoteException ex) {
-            Logger.getLogger(ServerGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public ServerGUI(ServerImplementation server){
+        this.model = server;
+  
    
         panel.setLayout(new BorderLayout());
         panel.setPreferredSize(new Dimension(1200, 400));
@@ -86,9 +83,8 @@ public class ServerGUI implements Observer{
     }
     
     public static void main(String[] args) throws RemoteException{
-        
-        ServerGUI gui = new ServerGUI();
         ServerImplementation server = new ServerImplementation();
+        ServerGUI gui = new ServerGUI(server);
         server.aggiungiObserver(gui);
     
     }
