@@ -398,9 +398,9 @@ public class CasellaServer extends Observable {
         Statement st = null;
         
         String querySetLetta = 
-                  "UPDATE email"
-                + "SET letto=1"
-                + "WHERE id_email=" + emailLetta.getId() + "AND destinatario = '" + emailClient +"';";
+                  "UPDATE email "
+                + "SET letto=1 "
+                + "WHERE id_email=" + emailLetta.getId() + " AND destinatario = '" + emailClient +"';";
         r1.lock();
          try {
             conn = DriverManager.getConnection(urlDB);

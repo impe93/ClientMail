@@ -715,7 +715,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-        } 
+        }
+        setChanged();
+        notifyObservers(ClientGUI.LETTA_EMAIL);
     }
     
     /**

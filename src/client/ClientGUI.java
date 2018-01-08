@@ -48,6 +48,7 @@ public class ClientGUI extends JFrame implements Observer{
     public static final String EMAIL_RICEVUTA = "emailRicevuta";
     public static final String EMAIL_ELIMINATA = "emailEliminata";
     public static final String NUOVO_MESSAGGIO = "nuovoMessaggio";
+    public static final String LETTA_EMAIL = "lettaEmail";
     
     private Email emailDaVisualizzare;
     private final ClientImplementation modello;
@@ -224,6 +225,7 @@ public class ClientGUI extends JFrame implements Observer{
         this.modelListaEmail = new DefaultListModel<>();
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
+        this.listaEmailList.addListSelectionListener(controller);
         this.listaEmailList.addListSelectionListener( new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -372,6 +374,19 @@ public class ClientGUI extends JFrame implements Observer{
                 }
                 break;
             }
+            case ClientGUI.LETTA_EMAIL: {
+                this.listaEmail.clear();
+                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
+                this.modelListaEmail.clear();
+                for (Email email : this.listaEmail) {
+                    this.modelListaEmail.addElement(email);
+                }
+                if (this.listaEmail.size() > 0) {
+                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                }
+                break;
+            }
+            
             default: {
                 break;
             }

@@ -9,14 +9,17 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import modelli.Email;
 import modelli.EmailDaInviare;
 /**
  *
  * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
  */
-public class ClientController implements ActionListener {
+public class ClientController implements ActionListener, ListSelectionListener {
     
     private final ClientImplementation model;
     private final ArrayList<NuovaEmailGUI> schermateNuoveEmail;
@@ -94,6 +97,14 @@ public class ClientController implements ActionListener {
             default: {
                 break;
             }
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        Email emailSelezionata = ((JList<Email>)e.getSource()).getSelectedValue();
+        if (emailSelezionata != null && emailSelezionata.getLetto() == 0) {
+            model.segnaLetturaEmail(emailSelezionata);
         }
     }
     
