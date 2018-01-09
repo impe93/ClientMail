@@ -11,12 +11,12 @@ import java.awt.Component;
 import java.awt.Font;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import modelli.Email;
+import modelli.Utente;
 
 /**
  *
@@ -84,40 +84,74 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         
         Email email = (Email)value;
         
-        this.labelTitolo.setText(email.getMittente().getNome() + " " + email.getMittente().getCognome());
+        
         
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         this.labelData.setText(formatter.format(email.getData()));
         
         oggettoLabel.setText(formattaOggetto(email.getOggetto()));
         this.prioritaLabel.setText("Priorità: " + email.getPriorita());
-        corpoLabel.setText("<html>" + formattaCorpo(email.getCorpo()) + "</html>");
+        corpoLabel.setText(formattaCorpo(email.getCorpo()));
         
-        
-        if (selected) {
-            this.pannelloEmail.setBackground(Color.lightGray);
-            this.pannelloHeader.setBackground(Color.lightGray);
-            this.centralePanel.setBackground(Color.lightGray);
-            this.labelTitolo.setBackground(Color.lightGray);
-            this.labelData.setBackground(Color.lightGray);
-            this.oggettoLabel.setBackground(Color.lightGray);
-            this.corpoLabel.setBackground(Color.lightGray);
-        } else if(email.getLetto() == 1) {
-            this.pannelloEmail.setBackground(Color.white);
-            this.pannelloHeader.setBackground(Color.white);
-            this.centralePanel.setBackground(Color.white);
-            this.labelTitolo.setBackground(Color.white);
-            this.labelData.setBackground(Color.white);
-            this.oggettoLabel.setBackground(Color.white);
-            this.corpoLabel.setBackground(Color.white);
-        } else if (email.getLetto() == 0) {
-            this.pannelloEmail.setBackground(Color.yellow);
-            this.pannelloHeader.setBackground(Color.yellow);
-            this.centralePanel.setBackground(Color.yellow);
-            this.labelTitolo.setBackground(Color.yellow);
-            this.labelData.setBackground(Color.yellow);
-            this.oggettoLabel.setBackground(Color.yellow);
-            this.corpoLabel.setBackground(Color.yellow);
+        if (list instanceof ClientGUI.ListaInviateRicevute) {
+            if (((ClientGUI.ListaInviateRicevute)list).getTipoLista().equals(ClientGUI.ListaInviateRicevute.LISTA_INVIATE)) {
+                String destinatari = "";
+                for(Utente destinatario : email.getDestinatari()) {
+                    if (destinatari.equals("")) {
+                        destinatari += destinatario.getNome() + " " + destinatario.getCognome();
+                    } else {
+                        destinatari += ", " + destinatario.getNome() + " " + destinatario.getCognome();
+                    }
+                }
+                this.labelTitolo.setText(this.formattaDestinatari(destinatari));
+                
+                if (selected) {
+                    this.pannelloEmail.setBackground(Color.lightGray);
+                    this.pannelloHeader.setBackground(Color.lightGray);
+                    this.centralePanel.setBackground(Color.lightGray);
+                    this.labelTitolo.setBackground(Color.lightGray);
+                    this.labelData.setBackground(Color.lightGray);
+                    this.oggettoLabel.setBackground(Color.lightGray);
+                    this.corpoLabel.setBackground(Color.lightGray);
+                } else {
+                    this.pannelloEmail.setBackground(Color.white);
+                    this.pannelloHeader.setBackground(Color.white);
+                    this.centralePanel.setBackground(Color.white);
+                    this.labelTitolo.setBackground(Color.white);
+                    this.labelData.setBackground(Color.white);
+                    this.oggettoLabel.setBackground(Color.white);
+                    this.corpoLabel.setBackground(Color.white);
+                }
+            } else {
+                
+                this.labelTitolo.setText(email.getMittente().getNome() + " " + email.getMittente().getCognome());
+                
+                if (selected) {
+                    this.pannelloEmail.setBackground(Color.lightGray);
+                    this.pannelloHeader.setBackground(Color.lightGray);
+                    this.centralePanel.setBackground(Color.lightGray);
+                    this.labelTitolo.setBackground(Color.lightGray);
+                    this.labelData.setBackground(Color.lightGray);
+                    this.oggettoLabel.setBackground(Color.lightGray);
+                    this.corpoLabel.setBackground(Color.lightGray);
+                } else if(email.getLetto() == 1) {
+                    this.pannelloEmail.setBackground(Color.white);
+                    this.pannelloHeader.setBackground(Color.white);
+                    this.centralePanel.setBackground(Color.white);
+                    this.labelTitolo.setBackground(Color.white);
+                    this.labelData.setBackground(Color.white);
+                    this.oggettoLabel.setBackground(Color.white);
+                    this.corpoLabel.setBackground(Color.white);
+                } else if (email.getLetto() == 0) {
+                    this.pannelloEmail.setBackground(Color.yellow);
+                    this.pannelloHeader.setBackground(Color.yellow);
+                    this.centralePanel.setBackground(Color.yellow);
+                    this.labelTitolo.setBackground(Color.yellow);
+                    this.labelData.setBackground(Color.yellow);
+                    this.oggettoLabel.setBackground(Color.yellow);
+                    this.corpoLabel.setBackground(Color.yellow);
+                }
+            }
         }
         
         return this.pannelloEmail;
@@ -137,11 +171,23 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
     
     private String formattaOggetto (String oggetto) {
         String stringaFormattata = "";
-        for (int i = 0; i < 17 && i < oggetto.length(); i++) {
+        for (int i = 0; i < 35 && i < oggetto.length(); i++) {
             stringaFormattata += oggetto.charAt(i);
         }
         stringaFormattata = stringaFormattata.trim();
-        if(oggetto.length() > 17) {
+        if(oggetto.length() > 35) {
+            stringaFormattata += "...";
+        }
+        return stringaFormattata;
+    }
+    
+    private String formattaDestinatari (String destinatari) {
+        String stringaFormattata = "";
+        for (int i = 0; i < 25 && i < destinatari.length(); i++) {
+            stringaFormattata += destinatari.charAt(i);
+        }
+        stringaFormattata = stringaFormattata.trim();
+        if(destinatari.length() > 25) {
             stringaFormattata += "...";
         }
         return stringaFormattata;

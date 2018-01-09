@@ -50,6 +50,7 @@ public class ClientGUI extends JFrame implements Observer{
     public static final String EMAIL_RICEVUTA_ELIMINATA = "emailRicevutaEliminata";
     public static final String NUOVO_MESSAGGIO = "nuovoMessaggio";
     public static final String LETTA_EMAIL = "lettaEmail";
+    public static final String NOTIFICA = "notifica";
     
     private Email emailDaVisualizzare;
     private final ClientImplementation modello;
@@ -221,7 +222,7 @@ public class ClientGUI extends JFrame implements Observer{
 /* ------ Fine Toolbar Panel ------ */
 
 /* ------ Lista Email Panel ------ */
-        this.listaEmailList = new JList();
+        this.listaEmailList = new ListaInviateRicevute();
         this.listaEmailList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.modelListaEmail = new DefaultListModel<>();
         this.listaEmailList.setModel(this.modelListaEmail);
@@ -309,7 +310,9 @@ public class ClientGUI extends JFrame implements Observer{
                 }
                 this.dataOrdineButton.setName("perDataRicevuti");
                 this.prioritaOrdineButton.setName("perPrioritaRicevuti");
+                this.eliminaSelezionata.setName("eliminaRicevuta");
                 this.inVisualizzazione = ClientGUI.RICEVUTI;
+                ((ListaInviateRicevute)this.listaEmailList).setTipoLista(ListaInviateRicevute.LISTA_RICEVUTE);
                 break;
             }
             case ClientGUI.INVIATI: {
@@ -324,7 +327,9 @@ public class ClientGUI extends JFrame implements Observer{
                 }
                 this.dataOrdineButton.setName("perDataInviati");
                 this.prioritaOrdineButton.setName("perPrioritaInviati");
+                this.eliminaSelezionata.setName("eliminaInviata");
                 this.inVisualizzazione = ClientGUI.INVIATI;
+                ((ListaInviateRicevute)this.listaEmailList).setTipoLista(ListaInviateRicevute.LISTA_INVIATE);
                 break;
             }
             case ClientGUI.INVIATE_PER_DATA: {
@@ -383,8 +388,33 @@ public class ClientGUI extends JFrame implements Observer{
                     this.modelListaEmail.addElement(email);
                 }
                 if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                    int indiceSelezionata = 0;
+                    for (Email email : this.listaEmail){
+                        if (email.getId() == this.emailDaVisualizzare.getId()) {
+                            break;
+                        }
+                        indiceSelezionata++;
+                    }
+                    this.listaEmailList.setSelectedIndex(indiceSelezionata);
+                    eliminaSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
+                    inoltraSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
+                    mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
+                    String destinatari = "";
+                    for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
+                        if (i == 0) {
+                            destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
+                        } else {
+                            destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
+                        }
+                    }
+                    destinatariEmailLabel.setText(destinatari);
+                    oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
+                    corpoTextArea.setText(emailDaVisualizzare.getCorpo());
                 }
+                break;
+            }
+            case ClientGUI.NOTIFICA: {
+                
                 break;
             }
             
@@ -409,6 +439,27 @@ public class ClientGUI extends JFrame implements Observer{
         
         public Email getEmailDaInoltrareEliminare() {
             return this.emailDaInoltrareEliminare;
+        }
+        
+    }
+    
+    public class ListaInviateRicevute extends JList {
+        public static final String LISTA_INVIATE = "listaInviate";
+        public static final String LISTA_RICEVUTE = "listaRicevute";
+        
+        private String tipoLista;
+        
+        public ListaInviateRicevute () {
+            super();
+            this.tipoLista = ListaInviateRicevute.LISTA_RICEVUTE;
+        }
+
+        public String getTipoLista() {
+            return tipoLista;
+        }
+
+        public void setTipoLista(String tipoLista) {
+            this.tipoLista = tipoLista;
         }
         
     }

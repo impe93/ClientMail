@@ -110,12 +110,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         
         return ricevute;
     }
-
-    @Override
-    public boolean eliminaEmail(Email emailDaEliminare, Utente utente) throws RemoteException {
-        clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
-        return casella.eliminaEmail(emailDaEliminare, utente.getEmail());
-    }
     
     /*il metodo riceviEmail sul client viene chiamato all'interno del metodo inviaEmail di CasellaServer*/
     @Override
@@ -228,6 +222,22 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     public boolean segnaEmailComeLetta(String emailClient, Email emailLetta) throws RemoteException {
         casella.setLetta(emailClient, emailLetta);
         return true;
+    }
+
+    @Override
+    public boolean eliminaEmailPerMittente(Email emailDaEliminare, Utente utente) throws RemoteException {
+        boolean eliminata = casella.eliminaEmailDaMittente(emailDaEliminare, utente.getEmail());
+        if(eliminata)
+            clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+        return eliminata;
+    }
+
+    @Override
+    public boolean eliminaEmailPerDestinatario(Email emailDaEliminare, Utente utente) throws RemoteException {
+        boolean eliminata = casella.eliminaEmailDaDestinatario(emailDaEliminare, utente.getEmail());
+        if(eliminata)
+            clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+        return eliminata;
     }
     
 }

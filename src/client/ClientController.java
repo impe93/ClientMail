@@ -61,10 +61,17 @@ public class ClientController implements ActionListener, ListSelectionListener {
                 this.schermateNuoveEmail.add(new NuovaEmailGUI(this, this.schermateNuoveEmail.size()));
                 break;
             }
-            case "elimina": {
+            case "eliminaInviata": {
                 if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
                     Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
-                    this.model.eliminaEmail(emailDaEliminare);
+                    this.model.eliminaEmailInviata(emailDaEliminare);
+                }
+                break;
+            }
+            case "eliminaRicevuta": {
+                if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
+                    Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
+                    this.model.eliminaEmailRicevuta(emailDaEliminare);
                 }
                 break;
             }
