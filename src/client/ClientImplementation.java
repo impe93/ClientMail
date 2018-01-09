@@ -100,8 +100,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             if(nuoveEmailRicevute != null && nuoveEmailRicevute.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailRicevute(nuoveEmailRicevute);
             }
-        }
-        
+        }   
     }
     
     /**
@@ -278,9 +277,8 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     public void segnaLetturaEmail(Email emailLetta){
         try {
             if(this.server.segnaEmailComeLetta(utente.getEmail(),emailLetta)){
-                System.out.println("lettura email riuscita");
                 this.casellaPostaleClient.segnaLetturaEmail(emailLetta);
-                
+                System.out.println("lettura email riuscita");
             } else{
                 System.out.println("lettura email fallita");
             }
@@ -310,15 +308,5 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         if(messaggio != null){
             this.casellaPostaleClient.inserisciMessaggio(messaggio);
         }
-    }
-   
-    /*
-    TODO:
-    - mettere email ricevuta in cima alla lista nella visualizzazione
-    - lettura email aggiustare le variabili che vengono visualizzate dalla view
-    -
-    */
-    
-    
-    
+    }    
 }
