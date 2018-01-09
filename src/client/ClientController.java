@@ -156,16 +156,18 @@ public class ClientController implements ActionListener, ListSelectionListener {
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        final Component fonte = (Component)e.getSource();
-        new Thread() {
-            @Override
-            public void run() {
-                Email emailSelezionata = ((JList<Email>)fonte).getSelectedValue();
-                if (emailSelezionata != null && emailSelezionata.getLetto() == 0 && ((ClientGUI.ListaInviateRicevute)fonte).getTipoLista().equals(ClientGUI.ListaInviateRicevute.LISTA_RICEVUTE)) {
-                    model.segnaLetturaEmail(emailSelezionata);
+        if (e.getValueIsAdjusting()) {
+            final Component fonte = (Component)e.getSource();
+            new Thread() {
+                @Override
+                public void run() {
+                    Email emailSelezionata = ((JList<Email>)fonte).getSelectedValue();
+                    if (emailSelezionata != null && emailSelezionata.getLetto() == 0 && ((ClientGUI.ListaInviateRicevute)fonte).getTipoLista().equals(ClientGUI.ListaInviateRicevute.LISTA_RICEVUTE)) {
+                        model.segnaLetturaEmail(emailSelezionata);
+                    }
                 }
-            }
-        }.start();
+            }.start();
+        }
     }
     
 }

@@ -453,10 +453,12 @@ public class ClientGUI extends JFrame implements Observer{
                                 int indiceSelezionata = 0;
                                 for (Email email : listaEmail){
                                     if (email.getId() == emailDaVisualizzare.getId()) {
+                                        System.out.println(indiceSelezionata);
                                         break;
                                     }
                                     indiceSelezionata++;
                                 }
+                                System.out.println(indiceSelezionata);
                                 listaEmailList.setSelectedIndex(indiceSelezionata);
                                 eliminaSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
                                 inoltraSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
