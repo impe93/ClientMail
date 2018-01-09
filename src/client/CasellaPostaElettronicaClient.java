@@ -26,6 +26,8 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     private ArrayList<Email> emailInviate;
     private ArrayList<Email> emailRicevute;
     private ArrayList<String> messaggi;
+    private String ordineInviate; //puù assumere valore "data" oppure "priorita"
+    private String ordineRicevute; //puù assumere valore "data" oppure "priorita"
     
     public CasellaPostaElettronicaClient(String emailUtente){
         registraDriver();
@@ -34,6 +36,8 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         this.emailInviate = new ArrayList<>();
         this.emailRicevute = new ArrayList<>();
         this.messaggi = new ArrayList<>();
+        this.ordineInviate = "data";
+        this.ordineRicevute = "data";
     }
 
     public Utente getUtenteProprietario() {
@@ -143,6 +147,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     public void ordinaInviatePerPriorita(){
         ordinaPerPriorita(true);
+        this.ordineInviate = "priorita";
         setChanged();
         notifyObservers(ClientGUI.INVIATE_PER_PRIORITA);
     }
@@ -152,6 +157,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     public void ordinaRicevutePerPriorita(){
         ordinaPerPriorita(false);
+        this.ordineRicevute = "priorita";
         setChanged();
         notifyObservers(ClientGUI.RICEVUTE_PER_PRIORITA);
     }
@@ -222,6 +228,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     public void ordinaInviatePerData(){
         ordinaPerData(true);
+        this.ordineInviate = "data";
         setChanged();
         notifyObservers(ClientGUI.INVIATE_PER_DATA);
     }
@@ -231,6 +238,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     public void ordinaRicevutePerData(){
         ordinaPerData(false);
+        this.ordineRicevute = "data";
         setChanged();
         notifyObservers(ClientGUI.RICEVUTE_PER_DATA);
     }
@@ -484,6 +492,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmail(email, "email_inviate");
         }
         this.emailInviate.addAll(nuoveEmailInviate);
+        ordinaPerData(true);
         
         setChanged();
         notifyObservers(ClientGUI.INVIATI);
@@ -499,6 +508,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmail(email, "email_ricevute");
         }
         this.emailRicevute.addAll(nuoveEmailRicevute);
+        ordinaPerData(false);
         
         setChanged();
         notifyObservers(ClientGUI.RICEVUTI);
@@ -651,12 +661,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * mittente o il distinatario dell'email da eliminare
      * @param email: oggetto Email che si desidera rimuove da DB
      */
-    private void eliminaEmailDaDB(Email email){
+    private void eliminaEmailDaDB(Email email, String nomeTabellaDB){
         // il mio utenteProprietario è il mittente dell'email
-        if(this.utenteProprietario.getEmail().equals(email.getMittente().getEmail())){
-            eliminaEmail(email, "email_inviate");
-        } else{ // il mio utenteProprietario è il destinatario dell'email
-            eliminaEmail(email, "email_ricevute");
+        if(nomeTabellaDB.equals("email_inviate") && this.utenteProprietario.getEmail().equals(email.getMittente().getEmail())){
+            eliminaEmail(email, nomeTabellaDB);
+        } else if(nomeTabellaDB.equals("email_ricevute") && email.getDestinatari().contains(this.utenteProprietario)){ // il mio utenteProprietario è il destinatario dell'email
+            eliminaEmail(email, nomeTabellaDB);
         }
     }
     
@@ -765,10 +775,17 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     }
 
     @Override
-    public void elimina(Email email) {
-        eliminaEmailDaDB(email);
+    public void eliminaPerMittente(Email email) {
+        eliminaEmailDaDB(email, "email_inviate");
         setChanged();
-        notifyObservers(ClientGUI.EMAIL_ELIMINATA);
+        notifyObservers(ClientGUI.EMAIL_INVIATA_ELIMINATA);
+    }
+
+    @Override
+    public void eliminaPerDestinatario(Email email) {
+        eliminaEmailDaDB(email, "email_ricevute");
+        setChanged();
+        notifyObservers(ClientGUI.EMAIL_RICEVUTA_ELIMINATA);
     }
     
 }

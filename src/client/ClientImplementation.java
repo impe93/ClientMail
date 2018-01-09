@@ -221,28 +221,36 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      * non si sono verificati errori
      * @param emailDaEliminare: email che si desidera eliminare
      */
-    public void eliminaEmail(Email emailDaEliminare){
+    public void eliminaEmailInviata(Email emailDaEliminare){
         try {
-            if(this.server.eliminaEmail(emailDaEliminare, this.utente)){
-                System.out.println("Email eliminata con successo!");
-                this.casellaPostaleClient.elimina(emailDaEliminare);
+            if(this.server.eliminaEmailPerMittente(emailDaEliminare, this.utente)){
+                this.casellaPostaleClient.eliminaPerMittente(emailDaEliminare);
+                System.out.println("Email inviata eliminata con successo!");
             } else{
-                System.out.println("Si è verificato un errore durante l'eliminazione dell'email, riprovare più tardi!");
+                System.out.println("Si è verificato un errore durante l'eliminazione dell'email inviata, riprovare più tardi!");
             }
         } catch (RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    //bisogna segnalare al server che ci stiamo disconnettendo OK
-    
-    //fare letto non letto-->attenzione!!!! solo email ricevute possono essere lette!!!
-    //???ma devo notificare alla view la lettura o semplicemente le casella dell'email si colora 
-    //diversamente o viene segnata in qualche modo quando la clicchi per leggerla
-    
-    //popup per ogni messaggio
-    
-    //verificare se funziona eliminazione
+    /**
+     * Elimina un email dal database del server e poi da quello del client se 
+     * non si sono verificati errori
+     * @param emailDaEliminare: email che si desidera eliminare
+     */
+    public void eliminaEmailRicevuta(Email emailDaEliminare){
+        try {
+            if(this.server.eliminaEmailPerDestinatario(emailDaEliminare, this.utente)){
+                this.casellaPostaleClient.eliminaPerDestinatario(emailDaEliminare);
+                System.out.println("Email ricevuta eliminata con successo!");
+            } else{
+                System.out.println("Si è verificato un errore durante l'eliminazione dell'email ricevuta, riprovare più tardi!");
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     /**
      * Notifica al server che il client si vuole disconnettere
@@ -304,4 +312,13 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         }
     }
    
+    /*
+    TODO:
+    - mettere email ricevuta in cima alla lista nella visualizzazione
+    - lettura email aggiustare le variabili che vengono visualizzate dalla view
+    -
+    */
+    
+    
+    
 }

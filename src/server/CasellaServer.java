@@ -439,12 +439,11 @@ public class CasellaServer extends Observable {
     
     }
     
-    public boolean eliminaEmail(Email email, String clientRichiedente){
+    public boolean eliminaEmailDaMittente(Email email, String clientRichiedente){
         Connection conn = null;
         Statement st = null;
         String queryEliminaEmail="";
         
-        if(email.getMittente().equals(clientRichiedente)){
             //System.out.println("eliminata da mittente");
                 
             queryEliminaEmail = 
@@ -456,9 +455,40 @@ public class CasellaServer extends Observable {
             setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente +
             " IN CASELLA INVIATE - " + new Date().toString() + "]");
             logUltimaOperazione();
-                
+        
+        r1.lock();
+        try {
+            conn = DriverManager.getConnection(urlDB);
+            st = conn.createStatement();
+            st.executeUpdate(queryEliminaEmail);
         }
-        else{
+        catch(SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        finally {
+            try {
+                if(st != null){
+                    st.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            }
+            catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+            r1.unlock();
+         }
+        return true;
+    
+    }
+    
+    public boolean eliminaEmailDaDestinatario(Email email, String clientRichiedente){
+        Connection conn = null;
+        Statement st = null;
+        String queryEliminaEmail="";
+        
             //System.out.println("eliminata da destinatario");
             queryEliminaEmail = 
             "UPDATE email "
@@ -470,7 +500,7 @@ public class CasellaServer extends Observable {
             + " IN CASELLA RICEVUTE - " + new Date().toString() + "]");
             logUltimaOperazione();
                 
-        }
+        
         
         r1.lock();
         try {

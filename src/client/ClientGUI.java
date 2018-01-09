@@ -46,7 +46,8 @@ public class ClientGUI extends JFrame implements Observer{
     public static final String RICEVUTE_PER_DATA ="ricevutePerData";
     public static final String EMAIL_INVIATA = "emailInviata";
     public static final String EMAIL_RICEVUTA = "emailRicevuta";
-    public static final String EMAIL_ELIMINATA = "emailEliminata";
+    public static final String EMAIL_INVIATA_ELIMINATA = "emailInviataEliminata";
+    public static final String EMAIL_RICEVUTA_ELIMINATA = "emailRicevutaEliminata";
     public static final String NUOVO_MESSAGGIO = "nuovoMessaggio";
     public static final String LETTA_EMAIL = "lettaEmail";
     public static final String NOTIFICA = "notifica";
