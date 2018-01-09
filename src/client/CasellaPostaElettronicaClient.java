@@ -507,8 +507,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         } else{
             ordinaPerPriorita(true);
         }
-        setChanged();
-        notifyObservers(ClientGUI.INVIATI);
     }
     
     /**
@@ -526,10 +524,19 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         } else{
             ordinaPerPriorita(false);
         }
+    }
+
+    /**
+     * Notifica l'utente che le sue email sono state aggiornate dopo che è stata
+     * stabilita una connessione con il server
+     */
+    public void terminaAggiornamentoInizialeEmail(){
+        setChanged();
+        notifyObservers(ClientGUI.INVIATI);
         setChanged();
         notifyObservers(ClientGUI.RICEVUTI);
     }
-
+    
     /**
      * Inserisce una nuova email in email_ricevute o in email_inviate a seconda
      * del contenuto del paramentro nomeTabella
