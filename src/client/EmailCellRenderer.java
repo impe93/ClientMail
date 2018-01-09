@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import modelli.Email;
+import modelli.Utente;
 
 /**
  *
@@ -83,17 +84,27 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         
         Email email = (Email)value;
         
-        this.labelTitolo.setText(email.getMittente().getNome() + " " + email.getMittente().getCognome());
+        
         
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         this.labelData.setText(formatter.format(email.getData()));
         
         oggettoLabel.setText(formattaOggetto(email.getOggetto()));
         this.prioritaLabel.setText("Priorità: " + email.getPriorita());
-        corpoLabel.setText("<html>" + formattaCorpo(email.getCorpo()) + "</html>");
+        corpoLabel.setText(formattaCorpo(email.getCorpo()));
         
         if (list instanceof ClientGUI.ListaInviateRicevute) {
             if (((ClientGUI.ListaInviateRicevute)list).getTipoLista().equals(ClientGUI.ListaInviateRicevute.LISTA_INVIATE)) {
+                String destinatari = "";
+                for(Utente destinatario : email.getDestinatari()) {
+                    if (destinatari.equals("")) {
+                        destinatari += destinatario.getNome() + " " + destinatario.getCognome();
+                    } else {
+                        destinatari += ", " + destinatario.getNome() + " " + destinatario.getCognome();
+                    }
+                }
+                this.labelTitolo.setText(this.formattaDestinatari(destinatari));
+                
                 if (selected) {
                     this.pannelloEmail.setBackground(Color.lightGray);
                     this.pannelloHeader.setBackground(Color.lightGray);
@@ -112,6 +123,9 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
                     this.corpoLabel.setBackground(Color.white);
                 }
             } else {
+                
+                this.labelTitolo.setText(email.getMittente().getNome() + " " + email.getMittente().getCognome());
+                
                 if (selected) {
                     this.pannelloEmail.setBackground(Color.lightGray);
                     this.pannelloHeader.setBackground(Color.lightGray);
@@ -157,11 +171,23 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
     
     private String formattaOggetto (String oggetto) {
         String stringaFormattata = "";
-        for (int i = 0; i < 17 && i < oggetto.length(); i++) {
+        for (int i = 0; i < 35 && i < oggetto.length(); i++) {
             stringaFormattata += oggetto.charAt(i);
         }
         stringaFormattata = stringaFormattata.trim();
-        if(oggetto.length() > 17) {
+        if(oggetto.length() > 35) {
+            stringaFormattata += "...";
+        }
+        return stringaFormattata;
+    }
+    
+    private String formattaDestinatari (String destinatari) {
+        String stringaFormattata = "";
+        for (int i = 0; i < 25 && i < destinatari.length(); i++) {
+            stringaFormattata += destinatari.charAt(i);
+        }
+        stringaFormattata = stringaFormattata.trim();
+        if(destinatari.length() > 25) {
             stringaFormattata += "...";
         }
         return stringaFormattata;
