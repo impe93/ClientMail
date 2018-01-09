@@ -238,6 +238,7 @@ public class NuovaEmailGUI extends JFrame {
                 destinatario += String.valueOf(destinatari.charAt(i));
             } else {
                 valoreDaRitornare.add(destinatario);
+                destinatario = "";
             }
         }
         

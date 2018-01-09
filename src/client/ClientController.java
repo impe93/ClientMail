@@ -9,6 +9,8 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
@@ -34,6 +36,7 @@ public class ClientController implements ActionListener, ListSelectionListener {
         Component fonte = (Component)e.getSource();
         switch (fonte.getName()) {
             case "perPrioritaRicevuti": {
+                
                 model.ordinaRicevutePerPriorita();
                 break;
             }
@@ -58,7 +61,7 @@ public class ClientController implements ActionListener, ListSelectionListener {
                 break;
             }
             case "nuova": {
-                this.schermateNuoveEmail.add(new NuovaEmailGUI(this, this.schermateNuoveEmail.size()));
+                schermateNuoveEmail.add(new NuovaEmailGUI(this, schermateNuoveEmail.size()));
                 break;
             }
             case "eliminaInviata": {
@@ -110,7 +113,7 @@ public class ClientController implements ActionListener, ListSelectionListener {
     @Override
     public void valueChanged(ListSelectionEvent e) {
         Email emailSelezionata = ((JList<Email>)e.getSource()).getSelectedValue();
-        if (emailSelezionata != null && emailSelezionata.getLetto() == 0) {
+        if (emailSelezionata != null && emailSelezionata.getLetto() == 0 && ((ClientGUI.ListaInviateRicevute)e.getSource()).getTipoLista().equals(ClientGUI.ListaInviateRicevute.LISTA_RICEVUTE)) {
             model.segnaLetturaEmail(emailSelezionata);
         }
     }
