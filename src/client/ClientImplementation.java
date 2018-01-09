@@ -101,6 +101,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
                 this.casellaPostaleClient.inserisciNuoveEmailRicevute(nuoveEmailRicevute);
             }
         }   
+        this.casellaPostaleClient.terminaAggiornamentoInizialeEmail();
     }
     
     /**

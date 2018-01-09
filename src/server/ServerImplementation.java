@@ -169,7 +169,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
                     messaggio = messaggio + utente + "\n";
                 }
                 try{
-                clientConnessi.get(emailRitorno.getMittente()).riceviMessaggio(messaggio);
+                clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio(messaggio);
                 }
                 catch(RemoteException e){
                         System.out.println(e.getMessage());
