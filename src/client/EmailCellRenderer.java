@@ -171,11 +171,11 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
     
     private String formattaOggetto (String oggetto) {
         String stringaFormattata = "";
-        for (int i = 0; i < 35 && i < oggetto.length(); i++) {
+        for (int i = 0; i < 26 && i < oggetto.length(); i++) {
             stringaFormattata += oggetto.charAt(i);
         }
         stringaFormattata = stringaFormattata.trim();
-        if(oggetto.length() > 35) {
+        if(oggetto.length() > 26) {
             stringaFormattata += "...";
         }
         return stringaFormattata;
@@ -183,11 +183,11 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
     
     private String formattaDestinatari (String destinatari) {
         String stringaFormattata = "";
-        for (int i = 0; i < 25 && i < destinatari.length(); i++) {
+        for (int i = 0; i < 21 && i < destinatari.length(); i++) {
             stringaFormattata += destinatari.charAt(i);
         }
         stringaFormattata = stringaFormattata.trim();
-        if(destinatari.length() > 25) {
+        if(destinatari.length() > 21) {
             stringaFormattata += "...";
         }
         return stringaFormattata;
