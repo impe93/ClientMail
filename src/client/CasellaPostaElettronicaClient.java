@@ -358,6 +358,11 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM email_inviate " +
                 "WHERE mittente = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, true);
+        if(this.ordineInviate.equals("data")){
+            ordinaPerData(true);
+        } else{
+            ordinaPerPriorita(true);
+        }
     }
     
     /**
@@ -371,6 +376,11 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM email_ricevute " +
                 "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
         recuperaEmailUtente(queryEmailRicevute, false);
+        if(this.ordineRicevute.equals("data")){
+            ordinaPerData(false);
+        } else{
+            ordinaPerPriorita(false);
+        }
     }
     
     /**
@@ -492,8 +502,11 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmail(email, "email_inviate");
         }
         this.emailInviate.addAll(nuoveEmailInviate);
-        ordinaPerData(true);
-        
+        if(this.ordineInviate.equals("data")){
+            ordinaPerData(true);
+        } else{
+            ordinaPerPriorita(true);
+        }
         setChanged();
         notifyObservers(ClientGUI.INVIATI);
     }
@@ -508,8 +521,11 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             inserisciNuovaEmail(email, "email_ricevute");
         }
         this.emailRicevute.addAll(nuoveEmailRicevute);
-        ordinaPerData(false);
-        
+        if(this.ordineRicevute.equals("data")){
+            ordinaPerData(false);
+        } else{
+            ordinaPerPriorita(false);
+        }
         setChanged();
         notifyObservers(ClientGUI.RICEVUTI);
     }
@@ -661,12 +677,14 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * mittente o il distinatario dell'email da eliminare
      * @param email: oggetto Email che si desidera rimuove da DB
      */
-    private void eliminaEmailDaDB(Email email, String nomeTabellaDB){
+    private void eliminaEmail(Email email, String nomeTabellaDB){
         // il mio utenteProprietario è il mittente dell'email
         if(nomeTabellaDB.equals("email_inviate") && this.utenteProprietario.getEmail().equals(email.getMittente().getEmail())){
-            eliminaEmail(email, nomeTabellaDB);
+            eliminaEmailDaDB(email, nomeTabellaDB);
+            this.emailInviate.remove(email);
         } else if(nomeTabellaDB.equals("email_ricevute") && email.getDestinatari().contains(this.utenteProprietario)){ // il mio utenteProprietario è il destinatario dell'email
-            eliminaEmail(email, nomeTabellaDB);
+            eliminaEmailDaDB(email, nomeTabellaDB);
+            this.emailRicevute.remove(email);
         }
     }
     
@@ -676,7 +694,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param emailDaEliminare: email che si desidera rimuovere
      * @param nomeTabellaDB: nome della tabella dalla quale cancellare l'email
      */
-    private void eliminaEmail(Email emailDaEliminare, String nomeTabellaDB){
+    private void eliminaEmailDaDB(Email emailDaEliminare, String nomeTabellaDB){
         String queryEliminazioneEmailInviata = "DELETE FROM "+ nomeTabellaDB +" WHERE id_email = " + emailDaEliminare.getId();
         Connection conn = null;
         Statement st = null;
@@ -705,6 +723,23 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param emailLetta : email che si desidera contrassegnare come già letta
      */
     public void segnaLetturaEmail(Email emailLetta){
+        for(Email email: this.emailRicevute){
+            if(email.getId() == emailLetta.getId()){
+                segnaLetturaEmailInDB(emailLetta);
+                email.setLetto(1);
+                setChanged();
+                notifyObservers(ClientGUI.LETTA_EMAIL);
+            }
+        }
+    }
+    
+    /**
+     * Segna l'email passata come parametro come già letta in tabella 
+     * email_ricevute del DB
+     * @param emailLetta: email che si desidera contrassegnare come già letta in 
+     *  DB
+     */
+    private void segnaLetturaEmailInDB(Email emailLetta){
         String queryLetturaEmail = "UPDATE email_ricevute SET letto = 1 WHERE id_email = " + emailLetta.getId();
         Connection conn = null;
         Statement st = null;
@@ -726,9 +761,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 System.out.println(ex.getMessage());
             }
         }
-        
-        setChanged();
-        notifyObservers(ClientGUI.LETTA_EMAIL);
     }
     
     /**
@@ -762,6 +794,11 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     public void inserisciInInviati(Email email) {
         inserisciNuovaEmail(email, "email_inviate");
         this.emailInviate.add(email);
+        if(this.ordineInviate.equals("data")){
+            ordinaPerData(true);
+        } else{
+            ordinaPerPriorita(true);
+        }
         setChanged();
         notifyObservers(ClientGUI.EMAIL_INVIATA);
     }
@@ -770,20 +807,25 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     public void inserisciInRicevuti(Email email) {
         inserisciNuovaEmail(email, "email_ricevute");
         this.emailRicevute.add(email);
+        if(this.ordineRicevute.equals("data")){
+            ordinaPerData(false);
+        } else{
+            ordinaPerPriorita(false);
+        }
         setChanged();
         notifyObservers(ClientGUI.EMAIL_RICEVUTA);
     }
 
     @Override
     public void eliminaPerMittente(Email email) {
-        eliminaEmailDaDB(email, "email_inviate");
+        eliminaEmail(email, "email_inviate");
         setChanged();
         notifyObservers(ClientGUI.EMAIL_INVIATA_ELIMINATA);
     }
 
     @Override
     public void eliminaPerDestinatario(Email email) {
-        eliminaEmailDaDB(email, "email_ricevute");
+        eliminaEmail(email, "email_ricevute");
         setChanged();
         notifyObservers(ClientGUI.EMAIL_RICEVUTA_ELIMINATA);
     }
