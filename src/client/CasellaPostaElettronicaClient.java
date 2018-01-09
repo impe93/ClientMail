@@ -197,11 +197,23 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 email.setPriorita(rs.getInt("priorita"));
                 email.setLetto(rs.getInt("letto"));
                 if(isInviate){
-                    if(!this.emailInviate.contains(email)){
+                    boolean found = false;
+                    for(Email emailLista: this.emailInviate)
+                        if(emailLista.equals(email))
+                            found = true;
+                    
+                    if(!found){
                         this.emailInviate.add(email);
                     }
                 } else{
-                    this.emailRicevute.add(email);
+                    boolean found = false;
+                    for(Email emailLista: this.emailRicevute)
+                        if(emailLista.equals(email))
+                            found = true;
+                    
+                    if(!found){
+                        this.emailRicevute.add(email);
+                    }
                 }
             }
         } catch(SQLException e) {
