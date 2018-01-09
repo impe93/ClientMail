@@ -11,7 +11,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -93,31 +92,52 @@ public class EmailCellRenderer extends DefaultListCellRenderer {
         this.prioritaLabel.setText("Priorità: " + email.getPriorita());
         corpoLabel.setText("<html>" + formattaCorpo(email.getCorpo()) + "</html>");
         
-        
-        if (selected) {
-            this.pannelloEmail.setBackground(Color.lightGray);
-            this.pannelloHeader.setBackground(Color.lightGray);
-            this.centralePanel.setBackground(Color.lightGray);
-            this.labelTitolo.setBackground(Color.lightGray);
-            this.labelData.setBackground(Color.lightGray);
-            this.oggettoLabel.setBackground(Color.lightGray);
-            this.corpoLabel.setBackground(Color.lightGray);
-        } else if(email.getLetto() == 1) {
-            this.pannelloEmail.setBackground(Color.white);
-            this.pannelloHeader.setBackground(Color.white);
-            this.centralePanel.setBackground(Color.white);
-            this.labelTitolo.setBackground(Color.white);
-            this.labelData.setBackground(Color.white);
-            this.oggettoLabel.setBackground(Color.white);
-            this.corpoLabel.setBackground(Color.white);
-        } else if (email.getLetto() == 0) {
-            this.pannelloEmail.setBackground(Color.yellow);
-            this.pannelloHeader.setBackground(Color.yellow);
-            this.centralePanel.setBackground(Color.yellow);
-            this.labelTitolo.setBackground(Color.yellow);
-            this.labelData.setBackground(Color.yellow);
-            this.oggettoLabel.setBackground(Color.yellow);
-            this.corpoLabel.setBackground(Color.yellow);
+        if (list instanceof ClientGUI.ListaInviateRicevute) {
+            if (((ClientGUI.ListaInviateRicevute)list).getTipoLista().equals(ClientGUI.ListaInviateRicevute.LISTA_INVIATE)) {
+                if (selected) {
+                    this.pannelloEmail.setBackground(Color.lightGray);
+                    this.pannelloHeader.setBackground(Color.lightGray);
+                    this.centralePanel.setBackground(Color.lightGray);
+                    this.labelTitolo.setBackground(Color.lightGray);
+                    this.labelData.setBackground(Color.lightGray);
+                    this.oggettoLabel.setBackground(Color.lightGray);
+                    this.corpoLabel.setBackground(Color.lightGray);
+                } else {
+                    this.pannelloEmail.setBackground(Color.white);
+                    this.pannelloHeader.setBackground(Color.white);
+                    this.centralePanel.setBackground(Color.white);
+                    this.labelTitolo.setBackground(Color.white);
+                    this.labelData.setBackground(Color.white);
+                    this.oggettoLabel.setBackground(Color.white);
+                    this.corpoLabel.setBackground(Color.white);
+                }
+            } else {
+                if (selected) {
+                    this.pannelloEmail.setBackground(Color.lightGray);
+                    this.pannelloHeader.setBackground(Color.lightGray);
+                    this.centralePanel.setBackground(Color.lightGray);
+                    this.labelTitolo.setBackground(Color.lightGray);
+                    this.labelData.setBackground(Color.lightGray);
+                    this.oggettoLabel.setBackground(Color.lightGray);
+                    this.corpoLabel.setBackground(Color.lightGray);
+                } else if(email.getLetto() == 1) {
+                    this.pannelloEmail.setBackground(Color.white);
+                    this.pannelloHeader.setBackground(Color.white);
+                    this.centralePanel.setBackground(Color.white);
+                    this.labelTitolo.setBackground(Color.white);
+                    this.labelData.setBackground(Color.white);
+                    this.oggettoLabel.setBackground(Color.white);
+                    this.corpoLabel.setBackground(Color.white);
+                } else if (email.getLetto() == 0) {
+                    this.pannelloEmail.setBackground(Color.yellow);
+                    this.pannelloHeader.setBackground(Color.yellow);
+                    this.centralePanel.setBackground(Color.yellow);
+                    this.labelTitolo.setBackground(Color.yellow);
+                    this.labelData.setBackground(Color.yellow);
+                    this.oggettoLabel.setBackground(Color.yellow);
+                    this.corpoLabel.setBackground(Color.yellow);
+                }
+            }
         }
         
         return this.pannelloEmail;
