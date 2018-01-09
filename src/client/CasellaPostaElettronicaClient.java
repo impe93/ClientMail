@@ -661,12 +661,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * mittente o il distinatario dell'email da eliminare
      * @param email: oggetto Email che si desidera rimuove da DB
      */
-    private void eliminaEmailDaDB(Email email){
+    private void eliminaEmailDaDB(Email email, String nomeTabellaDB){
         // il mio utenteProprietario è il mittente dell'email
-        if(this.utenteProprietario.getEmail().equals(email.getMittente().getEmail())){
-            eliminaEmail(email, "email_inviate");
-        } else{ // il mio utenteProprietario è il destinatario dell'email
-            eliminaEmail(email, "email_ricevute");
+        if(nomeTabellaDB.equals("email_inviate") && this.utenteProprietario.getEmail().equals(email.getMittente().getEmail())){
+            eliminaEmail(email, nomeTabellaDB);
+        } else if(nomeTabellaDB.equals("email_ricevute") && email.getDestinatari().contains(this.utenteProprietario)){ // il mio utenteProprietario è il destinatario dell'email
+            eliminaEmail(email, nomeTabellaDB);
         }
     }
     
@@ -775,16 +775,16 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
 
     @Override
     public void eliminaPerMittente(Email email) {
-        eliminaEmailDaDB(email);
+        eliminaEmailDaDB(email, "email_inviate");
         setChanged();
-        notifyObservers(ClientGUI.EMAIL_ELIMINATA);
+        notifyObservers(ClientGUI.EMAIL_INVIATA_ELIMINATA);
     }
 
     @Override
     public void eliminaPerDestinatario(Email email) {
-        eliminaEmailDaDB(email);
+        eliminaEmailDaDB(email, "email_ricevute");
         setChanged();
-        notifyObservers(ClientGUI.EMAIL_ELIMINATA);
+        notifyObservers(ClientGUI.EMAIL_RICEVUTA_ELIMINATA);
     }
     
 }
