@@ -556,8 +556,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      */
     public void terminaAggiornamentoInizialeEmail(){
         setChanged();
-        notifyObservers(ClientGUI.INVIATI);
-        setChanged();
         notifyObservers(ClientGUI.RICEVUTI);
     }
     
@@ -713,9 +711,17 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         if(nomeTabellaDB.equals("email_inviate") && this.utenteProprietario.getEmail().equals(email.getMittente().getEmail())){
             eliminaEmailDaDB(email, nomeTabellaDB);
             this.emailInviate.remove(email);
-        } else if(nomeTabellaDB.equals("email_ricevute") && email.getDestinatari().contains(this.utenteProprietario)){ // il mio utenteProprietario è il destinatario dell'email
-            eliminaEmailDaDB(email, nomeTabellaDB);
-            this.emailRicevute.remove(email);
+        } else{
+            boolean isDestinatario = false;
+            for(Utente utente: email.getDestinatari()){
+                if(utente.getEmail().equals(this.utenteProprietario.getEmail()))
+                    isDestinatario = true;
+            }
+            // il mio utenteProprietario è il destinatario dell'email
+            if(nomeTabellaDB.equals("email_ricevute") && isDestinatario){
+                eliminaEmailDaDB(email, nomeTabellaDB);
+                this.emailRicevute.remove(email);
+            }
         }
     }
     
