@@ -26,9 +26,14 @@ public interface Server extends Remote{
     ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException;
     
     /*
-    *   Elimina l'email dal database
+    *   Elimina l'email per il mittente dal database
     */
-    boolean eliminaEmail(Email emailDaEliminare, Utente utente) throws RemoteException;
+    boolean eliminaEmailPerMittente(Email emailDaEliminare, Utente utente) throws RemoteException;
+    
+    /*
+    *   Elimina l'email per il destinatario dal database
+    */
+    boolean eliminaEmailPerDestinatario(Email emailDaEliminare, Utente utente) throws RemoteException;
     
     /*
     *   A partire da un istanza di EmailDaInviare crea un'istanza di tipo Email che viene

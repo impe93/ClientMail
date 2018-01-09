@@ -7,5 +7,6 @@ package modelli;
 public interface CasellaPostaElettronica {
     void inserisciInInviati(Email email);
     void inserisciInRicevuti(Email email);
-    void elimina(Email email);
+    void eliminaPerMittente(Email email);
+    void eliminaPerDestinatario(Email email);
 }
