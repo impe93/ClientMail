@@ -278,11 +278,23 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 email.setPriorita(rs.getInt("priorita"));
                 email.setLetto(rs.getInt("letto"));
                 if(isInviate){
-                    if(!this.emailInviate.contains(email)){
+                    boolean found = false;
+                    for(Email emailLista: this.emailInviate)
+                        if(emailLista.equals(email))
+                            found = true;
+                    
+                    if(!found){
                         this.emailInviate.add(email);
                     }
                 } else{
-                    this.emailRicevute.add(email);
+                    boolean found = false;
+                    for(Email emailLista: this.emailRicevute)
+                        if(emailLista.equals(email))
+                            found = true;
+                    
+                    if(!found){
+                        this.emailRicevute.add(email);
+                    }
                 }
             }
         } catch(SQLException e) {
@@ -457,12 +469,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             queryUtentiDestinatari =
                     "SELECT * " + 
                     "FROM utente " +
-                    "WHERE email = (SELECT destinatario FROM email_inviate WHERE id_email= " + idEmail+ ")";
+                    "WHERE email in (SELECT destinatario FROM email_inviate WHERE id_email= " + idEmail+ ")";
         } else{
             queryUtentiDestinatari =
                     "SELECT * " + 
                     "FROM utente " +
-                    "WHERE email = (SELECT destinatario FROM email_ricevute WHERE id_email= " + idEmail+ ")";
+                    "WHERE email in (SELECT destinatario FROM email_ricevute WHERE id_email= " + idEmail+ ")";
         }
         try {
             conn = DriverManager.getConnection(urlDB);
@@ -800,7 +812,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     @Override
     public void inserisciInInviati(Email email) {
         inserisciNuovaEmail(email, "email_inviate");
-        this.emailInviate.add(email);
         if(this.ordineInviate.equals("data")){
             ordinaPerData(true);
         } else{
@@ -813,7 +824,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     @Override
     public void inserisciInRicevuti(Email email) {
         inserisciNuovaEmail(email, "email_ricevute");
-        this.emailRicevute.add(email);
         if(this.ordineRicevute.equals("data")){
             ordinaPerData(false);
         } else{

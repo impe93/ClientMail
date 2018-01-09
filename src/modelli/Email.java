@@ -3,6 +3,7 @@ package modelli;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  *
@@ -124,9 +125,36 @@ public class Email implements Serializable{
     
      @Override
     public String toString() {
+        String destinatariEmail = "";
+        for(Utente dest: this.destinatari){
+            destinatariEmail += " "+dest.getEmail();
+        }
         return "Email{" + "id=" + id + ", mittente=" 
-                + mittente.getEmail() + ", destinatari=" + destinatari.get(0).getEmail() + ", oggetto=" 
+                + mittente.getEmail() + ", destinatari=" + destinatariEmail + ", oggetto=" 
                 + oggetto + ", corpo=" + corpo + ", data=" + data.toString() + ", priorita=" 
                 + priorita + ", letto=" + letto + '}';
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Email other = (Email) obj;
+        return this.id == other.id;
+    }
+    
+    
 }
