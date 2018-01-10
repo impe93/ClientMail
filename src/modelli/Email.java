@@ -3,21 +3,20 @@ package modelli;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
 public class Email implements Serializable{
-    int id;
-    Utente mittente;
-    ArrayList<Utente> destinatari;
-    String oggetto;
-    String corpo;
-    Date data;
-    int priorita;
-    int letto;
+    private int id;
+    private Utente mittente;
+    private ArrayList<Utente> destinatari;
+    private String oggetto;
+    private String corpo;
+    private Date data;
+    private int priorita;
+    private int letto;
 
     
     public Email(int id, Utente mittente, ArrayList destinatari, String oggetto, String corpo){
