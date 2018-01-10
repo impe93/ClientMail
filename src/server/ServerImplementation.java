@@ -167,13 +167,13 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
                         }
                         try{
                             clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da "
-                                    + emailRitorno.getMittente()+"!");
+                                    + emailRitorno.getMittente().getEmail()+"!");
                         }
                         catch(RemoteException e){
                             System.out.println(e.getMessage());
                         }
                     }
-                    else{
+                    else if(casella.recuperaDatiUtente(destinatario.getEmail())==null){
                         destinatariInesistenti.add(destinatario.getEmail());
                     }
                 } finally {
