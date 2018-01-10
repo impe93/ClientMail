@@ -28,6 +28,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     private ArrayList<String> messaggi;
     private String ordineInviate; //puù assumere valore "data" oppure "priorita"
     private String ordineRicevute; //puù assumere valore "data" oppure "priorita"
+    private int idUltimaEmailLetta;
     
     public CasellaPostaElettronicaClient(String emailUtente){
         registraDriver();
@@ -38,6 +39,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         this.messaggi = new ArrayList<>();
         this.ordineInviate = "data";
         this.ordineRicevute = "data";
+        this.idUltimaEmailLetta = -1;
     }
 
     public Utente getUtenteProprietario() {
@@ -50,6 +52,10 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     
     public ArrayList<Email> getEmailRicevute() {
         return emailRicevute;
+    }
+    
+    public int getIdUltimaLetta(){
+        return this.idUltimaEmailLetta;
     }
     
     /**
@@ -764,6 +770,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             if(email.getId() == emailLetta.getId()){
                 segnaLetturaEmailInDB(emailLetta);
                 email.setLetto(1);
+                this.idUltimaEmailLetta = emailLetta.getId();
                 setChanged();
                 notifyObservers(ClientGUI.LETTA_EMAIL);
             }
