@@ -5,6 +5,7 @@ import modelli.Email;
 import modelli.Utente;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.concurrent.locks.Lock;
 import modelli.EmailDaInviare;
 
 /**
@@ -55,4 +56,5 @@ public interface Server extends Remote{
     *  Segna l'email passata come parametro come già letta
     */
     boolean segnaEmailComeLetta(String emailClient, Email emailLetta) throws RemoteException;
+    
 }
