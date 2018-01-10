@@ -22,6 +22,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
@@ -31,10 +34,13 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     
     
     private Map<String, Client> clientConnessi = new HashMap<>();
+    private final ReadWriteLock rwHM;
+    private final Lock rHM;
+    private final Lock wHM;
     private final int NUM_THREAD = 3;
     CasellaServer casella;
     Executor exec;
-
+    
     public Map<String, Client> getClientConnessi() {
         return clientConnessi;
     }
@@ -44,8 +50,8 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     *  Costruttore di ServerImplementation
     */
     public ServerImplementation() throws RemoteException{
-        /* 
-        registrazione dell'oggetto ServerImplementation presso il registro di 
+        /*
+        registrazione dell'oggetto ServerImplementation presso il registro di
         bootstrap (rmiregistry)
         */
         lanciaRMIRegistry();
@@ -59,13 +65,15 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         
         casella = new CasellaServer();
         exec = Executors.newFixedThreadPool(NUM_THREAD);
-    
+        rwHM = new ReentrantReadWriteLock();
+        rHM = rwHM.readLock();
+        wHM = rwHM.writeLock();
     }
     
     public void aggiungiObserver(ServerGUI serverGui){
         this.casella.addObserver(serverGui);
     }
-
+    
     @Override
     public ArrayList<Email> getInviate(int ultimaInviata, Utente utente) throws RemoteException {
         final int ultimaInviataFinal = ultimaInviata;
@@ -87,7 +95,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         
         return inviate;
     }
-
+    
     @Override
     public ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException {
         final int ultimaRicevutaFinal = ultimaRicevuta;
@@ -133,46 +141,61 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             System.out.println(e.getMessage());
         }
         if(emailRitorno != null){
+            rHM.lock();
             try{
-                clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("Email inviata correttamente!");
-            }
-            catch(RemoteException e){
-                        System.out.println(e.getMessage());
+                try{
+                    clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("Email inviata correttamente!");
+                }
+                catch(RemoteException e){
+                    System.out.println(e.getMessage());
+                }
+            } finally {
+                rHM.unlock();
             }
             ArrayList<Utente> destinatari = new ArrayList<>();
             destinatari.addAll(emailRitorno.getDestinatari());
             for(Utente destinatario : destinatari){
-                Client clientRicevente = clientConnessi.get(destinatario.getEmail());
-                if(clientRicevente != null){
-                    try{
-                        clientRicevente.riceviEmail(emailRitorno);
+                rHM.lock();
+                try {
+                    Client clientRicevente = clientConnessi.get(destinatario.getEmail());
+                    if(clientRicevente != null){
+                        try{
+                            clientRicevente.riceviEmail(emailRitorno);
+                        }
+                        catch(RemoteException e){
+                            System.out.println(e.getMessage());
+                        }
+                        try{
+                            clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da "
+                                    + emailRitorno.getMittente()+"!");
+                        }
+                        catch(RemoteException e){
+                            System.out.println(e.getMessage());
+                        }
                     }
-                    catch(RemoteException e){
-                        System.out.println(e.getMessage());
+                    else{
+                        destinatariInesistenti.add(destinatario.getEmail());
                     }
-                    try{
-                        clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da " 
-                        + emailRitorno.getMittente()+"!");
-                    }
-                    catch(RemoteException e){
-                        System.out.println(e.getMessage());
-                    }
-                }
-                else{
-                    destinatariInesistenti.add(destinatario.getEmail());
+                } finally {
+                    rHM.unlock();
                 }
             }
             if(destinatariInesistenti.isEmpty()==false){
                 String messaggio = "Non è stato possibile inviare l'email "
-                    + "ai seguenti destinatari:\n";
+                        + "ai seguenti destinatari:\n";
                 for(String utente : destinatariInesistenti){
                     messaggio = messaggio + utente + "\n";
                 }
+                rHM.lock();
                 try{
-                clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio(messaggio);
-                }
-                catch(RemoteException e){
+                    try{
+                        clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio(messaggio);
+                    }
+                    catch(RemoteException e){
                         System.out.println(e.getMessage());
+                    }
+                } finally {
+                    rHM.unlock();
                 }
             }
             
@@ -196,47 +219,70 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     
     @Override
     public void connettiAlClient(String emailClient) throws RemoteException {
+        wHM.lock();
         try {
-            clientConnessi.put(emailClient, (Client)Naming.lookup("//localhost/Client/" + emailClient));
-            
-            casella.setOperazioneEseguita("* [NUOVO CLIENT CONNESSO: " + emailClient + " - " + 
+            try {
+                clientConnessi.put(emailClient, (Client)Naming.lookup("//localhost/Client/" + emailClient));
+                
+                casella.setOperazioneEseguita("* [NUOVO CLIENT CONNESSO: " + emailClient + " - " +
                         new Date().toString() + "]");
-            casella.logUltimaOperazione();
-        } catch (NotBoundException | MalformedURLException | RemoteException ex) {
-            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
-        }    
+                casella.logUltimaOperazione();
+            } catch (NotBoundException | MalformedURLException | RemoteException ex) {
+                Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        finally {
+                wHM.unlock();
+        }
     }
-
+    
     @Override
     public boolean disconnettiClient(String emailClient) throws RemoteException {
-        clientConnessi.remove(emailClient);
-        casella.setOperazioneEseguita("* [CLIENT DISCONNESSO: " + emailClient + " - " + 
-                        new Date().toString() + "]");
+        wHM.lock();
+        try {
+            clientConnessi.remove(emailClient);
+        } finally {
+            wHM.unlock();
+        }
+        casella.setOperazioneEseguita("* [CLIENT DISCONNESSO: " + emailClient + " - " +
+                new Date().toString() + "]");
         casella.logUltimaOperazione();
         //valore di ritorno??
         return true;
         
     }
-
+    
     @Override
     public boolean segnaEmailComeLetta(String emailClient, Email emailLetta) throws RemoteException {
         casella.setLetta(emailClient, emailLetta);
         return true;
     }
-
+    
     @Override
     public boolean eliminaEmailPerMittente(Email emailDaEliminare, Utente utente) throws RemoteException {
         boolean eliminata = casella.eliminaEmailDaMittente(emailDaEliminare, utente.getEmail());
-        if(eliminata)
-            clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+        if(eliminata){
+            rHM.lock();
+            try {
+                clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+            } finally {
+                rHM.unlock();
+            }
+        }
         return eliminata;
     }
-
+    
     @Override
     public boolean eliminaEmailPerDestinatario(Email emailDaEliminare, Utente utente) throws RemoteException {
         boolean eliminata = casella.eliminaEmailDaDestinatario(emailDaEliminare, utente.getEmail());
-        if(eliminata)
-            clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+        if(eliminata){
+            rHM.lock();
+            try {
+                clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+            } finally {
+                rHM.unlock();
+            }
+        }
         return eliminata;
     }
     
