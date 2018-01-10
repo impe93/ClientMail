@@ -36,22 +36,28 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     private final Lock rlDB;
     private final Lock wlDB;
     private final ReadWriteLock rwlEmailInviate;
-    private final Lock rlEmailInviate;
     private final Lock wlEmailInviate;
     private final ReadWriteLock rwlEmailRicevute;
-    private final Lock rlEmailRicevute;
     private final Lock wlEmailRicevute;
+    private final ReadWriteLock rwlMessaggi;
+    private final Lock wlMessaggi;
+    /*
+    Non è stato creato un lock per idUltimaEmailLetta perchè grazie al
+    write lock di emailRicevute non è possibile che si presentino delle 
+    situazioni di accesso conflittuale alla variabile.
+    */   
     
     public CasellaPostaElettronicaClient(String emailUtente){
         this.rwlDB = new ReentrantReadWriteLock();
         this.rlDB = rwlDB.readLock();
         this.wlDB = rwlDB.writeLock();
         this.rwlEmailInviate = new ReentrantReadWriteLock();
-        this.rlEmailInviate = rwlEmailInviate.readLock();
         this.wlEmailInviate = rwlEmailInviate.writeLock();
         this.rwlEmailRicevute = new ReentrantReadWriteLock();
-        this.rlEmailRicevute = rwlEmailRicevute.readLock();
         this.wlEmailRicevute = rwlEmailRicevute.writeLock();
+        this.rwlMessaggi = new ReentrantReadWriteLock();
+        this.wlMessaggi = rwlMessaggi.writeLock();
+        
         registraDriver();
         this.urlDB = "jdbc:sqlite:" + "DB_" + emailUtente + ".db";   
         this.utenteProprietario = recuperaDatiUtente(emailUtente);
@@ -914,7 +920,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param messaggio: stringa contenente un messaggio proveniente dal server
      */
     public void inserisciMessaggio(String messaggio){
-        this.messaggi.add(messaggio);
+        wlMessaggi.lock();
+        try {
+            this.messaggi.add(messaggio);
+        } finally {
+            wlMessaggi.unlock();
+        }
         setChanged();
         notifyObservers(ClientGUI.NUOVO_MESSAGGIO);
     }
@@ -925,10 +936,19 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @return un ArrayList di messaggi ricevuti se presenti, null altrimenti
      */
     public ArrayList<String> leggiMessaggi(){
-        if(!this.messaggi.isEmpty()){
-            ArrayList<String> messaggiRicevuti = new ArrayList<>();
-            messaggiRicevuti.addAll(this.messaggi);
-            this.messaggi.clear();
+        boolean letturaEffettuata = false;
+        ArrayList<String> messaggiRicevuti = new ArrayList<>();
+        wlMessaggi.lock();
+        try {
+            if(!this.messaggi.isEmpty()){
+                messaggiRicevuti.addAll(this.messaggi);
+                this.messaggi.clear();
+                letturaEffettuata = true;
+            }
+        } finally {
+            wlMessaggi.unlock();
+        }
+        if(letturaEffettuata){
             return messaggiRicevuti;
         } else{
             return null;
