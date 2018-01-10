@@ -23,7 +23,7 @@ public class EmailDaInviare implements Serializable{
         this.data = new Date();
     }
     
-    public EmailDaInviare(ArrayList<String> destinatari, String oggetto, Date data, int priorita, String corpo) {
+    public EmailDaInviare(ArrayList<String> destinatari, String oggetto, Date data, int priorita, String corpo, Utente mittente) {
         this.destinatari = destinatari;
         this.mittente = mittente;
         this.oggetto = oggetto;
