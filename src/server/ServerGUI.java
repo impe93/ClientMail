@@ -75,17 +75,17 @@ public class ServerGUI implements Observer{
         frame.setVisible(true);
         
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
-        @Override
-        public void windowClosing(WindowEvent winEvt) {
-            int risposta = JOptionPane.showConfirmDialog(null,"Confermi la "
+            @Override
+            public void windowClosing(WindowEvent winEvt) {
+                int risposta = JOptionPane.showConfirmDialog(null,"Confermi la "
                         + "chiusura del server?","Conferma",
                         JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-                 
+                
                 if(risposta == JOptionPane.YES_OPTION){
                     System.exit(0);
                 }
-        }
-    });
+            }
+        });
         
     }
     
