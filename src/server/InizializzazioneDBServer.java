@@ -38,20 +38,20 @@ public class InizializzazioneDBServer {
     }
     
     private static void creaDBServer() throws SQLException {
-            try (Connection conn = DriverManager.getConnection(urlDB)) {
-                if (conn != null) {
-                    DatabaseMetaData meta = conn.getMetaData();
-                    System.out.println("The driver name is " + meta.getDriverName());
-                    System.out.println("A new database has been created.");
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }  
+        try (Connection conn = DriverManager.getConnection(urlDB)) {
+            if (conn != null) {
+                DatabaseMetaData meta = conn.getMetaData();
+                System.out.println("The driver name is " + meta.getDriverName());
+                System.out.println("A new database has been created.");
+                conn.close();
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
     
     private static void creaTabellaUtenti() throws SQLException{
-        String creazioneTabellaUtenti 
+        String creazioneTabellaUtenti
                 = "create table utenti ("
                 + "email text primary key,"
                 + "nome text not null,"
@@ -78,7 +78,7 @@ public class InizializzazioneDBServer {
                 + "eliminataDaDestinatario integer not null check(eliminataDaDestinatario = 0 or eliminataDaDestinatario = 1),"
                 + "primary key (id_email, destinatario)"
                 + ")";
-        String eliminaTabellaEmail 
+        String eliminaTabellaEmail
                 = "DROP TABLE if exists 'email'";
         eseguiQueryDB(urlDB, creaTabellaEmail, eliminaTabellaEmail);
         
@@ -105,13 +105,13 @@ public class InizializzazioneDBServer {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-        }   
-    
+        }
+        
     }
     
     private static void inserisciUtentiInTabellaUtenti() throws SQLException{
-       
-        String inserimentoUtenti 
+        
+        String inserimentoUtenti
                 = "INSERT INTO utenti (email, nome, cognome)"
                 + "VALUES"
                 + "('francesca.riddone@edu.unito.it','Francesca','Riddone'),"
@@ -138,7 +138,7 @@ public class InizializzazioneDBServer {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-        }   
+        }
     }
     
     private static void inserisciEmailInTabellaEmail() throws SQLException{
@@ -175,7 +175,7 @@ public class InizializzazioneDBServer {
         
         int priorita = 3;
         int letto = 0;
-       
+        
         String inserimentoEmail = "INSERT INTO email (id_email, mittente, "
                 + "destinatario, oggetto, corpo,"
                 + "data, priorita,letto,eliminataDaMittente,"
@@ -184,7 +184,7 @@ public class InizializzazioneDBServer {
         
         Connection conn = null;
         PreparedStatement pst = null;
-
+        
         try{
             conn = DriverManager.getConnection(urlDB);
             for(int i=0;i<9;i++){
@@ -216,8 +216,8 @@ public class InizializzazioneDBServer {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-        }   
-    
+        }
+        
     }
-
+    
 }

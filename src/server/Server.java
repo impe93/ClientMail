@@ -5,6 +5,7 @@ import modelli.Email;
 import modelli.Utente;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.concurrent.locks.Lock;
 import modelli.EmailDaInviare;
 
 /**
@@ -14,13 +15,13 @@ import modelli.EmailDaInviare;
 public interface Server extends Remote{
     
     /*
-    *   Restituisce le email inviate di un determinato utente a partire da quella con 
+    *   Restituisce le email inviate di un determinato utente a partire da quella con
     *   idEmail uguale a ultimaInviata
     */
     ArrayList<Email> getInviate(int ultimaInviata, Utente utente) throws RemoteException;
     
     /*
-    *   Restituisce le email ricevute di un determinato utente a partire da quella con 
+    *   Restituisce le email ricevute di un determinato utente a partire da quella con
     *   idEmail uguale a ultimaRicevuta
     */
     ArrayList<Email> getRicevute(int ultimaRicevuta, Utente utente) throws RemoteException;
@@ -52,7 +53,8 @@ public interface Server extends Remote{
     boolean disconnettiClient(String emailClient) throws RemoteException;
     
     /*
-    *  Segna l'email passata come parametro come già letta 
+    *  Segna l'email passata come parametro come già letta
     */
     boolean segnaEmailComeLetta(String emailClient, Email emailLetta) throws RemoteException;
+    
 }

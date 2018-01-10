@@ -32,11 +32,32 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     private String ordineInviate; //puù assumere valore "data" oppure "priorita"
     private String ordineRicevute; //puù assumere valore "data" oppure "priorita"
     private int idUltimaEmailLetta;
-    private final ReadWriteLock rwl;
-    private final Lock rl;
-    private final Lock wl;
+    private final ReadWriteLock rwlDB;
+    private final Lock rlDB;
+    private final Lock wlDB;
+    private final ReadWriteLock rwlEmailInviate;
+    private final Lock wlEmailInviate;
+    private final ReadWriteLock rwlEmailRicevute;
+    private final Lock wlEmailRicevute;
+    private final ReadWriteLock rwlMessaggi;
+    private final Lock wlMessaggi;
+    /*
+    Non è stato creato un lock per idUltimaEmailLetta perchè grazie al
+    write lock di emailRicevute non è possibile che si presentino delle 
+    situazioni di accesso conflittuale alla variabile.
+    */   
     
     public CasellaPostaElettronicaClient(String emailUtente){
+        this.rwlDB = new ReentrantReadWriteLock();
+        this.rlDB = rwlDB.readLock();
+        this.wlDB = rwlDB.writeLock();
+        this.rwlEmailInviate = new ReentrantReadWriteLock();
+        this.wlEmailInviate = rwlEmailInviate.writeLock();
+        this.rwlEmailRicevute = new ReentrantReadWriteLock();
+        this.wlEmailRicevute = rwlEmailRicevute.writeLock();
+        this.rwlMessaggi = new ReentrantReadWriteLock();
+        this.wlMessaggi = rwlMessaggi.writeLock();
+        
         registraDriver();
         this.urlDB = "jdbc:sqlite:" + "DB_" + emailUtente + ".db";   
         this.utenteProprietario = recuperaDatiUtente(emailUtente);
@@ -46,9 +67,6 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         this.ordineInviate = "data";
         this.ordineRicevute = "data";
         this.idUltimaEmailLetta = -1;
-        rwl = new ReentrantReadWriteLock();
-        rl = rwl.readLock();
-        wl = rwl.writeLock();
     }
 
     public Utente getUtenteProprietario() {
@@ -130,7 +148,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM " + tabellaEmail + " " +
                 "WHERE data = " +
                 "(SELECT MAX(data) FROM " + tabellaEmail + ")";
-        rl.lock();
+        rlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -154,7 +172,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-            rl.unlock();
+            rlDB.unlock();
         }
         return idUltimaEmail;
     }
@@ -192,13 +210,15 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         ResultSet rs = null;
         String queryOrdinamentoPerPriorita = "";
         if(isInviate){
+            wlEmailInviate.lock();
             queryOrdinamentoPerPriorita = "SELECT * FROM email_inviate ORDER BY priorita DESC";
             this.emailInviate.clear();
         } else{
+            wlEmailRicevute.lock();
             queryOrdinamentoPerPriorita = "SELECT * FROM email_ricevute ORDER BY priorita DESC";
             this.emailRicevute.clear();
         }
-        rl.lock();
+        rlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -250,7 +270,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-            rl.unlock();
+            rlDB.unlock();
+            if(isInviate){
+                wlEmailInviate.unlock();
+            } else{
+                wlEmailRicevute.unlock();
+            }
         }
     }
     
@@ -287,12 +312,15 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         ResultSet rs = null;
         String queryOrdinamentoPerPriorita = "";
         if(isInviate){
+            wlEmailInviate.lock();
             queryOrdinamentoPerPriorita = "SELECT * FROM email_inviate ORDER BY data DESC";
             this.emailInviate.clear();
         } else{
+            wlEmailRicevute.lock();
             queryOrdinamentoPerPriorita = "SELECT * FROM email_ricevute ORDER BY data DESC";
             this.emailRicevute.clear();
         }
+        rlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -344,6 +372,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            rlDB.unlock();
+            if(isInviate){
+                wlEmailInviate.unlock();
+            } else{
+                wlEmailRicevute.unlock();
+            }
         }
     }
     
@@ -363,6 +397,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "SELECT * " + 
                 "FROM utente " +
                 "WHERE email = '" + emailUtente + "'";
+        rlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -386,6 +421,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            rlDB.unlock();
         }
         return utente;
     }
@@ -395,12 +431,16 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * di posta elettronica
      */
     public void recuperaEmailInviate(){
-        this.emailInviate = new ArrayList<>();
-        String queryEmailRicevute = 
+        String queryEmailInviate = 
                 "SELECT * " + 
                 "FROM email_inviate " +
                 "WHERE mittente = '" + this.utenteProprietario.getEmail() + "'";
-        recuperaEmailUtente(queryEmailRicevute, true);
+        wlEmailInviate.lock();
+        try {
+            recuperaEmailUtente(queryEmailInviate, true);
+        } finally {
+            wlEmailInviate.unlock();
+        }
         if(this.ordineInviate.equals("data")){
             ordinaPerData(true);
         } else{
@@ -413,12 +453,16 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * di posta elettronica
      */
     public void recuperaEmailRicevute(){
-        this.emailRicevute = new ArrayList<>();
         String queryEmailRicevute = 
                 "SELECT * " + 
                 "FROM email_ricevute " +
                 "WHERE destinatario = '" + this.utenteProprietario.getEmail() + "'";
-        recuperaEmailUtente(queryEmailRicevute, false);
+        wlEmailRicevute.lock();
+        try {
+            recuperaEmailUtente(queryEmailRicevute, false);
+        } finally {
+            wlEmailRicevute.unlock();
+        }
         if(this.ordineRicevute.equals("data")){
             ordinaPerData(false);
         } else{
@@ -434,10 +478,10 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * le email è email_inviate, false se la tabella è email_ricevute
      */
     private void recuperaEmailUtente(String query, boolean isInviate){
-        
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
+        rlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -477,6 +521,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            rlDB.unlock();
         }
     }
     
@@ -507,6 +552,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                     "FROM utente " +
                     "WHERE email in (SELECT destinatario FROM email_ricevute WHERE id_email= " + idEmail+ ")";
         }
+        rlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -531,6 +577,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            rlDB.unlock();
         }
         return utentiDestinatari;        
     }
@@ -544,7 +591,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         for (Email email : nuoveEmailInviate){
             inserisciNuovaEmail(email, "email_inviate");
         }
-        this.emailInviate.addAll(nuoveEmailInviate);
+        wlEmailInviate.lock();
+        try {
+            this.emailInviate.addAll(nuoveEmailInviate);
+        } finally {
+            wlEmailInviate.unlock();
+        }
         if(this.ordineInviate.equals("data")){
             ordinaPerData(true);
         } else{
@@ -561,7 +613,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         for(Email email: nuoveEmailRicevute) {
             inserisciNuovaEmail(email, "email_ricevute");
         }
-        this.emailRicevute.addAll(nuoveEmailRicevute);
+        wlEmailRicevute.lock();
+        try {
+            this.emailRicevute.addAll(nuoveEmailRicevute);
+        } finally {
+            wlEmailRicevute.unlock();
+        }
         if(this.ordineRicevute.equals("data")){
             ordinaPerData(false);
         } else{
@@ -592,9 +649,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "INSERT INTO " + nomeTabella + " (id_email, mittente, destinatario, oggetto, corpo, data, priorita, letto) "
               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
-        Connection conn;
-        PreparedStatement ps;
-        
+        Connection conn = null;
+        PreparedStatement ps = null;
+        wlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             ps = conn.prepareStatement(inserimentoNuovaEmail);
@@ -614,7 +671,19 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             }    
         } catch (SQLException ex) {
             Logger.getLogger(CasellaPostaElettronicaClient.class.getName()).log(Level.SEVERE, null, ex);
-        }   
+        } finally {
+            try {
+                if(ps != null){
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+            wlDB.unlock();
+        }
     }
     
     /**
@@ -648,9 +717,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             Statement st = null;
             PreparedStatement pst = null;
             ResultSet rs = null;
+            wlDB.lock();
             try{
                 conn = DriverManager.getConnection(urlDB);
-                
                 for(Utente utente: utenti){
                     boolean utentePresente = false;
                     controlloPresenzaUtente = "SELECT * FROM utente WHERE email = '" + utente.getEmail() + "'";
@@ -686,6 +755,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 } catch (SQLException ex) {
                     System.out.println(ex.getMessage());
                 }
+                wlDB.unlock();
             }
         }
     }
@@ -729,7 +799,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         // il mio utenteProprietario è il mittente dell'email
         if(nomeTabellaDB.equals("email_inviate") && this.utenteProprietario.getEmail().equals(email.getMittente().getEmail())){
             eliminaEmailDaDB(email, nomeTabellaDB);
-            this.emailInviate.remove(email);
+            wlEmailInviate.lock();
+            try {
+                this.emailInviate.remove(email);
+            } finally {
+                wlEmailInviate.unlock();
+            }
         } else{
             boolean isDestinatario = false;
             for(Utente utente: email.getDestinatari()){
@@ -739,7 +814,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             // il mio utenteProprietario è il destinatario dell'email
             if(nomeTabellaDB.equals("email_ricevute") && isDestinatario){
                 eliminaEmailDaDB(email, nomeTabellaDB);
-                this.emailRicevute.remove(email);
+                wlEmailRicevute.lock();
+                try {
+                    this.emailRicevute.remove(email);
+                } finally {
+                    wlEmailRicevute.unlock();
+                }
             }
         }
     }
@@ -754,6 +834,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         String queryEliminazioneEmailInviata = "DELETE FROM "+ nomeTabellaDB +" WHERE id_email = " + emailDaEliminare.getId();
         Connection conn = null;
         Statement st = null;
+        wlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -771,6 +852,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            wlDB.unlock();
         }     
     }
     
@@ -779,15 +861,25 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param emailLetta : email che si desidera contrassegnare come già letta
      */
     public void segnaLetturaEmail(Email emailLetta){
-        for(Email email: this.emailRicevute){
-            if(email.getId() == emailLetta.getId()){
-                segnaLetturaEmailInDB(emailLetta);
-                email.setLetto(1);
-                this.idUltimaEmailLetta = emailLetta.getId();
-                setChanged();
-                notifyObservers(ClientGUI.LETTA_EMAIL);
+        boolean letta = false;
+        wlEmailRicevute.lock();
+        try {
+            for(Email email: this.emailRicevute){
+                if(email.getId() == emailLetta.getId()){
+                    segnaLetturaEmailInDB(emailLetta);
+                    email.setLetto(1);
+                    this.idUltimaEmailLetta = emailLetta.getId();
+                    letta = true;
+                    break;
+                }
             }
+        } finally {
+            wlEmailRicevute.unlock();
         }
+        if(letta){
+            setChanged();
+            notifyObservers(ClientGUI.LETTA_EMAIL);
+        }   
     }
     
     /**
@@ -800,6 +892,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         String queryLetturaEmail = "UPDATE email_ricevute SET letto = 1 WHERE id_email = " + emailLetta.getId();
         Connection conn = null;
         Statement st = null;
+        wlDB.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -817,6 +910,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            wlDB.unlock();
         }
     }
     
@@ -826,7 +920,12 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @param messaggio: stringa contenente un messaggio proveniente dal server
      */
     public void inserisciMessaggio(String messaggio){
-        this.messaggi.add(messaggio);
+        wlMessaggi.lock();
+        try {
+            this.messaggi.add(messaggio);
+        } finally {
+            wlMessaggi.unlock();
+        }
         setChanged();
         notifyObservers(ClientGUI.NUOVO_MESSAGGIO);
     }
@@ -837,10 +936,19 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      * @return un ArrayList di messaggi ricevuti se presenti, null altrimenti
      */
     public ArrayList<String> leggiMessaggi(){
-        if(!this.messaggi.isEmpty()){
-            ArrayList<String> messaggiRicevuti = new ArrayList<>();
-            messaggiRicevuti.addAll(this.messaggi);
-            this.messaggi.clear();
+        boolean letturaEffettuata = false;
+        ArrayList<String> messaggiRicevuti = new ArrayList<>();
+        wlMessaggi.lock();
+        try {
+            if(!this.messaggi.isEmpty()){
+                messaggiRicevuti.addAll(this.messaggi);
+                this.messaggi.clear();
+                letturaEffettuata = true;
+            }
+        } finally {
+            wlMessaggi.unlock();
+        }
+        if(letturaEffettuata){
             return messaggiRicevuti;
         } else{
             return null;

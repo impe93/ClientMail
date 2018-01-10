@@ -173,9 +173,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
                             System.out.println(e.getMessage());
                         }
                     }
-                    else if(casella.recuperaDatiUtente(destinatario.getEmail())==null){
-                        destinatariInesistenti.add(destinatario.getEmail());
-                    }
                 } finally {
                     rHM.unlock();
                 }
@@ -232,7 +229,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             }
         }
         finally {
-                wHM.unlock();
+            wHM.unlock();
         }
     }
     

@@ -29,11 +29,14 @@ public class CasellaServer extends Observable {
     private final ReadWriteLock rwDB1;
     private final Lock rDB1;
     private final Lock wDB1;
-
+    private final ReadWriteLock rwHM;
+    private final Lock rHM;
+    private final Lock wHM;
+    
     public String getOperazioneEseguita() {
         return operazioneEseguita;
     }
-
+    
     public void setOperazioneEseguita(String operazioneEseguita) {
         this.operazioneEseguita = operazioneEseguita;
     }
@@ -50,8 +53,11 @@ public class CasellaServer extends Observable {
         rwDB1 = new ReentrantReadWriteLock();
         rDB1 = rwDB1.readLock();
         wDB1 = rwDB1.writeLock();
+        rwHM = new ReentrantReadWriteLock();
+        rHM = rwHM.readLock();
+        wHM = rwHM.writeLock();
     }
-   
+    
     /*
     *   Recupera le Email ricevute di un utente a partire dall'Email con id ultimaRicevuta
     *   che viene passato come parametro, e le resttuisce in un ArrayList
@@ -64,9 +70,9 @@ public class CasellaServer extends Observable {
         Statement st = null;
         ResultSet rs = null;
         String cercaEmailRicevuteUtente =
-                "SELECT * " + 
+                "SELECT * " +
                 "FROM email " +
-                "WHERE destinatario = '" + utente.getEmail() 
+                "WHERE destinatario = '" + utente.getEmail()
                 + "' AND id_email >" + ultimaRicevuta +" AND eliminataDaDestinatario=0";
         
         rDB1.lock();
@@ -123,9 +129,9 @@ public class CasellaServer extends Observable {
         Statement st = null;
         ResultSet rs = null;
         String cercaEmailInviateUtente =
-                "SELECT * " + 
+                "SELECT * " +
                 "FROM email " +
-                "WHERE mittente = '" + utente.getEmail() 
+                "WHERE mittente = '" + utente.getEmail()
                 + "' AND id_email >" + ultimaInviata +" AND eliminataDaMittente=0";
         rDB1.lock();
         try {
@@ -146,10 +152,10 @@ public class CasellaServer extends Observable {
                 emailInviateUtente.add(email);
                 
             }
-        } 
+        }
         catch(SQLException e){
             System.out.println(e.getMessage());
-        } 
+        }
         finally {
             try {
                 if(rs != null){
@@ -170,9 +176,9 @@ public class CasellaServer extends Observable {
         
         return emailInviateUtente;
     }
-   
-     /*
-    *   A partire dall'email utente accede al database utenti e recupera 
+    
+    /*
+    *   A partire dall'email utente accede al database utenti e recupera
     *   tutti i dati del relativo utente: nome, cognome e email e restituisce un istanza
     *   dell'utente.
     */
@@ -181,8 +187,8 @@ public class CasellaServer extends Observable {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        String queryUtente = 
-                "SELECT * " + 
+        String queryUtente =
+                "SELECT * " +
                 "FROM utenti " +
                 "WHERE email = '" + emailUtente + "'";
         rDB1.lock();
@@ -217,8 +223,8 @@ public class CasellaServer extends Observable {
         return utente;
     }
     
-     /*
-    *   A partire dall'idEmail passato come parametro, accede al database e recupera tutti gli 
+    /*
+    *   A partire dall'idEmail passato come parametro, accede al database e recupera tutti gli
     *   utenti destinatari dell'email in questione e li restituisce sottoforma di ArrayList
     */
     private ArrayList<Utente> recuperaUtentiDestinatari(int idEmail){
@@ -226,10 +232,10 @@ public class CasellaServer extends Observable {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        String queryUtentiDestinatari = 
-                    "SELECT * " + 
-                    "FROM utenti " +
-                    "WHERE email IN (SELECT destinatario FROM email "
+        String queryUtentiDestinatari =
+                "SELECT * " +
+                "FROM utenti " +
+                "WHERE email IN (SELECT destinatario FROM email "
                 + "WHERE id_email= " + idEmail+ ")";
         rDB1.lock();
         try {
@@ -260,7 +266,7 @@ public class CasellaServer extends Observable {
             }
             rDB1.unlock();
         }
-        return utentiDestinatari;        
+        return utentiDestinatari;
     }
     
     /*
@@ -272,8 +278,8 @@ public class CasellaServer extends Observable {
         ResultSet rs = null;
         int idMax = -1;
         
-        String queryIdMax = 
-                    "SELECT MAX(id_email) FROM email";
+        String queryIdMax =
+                "SELECT MAX(id_email) FROM email";
         rDB1.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
@@ -304,8 +310,8 @@ public class CasellaServer extends Observable {
                 System.out.println(ex.getMessage());
             }
             rDB1.unlock();
-         }
-            
+        }
+        
         return idMax;
         
     }
@@ -314,7 +320,7 @@ public class CasellaServer extends Observable {
     *   A partire da un istanza di EmailDaInviare crea un'istanza di tipo Email che viene
     *   inserita all'interno del database e poi la restituisce al chiamante
     */
-    public Email inviaEmail(EmailDaInviare emailDaInviare, Map<String, Client> clientConnessi) throws RemoteException{   
+    public Email inviaEmail(EmailDaInviare emailDaInviare, Map<String, Client> clientConnessi) throws RemoteException{
         Connection conn = null;
         PreparedStatement pst = null;
         ResultSet rs = null;
@@ -326,8 +332,8 @@ public class CasellaServer extends Observable {
         Email email = null;
         
         setOperazioneEseguita("* [RICEVUTA RICHIESTA DI INVIO EMAIL DA " + emailDaInviare.getMittente().getEmail() + ""
-                        + " A " + emailDaInviare.getDestinatari().toString() + " - " + 
-                        new Date().toString() + "]");
+                + " A " + emailDaInviare.getDestinatari().toString() + " - " +
+                new Date().toString() + "]");
         logUltimaOperazione();
         
         if(nuovoId == 0){
@@ -337,45 +343,44 @@ public class CasellaServer extends Observable {
         ArrayList<String> utentiAccreditati = recuperaEmailUtenti();
         
         wDB1.lock();
-        try{   
-           for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
+        try{
+            for(int i = 0; i<emailDaInviare.getDestinatari().size();i++){
                 emailDestinatario = emailDaInviare.getDestinatari().get(i);
                 if(utentiAccreditati.contains(emailDestinatario)){
-                Utente destinatario;
-                destinatario = recuperaDatiUtente(emailDestinatario);
-                destinatari.add(destinatario);
-                String inserisciEmail = "INSERT INTO email (id_email, mittente, "
-                + "destinatario, oggetto, corpo,"
-                + "data, priorita,letto,eliminataDaMittente,"
-                + "eliminataDaDestinatario) "
-                + "VALUES (?,?,?,?,?,?,?,?,?,?)";
-                conn = DriverManager.getConnection(urlDB);
-                pst = conn.prepareStatement(inserisciEmail);
-                
-                pst.setInt(1,nuovoId);
-                pst.setString(2, emailDaInviare.getMittente().getEmail());
-                pst.setString(3,emailDestinatario);
-                pst.setString(4,emailDaInviare.getOggetto());
-                pst.setString(5,emailDaInviare.getCorpo());
-                java.sql.Date dataSql = new java.sql.Date(data.getTime());
-                pst.setDate(6, dataSql);
-                pst.setInt(7,emailDaInviare.getPriorita());
-                pst.setInt(8,0);
-                pst.setInt(9,0);
-                pst.setInt(10,0);
-                pst.executeUpdate();
-                
-                setOperazioneEseguita("* [INVIATA EMAIL A " + emailDestinatario + ""
-                        + " DA " + emailDaInviare.getMittente().getEmail() + " - " + 
-                        new Date().toString() + "]");
-                logUltimaOperazione();
-                email = new Email(nuovoId, emailDaInviare.getMittente(), destinatari, emailDaInviare.getOggetto(), emailDaInviare.getCorpo(), data, emailDaInviare.getPriorita(), 0);
+                    Utente destinatario;
+                    destinatario = recuperaDatiUtente(emailDestinatario);
+                    destinatari.add(destinatario);
+                    String inserisciEmail = "INSERT INTO email (id_email, mittente, "
+                            + "destinatario, oggetto, corpo,"
+                            + "data, priorita,letto,eliminataDaMittente,"
+                            + "eliminataDaDestinatario) "
+                            + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+                    conn = DriverManager.getConnection(urlDB);
+                    pst = conn.prepareStatement(inserisciEmail);
+                    
+                    pst.setInt(1,nuovoId);
+                    pst.setString(2, emailDaInviare.getMittente().getEmail());
+                    pst.setString(3,emailDestinatario);
+                    pst.setString(4,emailDaInviare.getOggetto());
+                    pst.setString(5,emailDaInviare.getCorpo());
+                    java.sql.Date dataSql = new java.sql.Date(data.getTime());
+                    pst.setDate(6, dataSql);
+                    pst.setInt(7,emailDaInviare.getPriorita());
+                    pst.setInt(8,0);
+                    pst.setInt(9,0);
+                    pst.setInt(10,0);
+                    pst.executeUpdate();
+                    
+                    setOperazioneEseguita("* [INVIATA EMAIL A " + emailDestinatario + ""
+                            + " DA " + emailDaInviare.getMittente().getEmail() + " - " +
+                            new Date().toString() + "]");
+                    logUltimaOperazione();
+                    email = new Email(nuovoId, emailDaInviare.getMittente(), destinatari, emailDaInviare.getOggetto(), emailDaInviare.getCorpo(), data, emailDaInviare.getPriorita(), 0);
                 }
                 else{
-                    //METODO CLIENT PER SEGNALARE L'ERRORE DI DESTINATARIO NON ESISTENTE
-                    setOperazioneEseguita("* [INVIO EMAIL A " + emailDestinatario 
-                        + " DA " + emailDaInviare.getMittente().getEmail() + " NON ESEGUITO,"
-                        + " DESTINATARIO INESISTENTE - " + new Date().toString() + "]");
+                    setOperazioneEseguita("* [INVIO EMAIL A " + emailDestinatario
+                            + " DA " + emailDaInviare.getMittente().getEmail() + " NON ESEGUITO,"
+                            + " DESTINATARIO INESISTENTE - " + new Date().toString() + "]");
                     logUltimaOperazione();
                 }
             }
@@ -385,21 +390,47 @@ public class CasellaServer extends Observable {
         }
         finally{
             try{
-               if(rs != null){
+                if(rs != null){
                     rs.close();
-               }
-               if(pst != null){
+                }
+                if(pst != null){
                     pst.close();
-               }
-               if (conn != null) {
+                }
+                if (conn != null) {
                     conn.close();
-               }
+                }
             }
             catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
             wDB1.unlock();
         }
+        
+        ArrayList<String> destinatariControllo = new ArrayList<>();
+            destinatariControllo.addAll(emailDaInviare.getDestinatari());
+            ArrayList<String> destinatariInesistenti = new ArrayList<>();
+            for(String destinatario : destinatariControllo){
+                if(recuperaDatiUtente(destinatario)==null)
+                    destinatariInesistenti.add(destinatario);
+            }
+            if(destinatariInesistenti.isEmpty()==false){
+                String messaggio = "Non è stato possibile inviare l'email "
+                        + "ai seguenti destinatari:\n";
+                for(String utente : destinatariInesistenti){
+                    messaggio = messaggio + utente + "\n";
+                }
+                rHM.lock();
+                try{
+                    try{
+                        clientConnessi.get(emailDaInviare.getMittente().getEmail()).riceviMessaggio(messaggio);
+                    }
+                    catch(RemoteException e){
+                        System.out.println(e.getMessage());
+                    }
+                } finally {
+                    rHM.unlock();
+                }
+            }
         
         return email;
     }
@@ -408,8 +439,8 @@ public class CasellaServer extends Observable {
         Connection conn = null;
         Statement st = null;
         
-        String querySetLetta = 
-                  "UPDATE email "
+        String querySetLetta =
+                "UPDATE email "
                 + "SET letto=1 "
                 + "WHERE id_email=" + emailLetta.getId() + " AND destinatario = '" + emailClient +"';";
         rDB1.lock();
@@ -435,10 +466,10 @@ public class CasellaServer extends Observable {
                 System.out.println(ex.getMessage());
             }
             rDB1.unlock();
-         }
+        }
         
         return true;
-    
+        
     }
     
     public boolean eliminaEmailDaMittente(Email email, String clientRichiedente){
@@ -446,17 +477,17 @@ public class CasellaServer extends Observable {
         Statement st = null;
         String queryEliminaEmail="";
         
-            //System.out.println("eliminata da mittente");
-                
-            queryEliminaEmail = 
-            "UPDATE email "
-            + "SET eliminataDaMittente=1 "
-            + "WHERE id_email= " + email.getId() + " AND mittente = '" 
-            + clientRichiedente +"';";
-                
-            setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente +
-            " IN CASELLA INVIATE - " + new Date().toString() + "]");
-            logUltimaOperazione();
+        //System.out.println("eliminata da mittente");
+        
+        queryEliminaEmail =
+                "UPDATE email "
+                + "SET eliminataDaMittente=1 "
+                + "WHERE id_email= " + email.getId() + " AND mittente = '"
+                + clientRichiedente +"';";
+        
+        setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente +
+                " IN CASELLA INVIATE - " + new Date().toString() + "]");
+        logUltimaOperazione();
         
         rDB1.lock();
         try {
@@ -481,9 +512,9 @@ public class CasellaServer extends Observable {
                 System.out.println(ex.getMessage());
             }
             rDB1.unlock();
-         }
+        }
         return true;
-    
+        
     }
     
     public boolean eliminaEmailDaDestinatario(Email email, String clientRichiedente){
@@ -491,17 +522,17 @@ public class CasellaServer extends Observable {
         Statement st = null;
         String queryEliminaEmail="";
         
-            //System.out.println("eliminata da destinatario");
-            queryEliminaEmail = 
-            "UPDATE email "
-            + "SET eliminataDaDestinatario=1 "
-            + "WHERE id_email= " + email.getId() + " AND destinatario = '" + 
-            clientRichiedente +"';";
-                
-            setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente + ""
-            + " IN CASELLA RICEVUTE - " + new Date().toString() + "]");
-            logUltimaOperazione();
-                
+        //System.out.println("eliminata da destinatario");
+        queryEliminaEmail =
+                "UPDATE email "
+                + "SET eliminataDaDestinatario=1 "
+                + "WHERE id_email= " + email.getId() + " AND destinatario = '" +
+                clientRichiedente +"';";
+        
+        setOperazioneEseguita("* [ELIMINATA EMAIL DA " + clientRichiedente + ""
+                + " IN CASELLA RICEVUTE - " + new Date().toString() + "]");
+        logUltimaOperazione();
+        
         
         
         rDB1.lock();
@@ -527,19 +558,19 @@ public class CasellaServer extends Observable {
                 System.out.println(ex.getMessage());
             }
             rDB1.unlock();
-         }
+        }
         return true;
-    
+        
     }
-
+    
     private ArrayList<String> recuperaEmailUtenti(){
         ArrayList<String> utenti = new ArrayList<>();
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        String queryUtenti = 
-            "SELECT email " + 
-            "FROM utenti";
+        String queryUtenti =
+                "SELECT email " +
+                "FROM utenti";
         rDB1.lock();
         try{
             conn = DriverManager.getConnection(urlDB);
@@ -569,6 +600,6 @@ public class CasellaServer extends Observable {
             }
             rDB1.unlock();
         }
-        return utenti;        
+        return utenti;
     }
 }
