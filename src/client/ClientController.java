@@ -102,7 +102,6 @@ public class ClientController implements ActionListener, ListSelectionListener {
                         }
                     }
                 }.start();
-                
                 break;
             }
             case "eliminaRicevuta": {

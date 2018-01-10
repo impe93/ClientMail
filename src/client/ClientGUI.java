@@ -229,7 +229,6 @@ public class ClientGUI extends JFrame implements Observer{
         this.modelListaEmail = new DefaultListModel<>();
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
-        this.listaEmailList.addListSelectionListener(controller);
         this.listaEmailList.addListSelectionListener( new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -254,6 +253,7 @@ public class ClientGUI extends JFrame implements Observer{
                 }
             }
         });
+        this.listaEmailList.addListSelectionListener(controller);
         this.listaEmailScrollPane = new JScrollPane(this.listaEmailList);
 /* ------ Fine Lista Email Panel ------ */
         
@@ -452,13 +452,14 @@ public class ClientGUI extends JFrame implements Observer{
                             if (listaEmail.size() > 0) {
                                 int indiceSelezionata = 0;
                                 for (Email email : listaEmail){
+                                    System.out.println(email.getId());
+                                    System.out.println(emailDaVisualizzare.getId());
                                     if (email.getId() == emailDaVisualizzare.getId()) {
                                         System.out.println(indiceSelezionata);
                                         break;
                                     }
                                     indiceSelezionata++;
                                 }
-                                System.out.println(indiceSelezionata);
                                 listaEmailList.setSelectedIndex(indiceSelezionata);
                                 eliminaSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
                                 inoltraSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
