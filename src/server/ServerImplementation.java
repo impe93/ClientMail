@@ -232,7 +232,7 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
             }
         }
         finally {
-                wHM.unlock();
+            wHM.unlock();
         }
     }
     
