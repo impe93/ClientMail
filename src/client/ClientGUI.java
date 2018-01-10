@@ -444,6 +444,7 @@ public class ClientGUI extends JFrame implements Observer{
                         @Override
                         public void run() {
                             listaEmail.clear();
+                            int idLetta = ((CasellaPostaElettronicaClient)oFinal).getIdUltimaLetta();
                             listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailRicevute());
                             modelListaEmail.clear();
                             for (Email email : listaEmail) {
@@ -454,7 +455,8 @@ public class ClientGUI extends JFrame implements Observer{
                                 for (Email email : listaEmail){
                                     System.out.println(email.getId());
                                     System.out.println(emailDaVisualizzare.getId());
-                                    if (email.getId() == emailDaVisualizzare.getId()) {
+                                    if (email.getId() == idLetta) {
+                                        emailDaVisualizzare = email;
                                         System.out.println(indiceSelezionata);
                                         break;
                                     }
