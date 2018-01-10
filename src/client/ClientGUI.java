@@ -486,10 +486,7 @@ public class ClientGUI extends JFrame implements Observer{
             case ClientGUI.NUOVO_MESSAGGIO: {
                 ArrayList<String> messaggi = ((CasellaPostaElettronicaClient)oFinal).leggiMessaggi();
                 for (String messaggio : messaggi) {
-                    JOptionPane.showMessageDialog(this,
-                            messaggio,
-                            "Messaggio",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    new MessaggioGUI("Messaggio", messaggio);
                 }
                 break;
             }
