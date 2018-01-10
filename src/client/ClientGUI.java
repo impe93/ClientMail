@@ -8,6 +8,7 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -26,6 +27,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -227,7 +229,6 @@ public class ClientGUI extends JFrame implements Observer{
         this.modelListaEmail = new DefaultListModel<>();
         this.listaEmailList.setModel(this.modelListaEmail);
         this.listaEmailList.setCellRenderer(new EmailCellRenderer());
-        this.listaEmailList.addListSelectionListener(controller);
         this.listaEmailList.addListSelectionListener( new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -252,6 +253,7 @@ public class ClientGUI extends JFrame implements Observer{
                 }
             }
         });
+        this.listaEmailList.addListSelectionListener(controller);
         this.listaEmailScrollPane = new JScrollPane(this.listaEmailList);
 /* ------ Fine Lista Email Panel ------ */
         
@@ -296,120 +298,188 @@ public class ClientGUI extends JFrame implements Observer{
     
     @Override
     public void update(Observable o, Object arg) {
+        final Observable oFinal = o;
         switch((String)arg) {
             case ClientGUI.RICEVUTI: {
-                this.listaEmail.clear();
-                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
-                this.modelListaEmail.clear();
-                for (Email email : this.listaEmail) {
-                    this.modelListaEmail.addElement(email);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailRicevute());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                            }
+                            
+                            if (listaEmail.size() > 0) {
+                                emailDaVisualizzare = listaEmail.get(0);
+                            }
+                            dataOrdineButton.setName("perDataRicevuti");
+                            prioritaOrdineButton.setName("perPrioritaRicevuti");
+                            eliminaSelezionata.setName("eliminaRicevuta");
+                            inVisualizzazione = ClientGUI.RICEVUTI;
+                            ((ListaInviateRicevute)listaEmailList).setTipoLista(ListaInviateRicevute.LISTA_RICEVUTE);
+                        }
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
-                }
-                this.dataOrdineButton.setName("perDataRicevuti");
-                this.prioritaOrdineButton.setName("perPrioritaRicevuti");
-                this.eliminaSelezionata.setName("eliminaRicevuta");
-                this.inVisualizzazione = ClientGUI.RICEVUTI;
-                ((ListaInviateRicevute)this.listaEmailList).setTipoLista(ListaInviateRicevute.LISTA_RICEVUTE);
                 break;
             }
             case ClientGUI.INVIATI: {
-                this.listaEmail.clear();
-                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
-                this.modelListaEmail.clear();
-                for (Email email : this.listaEmail) {
-                    this.modelListaEmail.addElement(email);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailInviate());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                            }
+                            if (listaEmail.size() > 0) {
+                                emailDaVisualizzare = listaEmail.get(0);
+                            }
+                            dataOrdineButton.setName("perDataInviati");
+                            prioritaOrdineButton.setName("perPrioritaInviati");
+                            eliminaSelezionata.setName("eliminaInviata");
+                            inVisualizzazione = ClientGUI.INVIATI;
+                            ((ListaInviateRicevute)listaEmailList).setTipoLista(ListaInviateRicevute.LISTA_INVIATE);
+                        }
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
-                }
-                this.dataOrdineButton.setName("perDataInviati");
-                this.prioritaOrdineButton.setName("perPrioritaInviati");
-                this.eliminaSelezionata.setName("eliminaInviata");
-                this.inVisualizzazione = ClientGUI.INVIATI;
-                ((ListaInviateRicevute)this.listaEmailList).setTipoLista(ListaInviateRicevute.LISTA_INVIATE);
                 break;
             }
             case ClientGUI.INVIATE_PER_DATA: {
-                this.listaEmail.clear();
-                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
-                this.modelListaEmail.clear();
-                for (Email email : this.listaEmail) {
-                    this.modelListaEmail.addElement(email);
-                }
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailInviate());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                            }
+                            if (listaEmail.size() > 0) {
+                                emailDaVisualizzare = listaEmail.get(0);
+                            }
+                        }
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             }
             case ClientGUI.INVIATE_PER_PRIORITA: {
-                this.listaEmail.clear();
-                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailInviate());
-                this.modelListaEmail.clear();
-                for (Email email : this.listaEmail) {
-                    this.modelListaEmail.addElement(email);
-                }
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailInviate());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                                
+                            }
+                            if (listaEmail.size() > 0) {
+                                emailDaVisualizzare = listaEmail.get(0);
+                            }
+                        }
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             }
             case ClientGUI.RICEVUTE_PER_PRIORITA: {
-                this.listaEmail.clear();
-                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
-                this.modelListaEmail.clear();
-                for (Email email : this.listaEmail) {
-                    this.modelListaEmail.addElement(email);
-                }
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailRicevute());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                            }
+                            if (listaEmail.size() > 0) {
+                                emailDaVisualizzare = listaEmail.get(0);
+                            }
+                        }
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             }
             case ClientGUI.RICEVUTE_PER_DATA: {
-                this.listaEmail.clear();
-                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
-                this.modelListaEmail.clear();
-                for (Email email : this.listaEmail) {
-                    this.modelListaEmail.addElement(email);
-                }
-                if (this.listaEmail.size() > 0) {
-                    this.emailDaVisualizzare = this.listaEmail.get(0);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailRicevute());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                            }
+                            if (listaEmail.size() > 0) {
+                                emailDaVisualizzare = listaEmail.get(0);
+                            }
+                        }
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             }
             case ClientGUI.LETTA_EMAIL: {
-                this.listaEmail.clear();
-                this.listaEmail.addAll(((CasellaPostaElettronicaClient)o).getEmailRicevute());
-                this.modelListaEmail.clear();
-                for (Email email : this.listaEmail) {
-                    this.modelListaEmail.addElement(email);
-                }
-                if (this.listaEmail.size() > 0) {
-                    int indiceSelezionata = 0;
-                    for (Email email : this.listaEmail){
-                        if (email.getId() == this.emailDaVisualizzare.getId()) {
-                            break;
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailRicevute());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                            }
+                            if (listaEmail.size() > 0) {
+                                int indiceSelezionata = 0;
+                                for (Email email : listaEmail){
+                                    System.out.println(email.getId());
+                                    System.out.println(emailDaVisualizzare.getId());
+                                    if (email.getId() == emailDaVisualizzare.getId()) {
+                                        System.out.println(indiceSelezionata);
+                                        break;
+                                    }
+                                    indiceSelezionata++;
+                                }
+                                listaEmailList.setSelectedIndex(indiceSelezionata);
+                                eliminaSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
+                                inoltraSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
+                                mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
+                                String destinatari = "";
+                                for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
+                                    if (i == 0) {
+                                        destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
+                                    } else {
+                                        destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
+                                    }
+                                }
+                                destinatariEmailLabel.setText(destinatari);
+                                oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
+                                corpoTextArea.setText(emailDaVisualizzare.getCorpo());
+                            }
                         }
-                        indiceSelezionata++;
-                    }
-                    this.listaEmailList.setSelectedIndex(indiceSelezionata);
-                    eliminaSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
-                    inoltraSelezionata.setEmailDaInoltrareEliminare(emailDaVisualizzare);
-                    mittenteEmailLabel.setText(emailDaVisualizzare.getMittente().getEmail());
-                    String destinatari = "";
-                    for(int i = 0; i < emailDaVisualizzare.getDestinatari().size(); i++) {
-                        if (i == 0) {
-                            destinatari = emailDaVisualizzare.getDestinatari().get(0).getEmail();
-                        } else {
-                            destinatari += ", " + emailDaVisualizzare.getDestinatari().get(i).getEmail();
-                        }
-                    }
-                    destinatariEmailLabel.setText(destinatari);
-                    oggettoEmailLabel.setText(emailDaVisualizzare.getOggetto());
-                    corpoTextArea.setText(emailDaVisualizzare.getCorpo());
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             }

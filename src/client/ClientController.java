@@ -31,31 +31,61 @@ public class ClientController implements ActionListener, ListSelectionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        Component fonte = (Component)e.getSource();
+        final Component fonte = (Component)e.getSource();
         switch (fonte.getName()) {
             case "perPrioritaRicevuti": {
-                
-                model.ordinaRicevutePerPriorita();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        model.ordinaRicevutePerPriorita();
+                    }
+                }.start();
                 break;
             }
             case "perPrioritaInviati": {
-                model.ordinaInviatePerPriorità();
+                Thread thread1 = new Thread() {
+                    @Override
+                    public void run() {
+                        model.ordinaInviatePerPriorità();
+                    }
+                };
+                thread1.start();
                 break;
             }
             case "perDataInviati": {
-                model.ordinaInviatePerData();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        model.ordinaInviatePerData();
+                    }
+                }.start();
                 break;
             }
             case "perDataRicevuti": {
-                model.ordinaRicevutePerData();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        model.ordinaRicevutePerData();
+                    }
+                }.start();
                 break;
             }
             case "emailInviate": {
-                model.getInviate();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        model.getInviate();
+                    }
+                }.start();
                 break;
             }
             case "emailRicevute": {
-                model.getRicevute();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        model.getRicevute();
+                    }
+                }.start();
                 break;
             }
             case "nuova": {
@@ -63,17 +93,27 @@ public class ClientController implements ActionListener, ListSelectionListener {
                 break;
             }
             case "eliminaInviata": {
-                if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
-                    Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
-                    this.model.eliminaEmailInviata(emailDaEliminare);
-                }
+                new Thread() {
+                    @Override
+                    public void run() {
+                        if (fonte instanceof ClientGUI.EliminaInoltraButton) {
+                            Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)fonte).getEmailDaInoltrareEliminare();
+                            model.eliminaEmailInviata(emailDaEliminare);
+                        }
+                    }
+                }.start();
                 break;
             }
             case "eliminaRicevuta": {
-                if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
-                    Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
-                    this.model.eliminaEmailRicevuta(emailDaEliminare);
-                }
+                new Thread() {
+                    @Override
+                    public void run() {
+                        if (fonte instanceof ClientGUI.EliminaInoltraButton) {
+                            Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)fonte).getEmailDaInoltrareEliminare();
+                            model.eliminaEmailRicevuta(emailDaEliminare);
+                        }
+                    }
+                }.start();
                 break;
             }
             case "inoltra": {
@@ -84,16 +124,21 @@ public class ClientController implements ActionListener, ListSelectionListener {
                 break;
             }
             case "invia": {
-                if (e.getSource() instanceof NuovaEmailGUI.BottoneInviaCancella) {
-                    NuovaEmailGUI schermataEvento = this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione());
-                    EmailDaInviare emailDaInviare = this.schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)e.getSource()).getPosizione()).getEmail();
-                    if (emailDaInviare != null) {
-                        this.model.inviaEmail(emailDaInviare);
-                        schermataEvento.setVisible(false);
-                    } else {
-                        JOptionPane.showMessageDialog(schermataEvento, "Si è verificato un problema con l'email, verificare che tutti i campi siano stati compilati correttamente", "Errore email", JOptionPane.ERROR_MESSAGE);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        if (fonte instanceof NuovaEmailGUI.BottoneInviaCancella) {
+                            NuovaEmailGUI schermataEvento = schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)fonte).getPosizione());
+                            EmailDaInviare emailDaInviare = schermateNuoveEmail.get(((NuovaEmailGUI.BottoneInviaCancella)fonte).getPosizione()).getEmail();
+                            if (emailDaInviare != null) {
+                                model.inviaEmail(emailDaInviare);
+                                schermataEvento.setVisible(false);
+                            } else {
+                                JOptionPane.showMessageDialog(schermataEvento, "Si è verificato un problema con l'email, verificare che tutti i campi siano stati compilati correttamente", "Errore email", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
                     }
-                }
+                }.start();
                 break;
             }
             case "cancella": {
@@ -110,9 +155,17 @@ public class ClientController implements ActionListener, ListSelectionListener {
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        Email emailSelezionata = ((JList<Email>)e.getSource()).getSelectedValue();
-        if (emailSelezionata != null && emailSelezionata.getLetto() == 0 && ((ClientGUI.ListaInviateRicevute)e.getSource()).getTipoLista().equals(ClientGUI.ListaInviateRicevute.LISTA_RICEVUTE)) {
-            model.segnaLetturaEmail(emailSelezionata);
+        if (e.getValueIsAdjusting()) {
+            final Component fonte = (Component)e.getSource();
+            new Thread() {
+                @Override
+                public void run() {
+                    Email emailSelezionata = ((JList<Email>)fonte).getSelectedValue();
+                    if (emailSelezionata != null && emailSelezionata.getLetto() == 0 && ((ClientGUI.ListaInviateRicevute)fonte).getTipoLista().equals(ClientGUI.ListaInviateRicevute.LISTA_RICEVUTE)) {
+                        model.segnaLetturaEmail(emailSelezionata);
+                    }
+                }
+            }.start();
         }
     }
     
