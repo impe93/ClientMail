@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package server;
 
 import java.awt.Component;
@@ -20,7 +20,7 @@ public class ServerController implements ActionListener{
     public ServerController(ServerImplementation model){
         this.model = model;
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         Component button = (Component)e.getSource();
@@ -29,7 +29,7 @@ public class ServerController implements ActionListener{
                 int risposta = JOptionPane.showConfirmDialog(null,"Confermi la "
                         + "chiusura del server?","Conferma",
                         JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-                 
+                
                 if(risposta == JOptionPane.YES_OPTION){
                     System.exit(0);
                 }

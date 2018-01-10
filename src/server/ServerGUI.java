@@ -40,14 +40,14 @@ public class ServerGUI implements Observer{
     */
     public ServerGUI(ServerImplementation server){
         this.model = server;
-  
-   
+        
+        
         panel.setLayout(new BorderLayout());
         panel.setPreferredSize(new Dimension(1200, 400));
         Border bordoTrenta = BorderFactory.createEmptyBorder(30, 30, 30, 30);
         panel.setBorder(bordoTrenta);
         frame.add(panel);
-     
+        
         
         Border bordoDieci = BorderFactory.createEmptyBorder(10, 10, 10, 10);
         lblIntestazione.setBorder(bordoDieci);
@@ -75,17 +75,17 @@ public class ServerGUI implements Observer{
         frame.setVisible(true);
         
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
-        @Override
-        public void windowClosing(WindowEvent winEvt) {
-            int risposta = JOptionPane.showConfirmDialog(null,"Confermi la "
+            @Override
+            public void windowClosing(WindowEvent winEvt) {
+                int risposta = JOptionPane.showConfirmDialog(null,"Confermi la "
                         + "chiusura del server?","Conferma",
                         JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-                 
+                
                 if(risposta == JOptionPane.YES_OPTION){
                     System.exit(0);
                 }
-        }
-    });
+            }
+        });
         
     }
     
@@ -99,6 +99,6 @@ public class ServerGUI implements Observer{
         ServerImplementation server = new ServerImplementation();
         ServerGUI gui = new ServerGUI(server);
         server.aggiungiObserver(gui);
-    
+        
     }
 }

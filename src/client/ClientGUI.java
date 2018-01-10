@@ -430,6 +430,7 @@ public class ClientGUI extends JFrame implements Observer{
                             }
                             if (listaEmail.size() > 0) {
                                 emailDaVisualizzare = listaEmail.get(0);
+                                System.out.println(emailDaVisualizzare.getOggetto());
                             }
                         }
                     });
@@ -489,6 +490,105 @@ public class ClientGUI extends JFrame implements Observer{
                             messaggio,
                             "Messaggio",
                             JOptionPane.INFORMATION_MESSAGE);
+                }
+                break;
+            }
+            
+            case ClientGUI.EMAIL_INVIATA_ELIMINATA: {
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailInviate());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                            }
+                            if (listaEmail.size() > 0) {
+                                listaEmailList.setSelectedIndex(0);
+                            }
+                        }
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+            }
+            
+            case ClientGUI.EMAIL_INVIATA: {
+                if (inVisualizzazione.equals(ClientGUI.INVIATI)) {
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                listaEmail.clear();
+                                listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailInviate());
+                                modelListaEmail.clear();
+                                for (Email email : listaEmail) {
+                                    modelListaEmail.addElement(email);
+                                }
+                                if (listaEmail.size() > 0) {
+                                    listaEmailList.setSelectedIndex(0);
+                                }
+                            }
+                        });
+                    } catch (InterruptedException | InvocationTargetException ex) {
+                        Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+            }
+            
+            case ClientGUI.EMAIL_RICEVUTA: {
+                if (inVisualizzazione.equals(ClientGUI.RICEVUTI)) {
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                listaEmail.clear();
+                                listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailRicevute());
+                                modelListaEmail.clear();
+                                for (Email email : listaEmail) {
+                                    modelListaEmail.addElement(email);
+                                }
+                                if (listaEmail.size() > 0) {
+                                    int indexDaSelezionare = 0;
+                                    for(Email email : listaEmail) {
+                                        if (emailDaVisualizzare.getId() == email.getId()) {
+                                            break;
+                                        }
+                                        indexDaSelezionare++;
+                                    }
+                                    listaEmailList.setSelectedIndex(indexDaSelezionare);
+                                }
+                            }
+                        });
+                    } catch (InterruptedException | InvocationTargetException ex) {
+                        Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+            }
+            
+            case ClientGUI.EMAIL_RICEVUTA_ELIMINATA: {
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            listaEmail.clear();
+                            listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailRicevute());
+                            modelListaEmail.clear();
+                            for (Email email : listaEmail) {
+                                modelListaEmail.addElement(email);
+                            }
+                            if (listaEmail.size() > 0) {
+                                listaEmailList.setSelectedIndex(0);
+                            }
+                        }
+                    });
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             }
