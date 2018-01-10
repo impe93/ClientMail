@@ -287,15 +287,6 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         }
     }
     
-    /**
-     * Recupera e ritorna eventuali nuovi messaggi ricevuti dal server nella casella di 
-     * posta elettronica del client, altrimenti ritorna null 
-     * @return un array di messaggi se sono presenti, null altrimenti
-     */
-    public ArrayList<String> leggiMessaggio(){
-        return this.casellaPostaleClient.leggiMessaggi();
-    }
-    
     @Override
     public void riceviEmail(Email emailRicevuta) throws RemoteException{
         if(emailRicevuta != null){

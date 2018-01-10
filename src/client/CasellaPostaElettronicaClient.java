@@ -9,6 +9,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Observable;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import modelli.CasellaPostaElettronica;
@@ -29,6 +32,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     private String ordineInviate; //puù assumere valore "data" oppure "priorita"
     private String ordineRicevute; //puù assumere valore "data" oppure "priorita"
     private int idUltimaEmailLetta;
+    private final ReadWriteLock rwl;
+    private final Lock rl;
+    private final Lock wl;
     
     public CasellaPostaElettronicaClient(String emailUtente){
         registraDriver();
@@ -40,6 +46,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         this.ordineInviate = "data";
         this.ordineRicevute = "data";
         this.idUltimaEmailLetta = -1;
+        rwl = new ReentrantReadWriteLock();
+        rl = rwl.readLock();
+        wl = rwl.writeLock();
     }
 
     public Utente getUtenteProprietario() {
@@ -121,6 +130,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 "FROM " + tabellaEmail + " " +
                 "WHERE data = " +
                 "(SELECT MAX(data) FROM " + tabellaEmail + ")";
+        rl.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -144,6 +154,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            rl.unlock();
         }
         return idUltimaEmail;
     }
@@ -187,6 +198,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             queryOrdinamentoPerPriorita = "SELECT * FROM email_ricevute ORDER BY priorita DESC";
             this.emailRicevute.clear();
         }
+        rl.lock();
         try {
             conn = DriverManager.getConnection(urlDB);
             st = conn.createStatement();
@@ -238,6 +250,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
+            rl.unlock();
         }
     }
     

@@ -316,12 +316,11 @@ public class CasellaServer extends Observable {
     */
     public Email inviaEmail(EmailDaInviare emailDaInviare, Map<String, Client> clientConnessi) throws RemoteException{   
         Connection conn = null;
-        Statement st = null;
+        PreparedStatement pst = null;
         ResultSet rs = null;
         ArrayList<Utente> destinatari = new ArrayList<>();
         Date data;
         data = emailDaInviare.getData();
-        java.sql.Date dataSql = new java.sql.Date(data.getTime());
         String emailDestinatario;
         int nuovoId = recuperaIdMax()+1;
         Email email = null;
@@ -345,29 +344,32 @@ public class CasellaServer extends Observable {
                 Utente destinatario;
                 destinatario = recuperaDatiUtente(emailDestinatario);
                 destinatari.add(destinatario);
-                
-                String inserisciEmail =
-                "INSERT INTO email (id_email,mittente,destinatario,oggetto,"
-                + "corpo,data,priorita,letto,eliminataDaMittente,eliminataDaDestinatario)"
-                + "VALUES"
-                + "(" + nuovoId + ",'" + emailDaInviare.getMittente().getEmail()
-                + "','" + emailDestinatario+ "','" + emailDaInviare.getOggetto() + "','"
-                + emailDaInviare.getCorpo() + "','" + dataSql +"'," + emailDaInviare.getPriorita() + ","
-                + "0,0,0);";
-        
+                String inserisciEmail = "INSERT INTO email (id_email, mittente, "
+                + "destinatario, oggetto, corpo,"
+                + "data, priorita,letto,eliminataDaMittente,"
+                + "eliminataDaDestinatario) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?)";
                 conn = DriverManager.getConnection(urlDB);
-                st = conn.createStatement();
-                st.executeUpdate(inserisciEmail);
+                pst = conn.prepareStatement(inserisciEmail);
+                
+                pst.setInt(1,nuovoId);
+                pst.setString(2, emailDaInviare.getMittente().getEmail());
+                pst.setString(3,emailDestinatario);
+                pst.setString(4,emailDaInviare.getOggetto());
+                pst.setString(5,emailDaInviare.getCorpo());
+                java.sql.Date dataSql = new java.sql.Date(data.getTime());
+                pst.setDate(6, dataSql);
+                pst.setInt(7,emailDaInviare.getPriorita());
+                pst.setInt(8,0);
+                pst.setInt(9,0);
+                pst.setInt(10,0);
+                pst.executeUpdate();
                 
                 setOperazioneEseguita("* [INVIATA EMAIL A " + emailDestinatario + ""
                         + " DA " + emailDaInviare.getMittente().getEmail() + " - " + 
                         new Date().toString() + "]");
                 logUltimaOperazione();
-                ArrayList<Utente> destinatarioEmail= new ArrayList<>();
-                destinatarioEmail.add(recuperaDatiUtente(emailDestinatario));
-                
-                email = new Email(nuovoId, emailDaInviare.getMittente(), 
-                destinatari,emailDaInviare.getOggetto(),emailDaInviare.getCorpo(),emailDaInviare.getPriorita());    
+                email = new Email(nuovoId, emailDaInviare.getMittente(), destinatari, emailDaInviare.getOggetto(), emailDaInviare.getCorpo(), data, emailDaInviare.getPriorita(), 0);
                 }
                 else{
                     //METODO CLIENT PER SEGNALARE L'ERRORE DI DESTINATARIO NON ESISTENTE
@@ -386,8 +388,8 @@ public class CasellaServer extends Observable {
                if(rs != null){
                     rs.close();
                }
-               if(st != null){
-                    st.close();
+               if(pst != null){
+                    pst.close();
                }
                if (conn != null) {
                     conn.close();

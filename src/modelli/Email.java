@@ -42,6 +42,19 @@ public class Email implements Serializable{
         this.letto = 0;
                 
     }
+
+    public Email(int id, Utente mittente, ArrayList<Utente> destinatari, String oggetto, String corpo, Date data, int priorita, int letto) {
+        this.id = id;
+        this.mittente = mittente;
+        this.destinatari = destinatari;
+        this.oggetto = oggetto;
+        this.corpo = corpo;
+        this.data = data;
+        this.priorita = priorita;
+        this.letto = letto;
+    }
+    
+    
     
     public Email(){
         this.id = 0;
