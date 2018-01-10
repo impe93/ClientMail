@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -52,7 +53,6 @@ public class ClientGUI extends JFrame implements Observer{
     public static final String EMAIL_RICEVUTA_ELIMINATA = "emailRicevutaEliminata";
     public static final String NUOVO_MESSAGGIO = "nuovoMessaggio";
     public static final String LETTA_EMAIL = "lettaEmail";
-    public static final String NOTIFICA = "notifica";
     
     private Email emailDaVisualizzare;
     private final ClientImplementation modello;
@@ -444,6 +444,7 @@ public class ClientGUI extends JFrame implements Observer{
                         @Override
                         public void run() {
                             listaEmail.clear();
+                            int idLetta = ((CasellaPostaElettronicaClient)oFinal).getIdUltimaLetta();
                             listaEmail.addAll(((CasellaPostaElettronicaClient)oFinal).getEmailRicevute());
                             modelListaEmail.clear();
                             for (Email email : listaEmail) {
@@ -452,10 +453,8 @@ public class ClientGUI extends JFrame implements Observer{
                             if (listaEmail.size() > 0) {
                                 int indiceSelezionata = 0;
                                 for (Email email : listaEmail){
-                                    System.out.println(email.getId());
-                                    System.out.println(emailDaVisualizzare.getId());
-                                    if (email.getId() == emailDaVisualizzare.getId()) {
-                                        System.out.println(indiceSelezionata);
+                                    if (email.getId() == idLetta) {
+                                        emailDaVisualizzare = email;
                                         break;
                                     }
                                     indiceSelezionata++;
@@ -483,8 +482,14 @@ public class ClientGUI extends JFrame implements Observer{
                 }
                 break;
             }
-            case ClientGUI.NOTIFICA: {
-                
+            case ClientGUI.NUOVO_MESSAGGIO: {
+                ArrayList<String> messaggi = ((CasellaPostaElettronicaClient)oFinal).leggiMessaggi();
+                for (String messaggio : messaggi) {
+                    JOptionPane.showMessageDialog(this,
+                            messaggio,
+                            "Messaggio",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
                 break;
             }
             
