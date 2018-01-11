@@ -48,11 +48,9 @@ public class CasellaServer extends Observable {
      */
     public CasellaServer(){
         this.urlDB = "jdbc:sqlite:Server.db";
-        this.operazioneEseguita = "";
         rwDB1 = new ReentrantReadWriteLock();
         rDB1 = rwDB1.readLock();
-        wDB1 = rwDB1.writeLock();
-        
+        wDB1 = rwDB1.writeLock();   
     }
     
     /**
