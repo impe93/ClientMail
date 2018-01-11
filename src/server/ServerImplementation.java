@@ -220,10 +220,8 @@ public final class ServerImplementation extends UnicastRemoteObject implements S
     public static void lanciaRMIRegistry() {
         try {
             LocateRegistry.createRegistry(1099);
-            System.out.println("java RMI registry creato");
         } catch (RemoteException e) {
             //non fa niente: RMI registry esiste già
-            System.out.println("java RMI registry già esistente!");
         }
     }
     

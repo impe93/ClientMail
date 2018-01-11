@@ -637,8 +637,8 @@ public class ClientGUI extends JFrame implements Observer{
     }
     
     public static void main (String[] args) {
-        ClientImplementation modello;
-        ClientGUI client;
+        ClientImplementation modello = null;
+        ClientGUI client = null;
         if (args.length == 1) {
             try {
                 modello = new ClientImplementation(args[0]);
