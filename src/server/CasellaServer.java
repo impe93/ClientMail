@@ -436,12 +436,12 @@ public class CasellaServer extends Observable {
             }
         }
         if(destinatariInesistenti.isEmpty()==false){
-            String messaggio = "Non è stato possibile inviare l'email "
+            String messaggio = "<html>Non è stato possibile inviare l'email "
                     + "ai seguenti destinatari:<br>";
             for(String utente : destinatariInesistenti){
                 messaggio = messaggio +"<b>"+ utente + "</b><br>";
             }
-            
+            messaggio += "</html>";
             try{
                 clientConnessi.get(emailDaInviare.getMittente().getEmail()).riceviMessaggio(messaggio);
             }
@@ -450,8 +450,6 @@ public class CasellaServer extends Observable {
             }
             
         }
-        
-        
         return email;
     }
     

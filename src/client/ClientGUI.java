@@ -344,7 +344,9 @@ public class ClientGUI extends JFrame implements Observer{
                             for (Email email : listaEmail) {
                                 modelListaEmail.addElement(email);
                             }
-                            emailDaVisualizzare = listaEmail.get(0);
+                            if (listaEmail.size() > 0) {
+                                emailDaVisualizzare = listaEmail.get(0);
+                            }
                             azzeraCampiEmailInVisualizzazione();
                             
                             dataOrdineButton.setName("perDataInviati");
@@ -437,7 +439,6 @@ public class ClientGUI extends JFrame implements Observer{
                             }
                             if (listaEmail.size() > 0) {
                                 emailDaVisualizzare = listaEmail.get(0);
-                                System.out.println(emailDaVisualizzare.getOggetto());
                             }
                         }
                     });
