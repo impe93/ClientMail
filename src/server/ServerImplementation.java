@@ -134,7 +134,12 @@ public final class ServerImplementation extends UnicastRemoteObject implements S
         ft = new FutureTask<>(new Callable<Email>(){
             @Override
             public Email call() throws RemoteException {
-                return casella.inviaEmail(emailDaInviareFinal, clientConnessi);
+                rHM.lock();
+                try {
+                    return casella.inviaEmail(emailDaInviareFinal, clientConnessi);
+                } finally {
+                    rHM.unlock();
+                }
             }
         });
         Email emailRitorno = null;

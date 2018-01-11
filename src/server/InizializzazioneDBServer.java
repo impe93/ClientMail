@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class InizializzazioneDBServer {
     
-    private static final String urlDB = "jdbc:sqlite:Server.db";
+    private static final String URL_DB = "jdbc:sqlite:Server.db";
     
     public static void main(String[] args){
         try {
@@ -38,7 +38,7 @@ public class InizializzazioneDBServer {
     }
     
     private static void creaDBServer() throws SQLException {
-        try (Connection conn = DriverManager.getConnection(urlDB)) {
+        try (Connection conn = DriverManager.getConnection(URL_DB)) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
                 System.out.println("The driver name is " + meta.getDriverName());
@@ -60,7 +60,7 @@ public class InizializzazioneDBServer {
         String eliminazioneTabellaUtenti
                 = "DROP TABLE if exists 'utenti'";
         
-        eseguiQueryDB(urlDB, creazioneTabellaUtenti, eliminazioneTabellaUtenti);
+        eseguiQueryDB(URL_DB, creazioneTabellaUtenti, eliminazioneTabellaUtenti);
     }
     
     private static void creaTabellaEmail() throws SQLException{
@@ -80,7 +80,7 @@ public class InizializzazioneDBServer {
                 + ")";
         String eliminaTabellaEmail
                 = "DROP TABLE if exists 'email'";
-        eseguiQueryDB(urlDB, creaTabellaEmail, eliminaTabellaEmail);
+        eseguiQueryDB(URL_DB, creaTabellaEmail, eliminaTabellaEmail);
         
     }
     
@@ -122,7 +122,7 @@ public class InizializzazioneDBServer {
         Statement st = null;
         
         try{
-            conn = DriverManager.getConnection(urlDB);
+            conn = DriverManager.getConnection(URL_DB);
             st = conn.createStatement();
             st.executeUpdate(inserimentoUtenti);
         } catch (SQLException e) {
@@ -186,7 +186,7 @@ public class InizializzazioneDBServer {
         PreparedStatement pst = null;
         
         try{
-            conn = DriverManager.getConnection(urlDB);
+            conn = DriverManager.getConnection(URL_DB);
             for(int i=0;i<9;i++){
                 pst = conn.prepareStatement(inserimentoEmail);
                 pst.setInt(1,i+1);

@@ -29,9 +29,6 @@ public class CasellaServer extends Observable {
     private final ReadWriteLock rwDB1;
     private final Lock rDB1;
     private final Lock wDB1;
-    private final ReadWriteLock rwHM;
-    private final Lock rHM;
-    private final Lock wHM;
     
     public String getOperazioneEseguita() {
         return operazioneEseguita;
@@ -53,9 +50,7 @@ public class CasellaServer extends Observable {
         rwDB1 = new ReentrantReadWriteLock();
         rDB1 = rwDB1.readLock();
         wDB1 = rwDB1.writeLock();
-        rwHM = new ReentrantReadWriteLock();
-        rHM = rwHM.readLock();
-        wHM = rwHM.writeLock();
+        
     }
     
     /*
@@ -419,17 +414,14 @@ public class CasellaServer extends Observable {
                 for(String utente : destinatariInesistenti){
                     messaggio = messaggio + utente + "\n";
                 }
-                rHM.lock();
-                try{
+                
                     try{
                         clientConnessi.get(emailDaInviare.getMittente().getEmail()).riceviMessaggio(messaggio);
                     }
                     catch(RemoteException e){
                         System.out.println(e.getMessage());
                     }
-                } finally {
-                    rHM.unlock();
-                }
+               
             }
         
         return email;
