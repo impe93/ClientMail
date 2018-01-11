@@ -258,11 +258,15 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      */
     public boolean disconnettiClientDaServer(){
         try {
-            if(this.server.disconnettiClient(this.utente.getEmail())){
+            if(this.server != null && this.server.disconnettiClient(this.utente.getEmail())){
                 System.out.println("disconnessione del client dal server riuscita");
                 return true;
             } else{
-                System.out.println("disconnessione del client dal server fallita");
+                if(this.server != null) {
+                    System.out.println("disconnessione del client dal server fallita");
+                } else {
+                    System.out.println("Non eri connesso a nessun server");
+                }
             }
         } catch (RemoteException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);

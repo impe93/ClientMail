@@ -21,7 +21,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -290,7 +289,8 @@ public class ClientGUI extends JFrame implements Observer{
         this.setLayout(new BorderLayout());        
         this.add(this.toolbarPanel, BorderLayout.NORTH);
         this.add(this.clientSplitPane, BorderLayout.CENTER);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(this.controller);
         this.pack();
         this.setVisible(true);
 /* ------ Fine Frame ------ */
@@ -486,10 +486,7 @@ public class ClientGUI extends JFrame implements Observer{
             case ClientGUI.NUOVO_MESSAGGIO: {
                 ArrayList<String> messaggi = ((CasellaPostaElettronicaClient)oFinal).leggiMessaggi();
                 for (String messaggio : messaggi) {
-                    JOptionPane.showMessageDialog(this,
-                            messaggio,
-                            "Messaggio",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    new MessaggioGUI("Messaggio", messaggio);
                 }
                 break;
             }

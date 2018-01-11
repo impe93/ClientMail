@@ -8,6 +8,8 @@ package client;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -19,7 +21,7 @@ import modelli.EmailDaInviare;
  *
  * @author Lorenzo Imperatrice, Francesca Riddone, Alessio Berger
  */
-public class ClientController implements ActionListener, ListSelectionListener {
+public class ClientController implements ActionListener, ListSelectionListener, WindowListener {
     
     private final ClientImplementation model;
     private final ArrayList<NuovaEmailGUI> schermateNuoveEmail;
@@ -167,6 +169,42 @@ public class ClientController implements ActionListener, ListSelectionListener {
                 }
             }.start();
         }
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        this.model.disconnettiClientDaServer();
+        System.exit(0);
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+        
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+        
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+        
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+        
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+        
     }
     
 }
