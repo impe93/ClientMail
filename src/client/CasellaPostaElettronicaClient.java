@@ -26,9 +26,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
     
     private final String urlDB;
     private final Utente utenteProprietario;
-    private ArrayList<Email> emailInviate;
-    private ArrayList<Email> emailRicevute;
-    private ArrayList<String> messaggi;
+    private final ArrayList<Email> emailInviate;
+    private final ArrayList<Email> emailRicevute;
+    private final ArrayList<String> messaggi;
     private String ordineInviate; //puù assumere valore "data" oppure "priorita"
     private String ordineRicevute; //puù assumere valore "data" oppure "priorita"
     private int idUltimaEmailLetta;
