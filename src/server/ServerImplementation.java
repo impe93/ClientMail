@@ -30,10 +30,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @author Alessio Berger, Lorenzo Imperatrice, Francesca Riddone
  */
-public class ServerImplementation extends UnicastRemoteObject implements Server{
+public final class ServerImplementation extends UnicastRemoteObject implements Server{
     
     
-    private Map<String, Client> clientConnessi = new HashMap<>();
+    private final Map<String, Client> clientConnessi;
     private final ReadWriteLock rwHM;
     private final Lock rHM;
     private final Lock wHM;
@@ -50,6 +50,18 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     *  Costruttore di ServerImplementation
     */
     public ServerImplementation() throws RemoteException{
+        
+        clientConnessi = new HashMap<>();
+        casella = new CasellaServer();
+        exec = Executors.newFixedThreadPool(NUM_THREAD);
+        rwHM = new ReentrantReadWriteLock();
+        rHM = rwHM.readLock();
+        wHM = rwHM.writeLock();
+        
+        serverUp();
+    }
+    
+    public void serverUp(){
         /*
         registrazione dell'oggetto ServerImplementation presso il registro di
         bootstrap (rmiregistry)
@@ -62,12 +74,6 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
         catch(MalformedURLException | RemoteException e) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, e);
         }
-        
-        casella = new CasellaServer();
-        exec = Executors.newFixedThreadPool(NUM_THREAD);
-        rwHM = new ReentrantReadWriteLock();
-        rHM = rwHM.readLock();
-        wHM = rwHM.writeLock();
     }
     
     public void aggiungiObserver(ServerGUI serverGui){
@@ -124,7 +130,8 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
     public Email inviaEmail(EmailDaInviare emailDaInviare) throws RemoteException {
         final EmailDaInviare emailDaInviareFinal = emailDaInviare;
         
-        FutureTask<Email> ft = new FutureTask<>(new Callable<Email>(){
+        FutureTask<Email> ft;
+        ft = new FutureTask<>(new Callable<Email>(){
             @Override
             public Email call() throws RemoteException {
                 return casella.inviaEmail(emailDaInviareFinal, clientConnessi);
@@ -167,7 +174,8 @@ public class ServerImplementation extends UnicastRemoteObject implements Server{
                         }
                         try{
                             clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da "
-                                    + emailRitorno.getMittente().getEmail()+"!");
+                                    + emailRitorno.getMittente().getEmail()+"!\n"
+                                    + "Oggetto: " + emailRitorno.getOggetto());
                         }
                         catch(RemoteException e){
                             System.out.println(e.getMessage());
