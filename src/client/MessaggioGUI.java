@@ -17,7 +17,7 @@ public class MessaggioGUI extends JFrame {
     
     private String messaggio;
     
-    private JFrame questoFrame;
+    private final JFrame questoFrame;
     
     private JLabel messaggioCentrale;
     private JButton bottoneChiusura;

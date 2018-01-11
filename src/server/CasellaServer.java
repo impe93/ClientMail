@@ -280,10 +280,11 @@ public class CasellaServer extends Observable {
             conn = DriverManager.getConnection(urlDB);
             ps = conn.prepareStatement(queryIdMax);
             rs = ps.executeQuery();
-            if(rs.next())
+            if(rs.next()) {
                 idMax = rs.getInt("MAX(id_email)");
-            else
+            } else {
                 idMax=0;
+            }
             
         }
         catch(SQLException e) {
@@ -405,8 +406,9 @@ public class CasellaServer extends Observable {
             destinatariControllo.addAll(emailDaInviare.getDestinatari());
             ArrayList<String> destinatariInesistenti = new ArrayList<>();
             for(String destinatario : destinatariControllo){
-                if(recuperaDatiUtente(destinatario)==null)
+                if(recuperaDatiUtente(destinatario)==null) {
                     destinatariInesistenti.add(destinatario);
+                }
             }
             if(destinatariInesistenti.isEmpty()==false){
                 String messaggio = "Non è stato possibile inviare l'email "
