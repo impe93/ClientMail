@@ -559,7 +559,7 @@ public class ClientGUI extends JFrame implements Observer{
                                 if (listaEmail.size() > 0) {
                                     int indexDaSelezionare = 0;
                                     for(Email email : listaEmail) {
-                                        if (emailDaVisualizzare.getId() == email.getId()) {
+                                        if (emailDaVisualizzare != null && emailDaVisualizzare.getId() == email.getId()) {
                                             break;
                                         }
                                         indexDaSelezionare++;
