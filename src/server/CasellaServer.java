@@ -42,22 +42,30 @@ public class CasellaServer extends Observable {
         setChanged();
         notifyObservers(getOperazioneEseguita());
     }
-    /*
-    *   Costruttore CasellaServer
-    */
+    
+    /**
+     * Costruttore CasellaServer
+     */
     public CasellaServer(){
         this.urlDB = "jdbc:sqlite:Server.db";
+        this.operazioneEseguita = "";
         rwDB1 = new ReentrantReadWriteLock();
         rDB1 = rwDB1.readLock();
         wDB1 = rwDB1.writeLock();
         
     }
     
-    /*
-    *   Recupera le Email ricevute di un utente a partire dall'Email con id ultimaRicevuta
-    *   che viene passato come parametro, e le resttuisce in un ArrayList
-    */
-    
+    /**
+     * Recupera le email ricevute dall'utente corrispondente all'oggetto Utente
+     * contenuto nel parametro utente a partire da quella con indice uguale a
+     * (ultimaRicevuta + 1)
+     * @param ultimaRicevuta: intero corrispondente all'id dell'ultima
+     *      email ricevuta presente nel DB del client
+     * @param utente: oggetto di tipo Utente che identifica l'utente del quale
+     *      vogliamo recuperare le email ricevute
+     * @return un ArrayList di email se sono presenti delle email ricevute con
+     *      id maggiore di ultimaRicevuta, un ArrayList vuoto altrimenti
+     */
     public ArrayList<Email> recuperaEmailRicevuteUtente(int ultimaRicevuta, Utente utente){
         ArrayList<Email> emailRicevuteUtente = new ArrayList<>();
         
@@ -105,18 +113,22 @@ public class CasellaServer extends Observable {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-            
             rDB1.unlock();
         }
-        
         return emailRicevuteUtente;
-        
     }
     
-    /*
-    *   Recupera le Email inviatee di un utente a partire dall'Email con id ultimaInviata
-    *   che viene passato come parametro, e le resttuisce in un ArrayList
-    */
+    /**
+     * Recupera le email inviate dall'utente corrispondente all'oggetto Utente
+     * contenuto nel parametro utente a partire da quella con indice uguale a
+     * (ultimaInviata + 1)
+     * @param ultimaInviata: intero corrispondente all'id dell'ultima
+     *      email inviata presente nel DB del client
+     * @param utente: oggetto di tipo Utente che identifica l'utente del quale
+     *      vogliamo recuperare le email inviate
+     * @return un ArrayList di email se sono presenti delle email inviate con
+     *      id maggiore di ultimaRicevuta, un ArrayList vuoto altrimenti
+     */
     public ArrayList<Email> recuperaEmailInviateUtente(int ultimaInviata, Utente utente){
         ArrayList<Email> emailInviateUtente = new ArrayList<>();
         
@@ -172,12 +184,14 @@ public class CasellaServer extends Observable {
         return emailInviateUtente;
     }
     
-    /*
-    *   A partire dall'email utente accede al database utenti e recupera
-    *   tutti i dati del relativo utente: nome, cognome e email e restituisce un istanza
-    *   dell'utente.
-    */
-    public Utente recuperaDatiUtente(String emailUtente){
+    /**
+     * Recupera e restituisce l'oggetto Utente con indirizzo email corrispondente
+     * al parametro emailUtente
+     * @param emailUtente: email dell'utente che stiamo cercando nel DB
+     * @return l'oggetto Utente con email corrispondente a emailUtente se
+     *      presente, null altrimenti
+     */
+    private Utente recuperaDatiUtente(String emailUtente){
         Utente utente = null;
         Connection conn = null;
         Statement st = null;
@@ -218,10 +232,13 @@ public class CasellaServer extends Observable {
         return utente;
     }
     
-    /*
-    *   A partire dall'idEmail passato come parametro, accede al database e recupera tutti gli
-    *   utenti destinatari dell'email in questione e li restituisce sottoforma di ArrayList
-    */
+    /**
+     * Recupera tutti gli oggetti utente corrispondenti agli utenti destinatari
+     * contenuti nell'email con id corrispondente al parametro idEmail dal DB
+     * @param idEmail: intero corrispondente all'id di una email
+     * @return un ArrayList contenente tutti gli utenti destinatari dell'email
+     *      con id uguale a idEmail
+     */
     private ArrayList<Utente> recuperaUtentiDestinatari(int idEmail){
         ArrayList<Utente> utentiDestinatari = new ArrayList<>();
         Connection conn = null;
@@ -264,9 +281,12 @@ public class CasellaServer extends Observable {
         return utentiDestinatari;
     }
     
-    /*
-    *   Accede al database e recupera l'idEmail più alto e lo restituisce
-    */
+    /**
+     * Recupera il massimo id associato ad una email presente nel DB e lo
+     * restituisce
+     * @return l'intero corrispondente all'id massimo associato ad una email
+     *      presente nel DB se sono presenti email nel DB, -1 altrimenti
+     */
     private int recuperaIdMax() {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -312,10 +332,17 @@ public class CasellaServer extends Observable {
         
     }
     
-    /*
-    *   A partire da un istanza di EmailDaInviare crea un'istanza di tipo Email che viene
-    *   inserita all'interno del database e poi la restituisce al chiamante
-    */
+    /**
+     * Crea un oggetto Email partendo dalle informazioni contenute nel parametro
+     * emailDaInviare e inserisce l'email nel DB; infine ritorna l'oggetto Email
+     * @param emailDaInviare: oggetto di tipo EmailDaInviare, contenente le
+     *      informazioni dell'email che il client desidera inviare
+     * @param clientConnessi: mappa contenenti i riferimenti ai client connessi
+     *      al server
+     * @return un oggetto Email corrispondente alla nuova email se non si sono
+     *      verificati errori durante l'esecuzione, null altrimenti
+     * @throws RemoteException
+     */
     public Email inviaEmail(EmailDaInviare emailDaInviare, Map<String, Client> clientConnessi) throws RemoteException{
         Connection conn = null;
         PreparedStatement pst = null;
@@ -376,7 +403,7 @@ public class CasellaServer extends Observable {
                 else{
                     setOperazioneEseguita("* [INVIO EMAIL A " + emailDestinatario
                             + " DA " + emailDaInviare.getMittente().getEmail() + " NON ESEGUITO,"
-                            + " DESTINATARIO INESISTENTE - " + new Date().toString() + "]");
+                                    + " DESTINATARIO INESISTENTE - " + new Date().toString() + "]");
                     logUltimaOperazione();
                 }
             }
@@ -403,32 +430,42 @@ public class CasellaServer extends Observable {
         }
         
         ArrayList<String> destinatariControllo = new ArrayList<>();
-            destinatariControllo.addAll(emailDaInviare.getDestinatari());
-            ArrayList<String> destinatariInesistenti = new ArrayList<>();
-            for(String destinatario : destinatariControllo){
-                if(recuperaDatiUtente(destinatario)==null) {
-                    destinatariInesistenti.add(destinatario);
-                }
+        destinatariControllo.addAll(emailDaInviare.getDestinatari());
+        ArrayList<String> destinatariInesistenti = new ArrayList<>();
+        for(String destinatario : destinatariControllo){
+            if(recuperaDatiUtente(destinatario)==null) {
+                destinatariInesistenti.add(destinatario);
             }
-            if(destinatariInesistenti.isEmpty()==false){
-                String messaggio = "Non è stato possibile inviare l'email "
-                        + "ai seguenti destinatari:\n";
-                for(String utente : destinatariInesistenti){
-                    messaggio = messaggio + utente + "\n";
-                }
-                
-                    try{
-                        clientConnessi.get(emailDaInviare.getMittente().getEmail()).riceviMessaggio(messaggio);
-                    }
-                    catch(RemoteException e){
-                        System.out.println(e.getMessage());
-                    }
-               
+        }
+        if(destinatariInesistenti.isEmpty()==false){
+            String messaggio = "Non è stato possibile inviare l'email "
+                    + "ai seguenti destinatari:\n";
+            for(String utente : destinatariInesistenti){
+                messaggio = messaggio + utente + "\n";
             }
+            
+            try{
+                clientConnessi.get(emailDaInviare.getMittente().getEmail()).riceviMessaggio(messaggio);
+            }
+            catch(RemoteException e){
+                System.out.println(e.getMessage());
+            }
+            
+        }
+        
         
         return email;
     }
     
+    /**
+     * Imposta a 1 il valore dell'attributo letto nella tupla del DB relativa
+     * all'email con id corrispondente all'id del parametro emailLetta e con
+     * destinatario corrispondente al parametro emailClient
+     * @param emailClient: stringa contenente l'email del client che vuole
+     *      leggere l'email
+     * @param emailLetta: oggetto Email corrispondente all'email letta dal client
+     * @return : true se l'email è stata letta correttamente, false altrimenti
+     */
     public boolean setLetta(String emailClient, Email emailLetta){
         Connection conn = null;
         Statement st = null;
@@ -466,6 +503,16 @@ public class CasellaServer extends Observable {
         
     }
     
+    /**
+     * Imposta a 1 il valore dell'attributo eliminataDaMittente nella tupla del DB
+     * con id_email corrispondente all'id del parametro email e mittente
+     * corrispondente al parametro clientRichiedente
+     * @param email: oggetto Email corrispondente all'email inviata che il client
+     *      vuole eliminare
+     * @param clientRichiedente: stringa corrispondente all'email del client che
+     *      vuole effettuare l'eliminazione dell'email
+     * @return true se l'email è stata eliminata correttamente, false altrimenti
+     */
     public boolean eliminaEmailDaMittente(Email email, String clientRichiedente){
         Connection conn = null;
         Statement st = null;
@@ -511,6 +558,16 @@ public class CasellaServer extends Observable {
         
     }
     
+    /**
+     * Imposta a 1 il valore dell'attributo eliminataDaDestinatario nella tupla
+     * del DB con id_email corrispondente all'id del parametro email e destinatario
+     * corrispondente al parametro clientRichiedente
+     * @param email: oggetto Email corrispondente all'email ricevuta che il client
+     *      vuole eliminare
+     * @param clientRichiedente: stringa corrispondente all'email del client che
+     *      vuole effettuare l'eliminazione dell'email
+     * @return true se l'email è stata eliminata correttamente, false altrimenti
+     */
     public boolean eliminaEmailDaDestinatario(Email email, String clientRichiedente){
         Connection conn = null;
         Statement st = null;
@@ -557,6 +614,12 @@ public class CasellaServer extends Observable {
         
     }
     
+    /**
+     * Recupera e restituisce gli indirizzi email di tutti gli utenti presenti
+     * nella tabella utenti del DB
+     * @return un ArrayList contenente gli indirizzi email di tutti gli utenti
+     *      presenti nel DB se presenti, un ArrayList vuoto altrimenti
+     */
     private ArrayList<String> recuperaEmailUtenti(){
         ArrayList<String> utenti = new ArrayList<>();
         Connection conn = null;
@@ -596,4 +659,5 @@ public class CasellaServer extends Observable {
         }
         return utenti;
     }
+    
 }

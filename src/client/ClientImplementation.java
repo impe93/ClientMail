@@ -89,10 +89,14 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             } catch (RemoteException ex) {
                 Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
+            if(nuoveEmailInviate == null){
+                System.out.println("si è verificato un errore durante il recupero delle email inviate");
+            } else if(nuoveEmailInviate.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
             }
-            if(nuoveEmailRicevute != null && nuoveEmailRicevute.size() > 0){
+            if(nuoveEmailRicevute == null){
+                System.out.println("si è verificato un errore durante il recupero delle email ricevute");
+            } else if(nuoveEmailRicevute.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailRicevute(nuoveEmailRicevute);
             }
         }   
@@ -112,6 +116,8 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             }
             if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
+            } else if(nuoveEmailInviate == null){
+                System.out.println("si è verificato un errore durante il recupero delle email inviate");
             }
         } else{
             String messaggio = "Impossibile prelevare nuove email dal server: connessione assente!";
@@ -124,15 +130,17 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      * Mostra al Client le sue email ricevute
      */
     public void getRicevute(){
-        ArrayList<Email> nuoveEmailInviate = null;
+        ArrayList<Email> nuoveEmailRicevute = null;
         if(this.server != null){
             try {
-                nuoveEmailInviate = this.server.getInviate(getUltimaInviata(), this.utente);
+                nuoveEmailRicevute = this.server.getInviate(getUltimaInviata(), this.utente);
             } catch (RemoteException ex) {
                 Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
-                this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
+            if(nuoveEmailRicevute != null && nuoveEmailRicevute.size() > 0){
+                this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailRicevute);
+            } else if(nuoveEmailRicevute == null){
+                System.out.println("si è verificato un errore durante il recupero delle email ricevute");
             }
         } else{
             String messaggio = "Impossibile prelevare nuove email dal server: connessione assente!";
