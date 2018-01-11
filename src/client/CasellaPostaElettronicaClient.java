@@ -208,7 +208,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        String queryOrdinamentoPerPriorita = "";
+        String queryOrdinamentoPerPriorita;
         if(isInviate){
             wlEmailInviate.lock();
             queryOrdinamentoPerPriorita = "SELECT * FROM email_inviate ORDER BY priorita DESC";
@@ -236,18 +236,22 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 email.setLetto(rs.getInt("letto"));
                 if(isInviate){
                     boolean found = false;
-                    for(Email emailLista: this.emailInviate)
-                        if(emailLista.equals(email))
+                    for(Email emailLista: this.emailInviate) {
+                        if(emailLista.equals(email)) {
                             found = true;
+                        }
+                    }
                     
                     if(!found){
                         this.emailInviate.add(email);
                     }
                 } else{
                     boolean found = false;
-                    for(Email emailLista: this.emailRicevute)
-                        if(emailLista.equals(email))
+                    for(Email emailLista: this.emailRicevute) {
+                        if(emailLista.equals(email)) {
                             found = true;
+                        }
+                    }
                     
                     if(!found){
                         this.emailRicevute.add(email);
@@ -310,7 +314,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        String queryOrdinamentoPerPriorita = "";
+        String queryOrdinamentoPerPriorita;
         if(isInviate){
             wlEmailInviate.lock();
             queryOrdinamentoPerPriorita = "SELECT * FROM email_inviate ORDER BY data DESC";
@@ -338,18 +342,22 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
                 email.setLetto(rs.getInt("letto"));
                 if(isInviate){
                     boolean found = false;
-                    for(Email emailLista: this.emailInviate)
-                        if(emailLista.equals(email))
+                    for(Email emailLista: this.emailInviate) {
+                        if(emailLista.equals(email)) {
                             found = true;
+                        }
+                    }
                     
                     if(!found){
                         this.emailInviate.add(email);
                     }
                 } else{
                     boolean found = false;
-                    for(Email emailLista: this.emailRicevute)
-                        if(emailLista.equals(email))
+                    for(Email emailLista: this.emailRicevute) {
+                        if(emailLista.equals(email)) {
                             found = true;
+                        }
+                    }
                     
                     if(!found){
                         this.emailRicevute.add(email);
@@ -808,8 +816,9 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
         } else{
             boolean isDestinatario = false;
             for(Utente utente: email.getDestinatari()){
-                if(utente.getEmail().equals(this.utenteProprietario.getEmail()))
+                if(utente.getEmail().equals(this.utenteProprietario.getEmail())) {
                     isDestinatario = true;
+                }
             }
             // il mio utenteProprietario è il destinatario dell'email
             if(nomeTabellaDB.equals("email_ricevute") && isDestinatario){

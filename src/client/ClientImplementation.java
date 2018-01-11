@@ -90,14 +90,12 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
                 Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
             }
             if(nuoveEmailInviate == null){
-                String messaggio = "Si è verificato un errore durante il recupero delle nuove email dal server: riprova!";
-                this.casellaPostaleClient.inserisciMessaggio(messaggio);
+                System.out.println("si è verificato un errore durante il recupero delle email inviate");
             } else if(nuoveEmailInviate.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
             }
             if(nuoveEmailRicevute == null){
-                String messaggio = "Si è verificato un errore durante il recupero delle nuove email dal server: riprova!";
-                this.casellaPostaleClient.inserisciMessaggio(messaggio);
+                System.out.println("si è verificato un errore durante il recupero delle email ricevute");
             } else if(nuoveEmailRicevute.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailRicevute(nuoveEmailRicevute);
             }
@@ -119,8 +117,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
             } else if(nuoveEmailInviate == null){
-                String messaggio = "Si è verificato un errore durante il recupero delle nuove email dal server: riprova!";
-                this.casellaPostaleClient.inserisciMessaggio(messaggio);
+                System.out.println("si è verificato un errore durante il recupero delle email inviate");
             }
         } else{
             String messaggio = "Impossibile prelevare nuove email dal server: connessione assente!";
@@ -143,8 +140,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             if(nuoveEmailRicevute != null && nuoveEmailRicevute.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailRicevute);
             } else if(nuoveEmailRicevute == null){
-                String messaggio = "Si è verificato un errore durante il recupero delle nuove email dal server: riprova!";
-                this.casellaPostaleClient.inserisciMessaggio(messaggio);
+                System.out.println("si è verificato un errore durante il recupero delle email ricevute");
             }
         } else{
             String messaggio = "Impossibile prelevare nuove email dal server: connessione assente!";
@@ -223,8 +219,6 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             Email emailInviata = this.server.inviaEmail(emailDaInviare);
             if(emailInviata == null){
                 System.out.println("Invio dell'email non riuscito!");
-                String messaggio = "Si è verificato un errore durante l'invio dell'email, riprova!";
-                this.casellaPostaleClient.inserisciMessaggio(messaggio);
             } else{
                 System.out.println("Email inviata con successo!");
                 this.casellaPostaleClient.inserisciInInviati(emailInviata);

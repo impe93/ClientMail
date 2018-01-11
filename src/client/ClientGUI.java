@@ -40,8 +40,8 @@ import modelli.Email;
  */
 public class ClientGUI extends JFrame implements Observer{
     
-    public static final String RICEVUTI = "ricevuti";
-    public static final String INVIATI = "inviati";
+    public static final String RICEVUTI = "Ricevuti";
+    public static final String INVIATI = "Inviati";
     public static final String INVIATE_PER_PRIORITA ="inviatePerPriorita";
     public static final String INVIATE_PER_DATA ="inviatePerData";
     public static final String RICEVUTE_PER_PRIORITA ="ricevutePerPriorita";
@@ -96,6 +96,7 @@ public class ClientGUI extends JFrame implements Observer{
     private JPanel panelSinistro;
     
     private JPanel ordinePanel;
+    private JLabel inVisualizzazioneLabel;
     private JButton prioritaOrdineButton;
     private JButton dataOrdineButton;
     
@@ -267,10 +268,14 @@ public class ClientGUI extends JFrame implements Observer{
         this.prioritaOrdineButton.addActionListener(controller);
         this.ordinePanel.add(this.prioritaOrdineButton, BorderLayout.WEST);
         
+        this.inVisualizzazioneLabel = new JLabel("<html><b style=\"font-size: 14px\">" + this.inVisualizzazione + "</b></html>", JLabel.CENTER);
+        this.ordinePanel.add(this.inVisualizzazioneLabel, BorderLayout.CENTER);
+        
         this.dataOrdineButton = new JButton("Per data");
         this.dataOrdineButton.setName("perDataRicevuti");
         this.dataOrdineButton.addActionListener(controller);
         this.ordinePanel.add(this.dataOrdineButton, BorderLayout.EAST);
+       
         
         this.panelSinistro.add(this.ordinePanel, BorderLayout.NORTH);
         this.panelSinistro.add(this.listaEmailScrollPane, BorderLayout.CENTER);
@@ -278,14 +283,14 @@ public class ClientGUI extends JFrame implements Observer{
 /* ------ Split Pane ------ */
         this.clientSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.panelSinistro, this.emailPanel);
         this.clientSplitPane.setOneTouchExpandable(true);
-        this.clientSplitPane.setDividerLocation(250);
+        this.clientSplitPane.setDividerLocation(320);
 /* ------ Fine Split Pane ------ */
         
 /* ------ Frame ------ */
-        Dimension minimumSize = new Dimension(250, 50);
+        Dimension minimumSize = new Dimension(320, 50);
         this.listaEmailScrollPane.setMinimumSize(minimumSize);
         this.emailPanel.setMinimumSize(minimumSize);
-        this.setPreferredSize(new Dimension(700, 500));
+        this.setPreferredSize(new Dimension(900, 500));
         this.setLayout(new BorderLayout());        
         this.add(this.toolbarPanel, BorderLayout.NORTH);
         this.add(this.clientSplitPane, BorderLayout.CENTER);
@@ -312,13 +317,14 @@ public class ClientGUI extends JFrame implements Observer{
                                 modelListaEmail.addElement(email);
                             }
                             
-                            if (listaEmail.size() > 0) {
-                                emailDaVisualizzare = listaEmail.get(0);
-                            }
+                            emailDaVisualizzare = null;
+                            azzeraCampiEmailInVisualizzazione();
+                            
                             dataOrdineButton.setName("perDataRicevuti");
                             prioritaOrdineButton.setName("perPrioritaRicevuti");
                             eliminaSelezionata.setName("eliminaRicevuta");
                             inVisualizzazione = ClientGUI.RICEVUTI;
+                            inVisualizzazioneLabel.setText("<html><b style=\"font-size: 14px\">" + inVisualizzazione + "</b></html>");
                             ((ListaInviateRicevute)listaEmailList).setTipoLista(ListaInviateRicevute.LISTA_RICEVUTE);
                         }
                     });
@@ -338,13 +344,14 @@ public class ClientGUI extends JFrame implements Observer{
                             for (Email email : listaEmail) {
                                 modelListaEmail.addElement(email);
                             }
-                            if (listaEmail.size() > 0) {
-                                emailDaVisualizzare = listaEmail.get(0);
-                            }
+                            emailDaVisualizzare = listaEmail.get(0);
+                            azzeraCampiEmailInVisualizzazione();
+                            
                             dataOrdineButton.setName("perDataInviati");
                             prioritaOrdineButton.setName("perPrioritaInviati");
                             eliminaSelezionata.setName("eliminaInviata");
                             inVisualizzazione = ClientGUI.INVIATI;
+                            inVisualizzazioneLabel.setText("<html><b style=\"font-size: 14px\">" + inVisualizzazione + "</b></html>");
                             ((ListaInviateRicevute)listaEmailList).setTipoLista(ListaInviateRicevute.LISTA_INVIATE);
                         }
                     });
@@ -596,6 +603,15 @@ public class ClientGUI extends JFrame implements Observer{
         }
     }
     
+    private void azzeraCampiEmailInVisualizzazione() {
+        this.mittenteEmailLabel.setText("");
+        this.destinatariEmailLabel.setText("");
+        this.oggettoEmailLabel.setText("");
+        this.corpoTextArea.setText("");
+        this.eliminaSelezionata.setEmailDaInoltrareEliminare(null);
+        this.inoltraSelezionata.setEmailDaInoltrareEliminare(null);
+    }
+    
     public class EliminaInoltraButton extends JButton {
         
         private Email emailDaInoltrareEliminare;
@@ -637,8 +653,8 @@ public class ClientGUI extends JFrame implements Observer{
     }
     
     public static void main (String[] args) {
-        ClientImplementation modello = null;
-        ClientGUI client = null;
+        ClientImplementation modello;
+        ClientGUI client;
         if (args.length == 1) {
             try {
                 modello = new ClientImplementation(args[0]);
