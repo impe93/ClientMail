@@ -10,7 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
@@ -100,7 +103,15 @@ public class ClientController implements ActionListener, ListSelectionListener, 
                     public void run() {
                         if (fonte instanceof ClientGUI.EliminaInoltraButton) {
                             Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)fonte).getEmailDaInoltrareEliminare();
-                            model.eliminaEmailInviata(emailDaEliminare);
+                            if (emailDaEliminare != null) {
+                                model.eliminaEmailInviata(emailDaEliminare);
+                            } else {
+                                try {
+                                    model.riceviMessaggio("Non è stata selezionata alcuna email da eliminare!");
+                                } catch (RemoteException ex) {
+                                    Logger.getLogger(ClientController.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
                         }
                     }
                 }.start();
@@ -112,7 +123,15 @@ public class ClientController implements ActionListener, ListSelectionListener, 
                     public void run() {
                         if (fonte instanceof ClientGUI.EliminaInoltraButton) {
                             Email emailDaEliminare = ((ClientGUI.EliminaInoltraButton)fonte).getEmailDaInoltrareEliminare();
-                            model.eliminaEmailRicevuta(emailDaEliminare);
+                            if (emailDaEliminare != null) {
+                                model.eliminaEmailRicevuta(emailDaEliminare);
+                            } else {
+                                try {
+                                    model.riceviMessaggio("Non è stata selezionata alcuna email da eliminare!");
+                                } catch (RemoteException ex) {
+                                    Logger.getLogger(ClientController.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
                         }
                     }
                 }.start();
@@ -121,7 +140,15 @@ public class ClientController implements ActionListener, ListSelectionListener, 
             case "inoltra": {
                 if (e.getSource() instanceof ClientGUI.EliminaInoltraButton) {
                     Email emailDaInoltrare = ((ClientGUI.EliminaInoltraButton)e.getSource()).getEmailDaInoltrareEliminare();
-                    this.schermateNuoveEmail.add(new NuovaEmailGUI(this, this.schermateNuoveEmail.size(), emailDaInoltrare));
+                    if (emailDaInoltrare != null) {
+                        this.schermateNuoveEmail.add(new NuovaEmailGUI(this, this.schermateNuoveEmail.size(), emailDaInoltrare));
+                    } else {
+                        try {
+                            model.riceviMessaggio("Non è stata selezionata alcuna email da inoltrare!");
+                        } catch (RemoteException ex) {
+                            Logger.getLogger(ClientController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                 }
                 break;
             }
