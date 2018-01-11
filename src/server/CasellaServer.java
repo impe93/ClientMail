@@ -439,9 +439,9 @@ public class CasellaServer extends Observable {
         }
         if(destinatariInesistenti.isEmpty()==false){
             String messaggio = "Non è stato possibile inviare l'email "
-                    + "ai seguenti destinatari:\n";
+                    + "ai seguenti destinatari:<br>";
             for(String utente : destinatariInesistenti){
-                messaggio = messaggio + utente + "\n";
+                messaggio = messaggio +"<b>"+ utente + "</b><br>";
             }
             
             try{
