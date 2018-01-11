@@ -28,7 +28,6 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         this.casellaPostaleClient = new CasellaPostaElettronicaClient(emailUtente);
         this.utente = this.casellaPostaleClient.recuperaDatiUtente(emailUtente);
         this.server = null;
-        connettiAlServer();
     }
     
     /**
@@ -44,21 +43,18 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         lanciaRMIRegistry();
         try {
             Naming.rebind("//localhost/Client/" + this.utente.getEmail(), this);
-        }
-        catch(MalformedURLException | RemoteException e) {
-            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, e);
-        }
-        /*
-        utilizzando il metodo lookup con il nome dell'oggetto remoto Server 
-        viene creato nel computer del Client uno stub dell'oggetto remoto
-        */
-        try {
+            /*
+            utilizzando il metodo lookup con il nome dell'oggetto remoto Server 
+            viene creato nel computer del Client uno stub dell'oggetto remoto
+            */
             this.server = (Server)Naming.lookup("//localhost/Server");
             this.server.connettiAlClient(this.utente.getEmail());
-        } catch (NotBoundException | MalformedURLException | RemoteException ex) {
-            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        catch(NullPointerException | MalformedURLException | NotBoundException | RemoteException e) {
+            Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, e);
+            String messaggio = "Connessione al server non riuscita! Impossibile prelevare eventuali nuove email!";
+            this.casellaPostaleClient.inserisciMessaggio(messaggio);
+        }   
     }
     
     /**
@@ -67,10 +63,8 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
     public static void lanciaRMIRegistry() {
         try {
             LocateRegistry.createRegistry(1099);
-            System.out.println("java RMI registry creato");
         } catch (RemoteException e) {
             //non fa niente: RMI registry esiste già
-            System.out.println("java RMI registry già esistente!");
         }
     }
     
@@ -82,8 +76,9 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      *      modello
      */
     public void registraOsservatoreEAggiornaEmail(ClientGUI osservatore){
-        this.casellaPostaleClient.recuperaEmailInviate();
         this.casellaPostaleClient.addObserver(osservatore);
+        connettiAlServer();
+        this.casellaPostaleClient.recuperaEmailInviate();
         this.casellaPostaleClient.recuperaEmailRicevute();
         ArrayList<Email> nuoveEmailInviate = null;
         ArrayList<Email> nuoveEmailRicevute = null;
@@ -118,6 +113,9 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
             }
+        } else{
+            String messaggio = "Impossibile prelevare nuove email dal server: connessione assente!";
+            this.casellaPostaleClient.inserisciMessaggio(messaggio);
         }
         this.casellaPostaleClient.mostraEmailInviate();
     }
@@ -136,6 +134,9 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
             }
+        } else{
+            String messaggio = "Impossibile prelevare nuove email dal server: connessione assente!";
+            this.casellaPostaleClient.inserisciMessaggio(messaggio);
         }
         this.casellaPostaleClient.mostraEmailRicevute();
     }
@@ -193,14 +194,18 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
      * @param emailDaInoltrare: email che si desidera inoltrare
      */
     public void inoltraEmail(EmailDaInviare emailDaInoltrare){
-        inviaEmail(emailDaInoltrare);
+        if(!inviaEmail(emailDaInoltrare)){
+            String messaggio = "Impossibile inoltrare l'email: connessione al server assente!";
+            this.casellaPostaleClient.inserisciMessaggio(messaggio);
+        }
     }
     
     /**
      * Invia una nuova email
      * @param emailDaInviare: email che si desidera inviare
+     * @return true se è avvenuta comunicazione con il server, false altrimenti
      */
-    public void inviaEmail(EmailDaInviare emailDaInviare){
+    public boolean inviaEmail(EmailDaInviare emailDaInviare){
         try {
             emailDaInviare.setMittente(this.utente);
             Email emailInviata = this.server.inviaEmail(emailDaInviare);
@@ -210,8 +215,12 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
                 System.out.println("Email inviata con successo!");
                 this.casellaPostaleClient.inserisciInInviati(emailInviata);
             }
-        } catch (RemoteException ex) {
+            return true;
+        } catch (RemoteException | NullPointerException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+            String messaggio = "Impossibile inviare l'email: connessione al server assente!";
+            this.casellaPostaleClient.inserisciMessaggio(messaggio);
+            return false;
         }
     }
     
@@ -228,8 +237,10 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             } else{
                 System.out.println("Si è verificato un errore durante l'eliminazione dell'email inviata, riprovare più tardi!");
             }
-        } catch (RemoteException ex) {
+        } catch (RemoteException | NullPointerException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+            String messaggio = "Impossibile eliminare email inviata: connessione al server assente!";
+            this.casellaPostaleClient.inserisciMessaggio(messaggio);
         }
     }
     
@@ -246,8 +257,10 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             } else{
                 System.out.println("Si è verificato un errore durante l'eliminazione dell'email ricevuta, riprovare più tardi!");
             }
-        } catch (RemoteException ex) {
+        } catch (RemoteException | NullPointerException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+            String messaggio = "Impossibile eliminare email ricevuta: connessione al server assente!";
+            this.casellaPostaleClient.inserisciMessaggio(messaggio);
         }
     }
     
@@ -264,7 +277,7 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             } else{
                 System.out.println("disconnessione del client dal server fallita");
             }
-        } catch (RemoteException ex) {
+        } catch (RemoteException | NullPointerException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
@@ -282,8 +295,10 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
             } else{
                 System.out.println("lettura email fallita");
             }
-        } catch (RemoteException ex) {
+        } catch (RemoteException | NullPointerException ex) {
             Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+            String messaggio = "Impossibile leggere email: connessione al server assente!";
+            this.casellaPostaleClient.inserisciMessaggio(messaggio);
         }
     }
     
