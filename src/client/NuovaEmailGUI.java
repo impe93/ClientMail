@@ -218,13 +218,11 @@ public class NuovaEmailGUI extends JFrame {
         int priorita = Integer.parseInt((String)this.prioritaComboBox.getSelectedItem());
         if (!destinatari.equals("")) {
             if (!oggetto.equals("")) {
-                if(!corpo.equals("")){
-                    emailDaInviare.setCorpo(corpo);
-                    emailDaInviare.setOggetto(oggetto);
-                    emailDaInviare.setDestinatari(this.prendiDestinatari(destinatari));
-                    emailDaInviare.setPriorita(priorita);
-                    return emailDaInviare;
-                }
+                emailDaInviare.setCorpo(corpo);
+                emailDaInviare.setOggetto(oggetto);
+                emailDaInviare.setDestinatari(this.prendiDestinatari(destinatari));
+                emailDaInviare.setPriorita(priorita);
+                return emailDaInviare;
             }
         }
         return null;
