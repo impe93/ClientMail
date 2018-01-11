@@ -186,83 +186,89 @@ public final class ServerImplementation extends UnicastRemoteObject implements
             }
         });
         
-        //Email da ritornare al mittente (copia di emailDaInviare) se l'invio 
+        //Email da ritornare al mittente (copia di emailDaInviare) se l'invio
         //va a buon fine
         Email emailRitorno = null;
         
         if(emailDaInviare != null){
-            exec.execute(ft);
-            
-            try{
-                emailRitorno = ft.get();
-            }
-            catch(InterruptedException | ExecutionException e){
-                System.out.println(e.getMessage());
-            }
-            
-            if(emailRitorno != null){
-                /*se emailRitorno è diverso da null vuol dire che l'email è stata
-                *inviata correttamente, quindi notifico il mittente dell'avvenuto
-                *invio.
-                */
-                rHM.lock();
+            if(emailDaInviare.getDestinatari()!=null && emailDaInviare.getMittente()!=null
+                    && emailDaInviare.getOggetto()!=null && emailDaInviare.getPriorita()>0
+                    && emailDaInviare.getPriorita()<11){
+                exec.execute(ft);
+                
                 try{
-                    try{
-                        clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("Email inviata correttamente!");
-                    }
-                    catch(RemoteException e){
-                        System.out.println(e.getMessage());
-                    }
-                } finally {
-                    rHM.unlock();
+                    emailRitorno = ft.get();
+                }
+                catch(InterruptedException | ExecutionException e){
+                    System.out.println(e.getMessage());
                 }
                 
-                /*
-                * Invio a ognuno dei destinatari l'email che andrà nella sua
-                * casella di posta in arrivo e notifico ognuno di loro con un
-                * messaggio della ricezione della nuova email
-                */
-                ArrayList<Utente> destinatari = new ArrayList<>();
-                destinatari.addAll(emailRitorno.getDestinatari());
-                
-                for(Utente destinatario : destinatari){
+                if(emailRitorno != null){
+                    /*se emailRitorno è diverso da null vuol dire che l'email è stata
+                    *inviata correttamente, quindi notifico il mittente dell'avvenuto
+                    *invio.
+                    */
                     rHM.lock();
-                    try {
-                        Client clientRicevente = clientConnessi.get(destinatario.getEmail());
-                        if(clientRicevente != null){
-                            try{
-                                clientRicevente.riceviEmail(emailRitorno);
-                            }
-                            catch(RemoteException e){
-                                System.out.println(e.getMessage());
-                            }
-                            try{
-                                clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da "
-                                        + emailRitorno.getMittente().getEmail()+"!\n"
-                                        + "Oggetto: " + emailRitorno.getOggetto());
-                            }
-                            catch(RemoteException e){
-                                System.out.println(e.getMessage());
-                            }
+                    try{
+                        try{
+                            clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("Email inviata correttamente!");
+                        }
+                        catch(RemoteException e){
+                            System.out.println(e.getMessage());
                         }
                     } finally {
                         rHM.unlock();
                     }
+                    
+                    /*
+                    * Invio a ognuno dei destinatari l'email che andrà nella sua
+                    * casella di posta in arrivo e notifico ognuno di loro con un
+                    * messaggio della ricezione della nuova email
+                    */
+                    ArrayList<Utente> destinatari = new ArrayList<>();
+                    destinatari.addAll(emailRitorno.getDestinatari());
+                    
+                    for(Utente destinatario : destinatari){
+                        rHM.lock();
+                        try {
+                            Client clientRicevente = clientConnessi.get(destinatario.getEmail());
+                            if(clientRicevente != null){
+                                try{
+                                    clientRicevente.riceviEmail(emailRitorno);
+                                }
+                                catch(RemoteException e){
+                                    System.out.println(e.getMessage());
+                                }
+                                try{
+                                    clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da "
+                                            + emailRitorno.getMittente().getEmail()+"!\n"
+                                            + "Oggetto: " + emailRitorno.getOggetto());
+                                }
+                                catch(RemoteException e){
+                                    System.out.println(e.getMessage());
+                                }
+                            }
+                        } finally {
+                            rHM.unlock();
+                        }
+                    }
+                    
+                    /*Ritorno al mittente l'istanza di Email inviata */
+                    return emailRitorno;
                 }
-                
-                /*Ritorno al mittente l'istanza di Email inviata */
-                return emailRitorno;
+                else{
+                    System.out.println("Server Error - Si è verificato un problema con l'invio dell'email.");
+                    return null;
+                }
             }
-            else{
-                System.out.println("Server Error - Si è verificato un problema con l'invio dell'email.");
-                return null;
-            }
+            else return null;
         }
+        
         else
             return null;
     }
     
-    /**Metodo che connette il Server tramite Rmi al Client quando quest'ultimo 
+    /**Metodo che connette il Server tramite Rmi al Client quando quest'ultimo
      * effettua la connessione e inserisce il rispettivo client nell'HashMap
      * dei client connessi.
      * @param emailClient: email del Client a cui ci si vuole connettere
