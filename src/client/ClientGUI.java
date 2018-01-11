@@ -8,7 +8,6 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -292,12 +290,7 @@ public class ClientGUI extends JFrame implements Observer{
         this.add(this.toolbarPanel, BorderLayout.NORTH);
         this.add(this.clientSplitPane, BorderLayout.CENTER);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent winEvt) {
-                System.exit(0);
-            }
-        });
+        this.addWindowListener(this.controller);
         this.pack();
         this.setVisible(true);
 /* ------ Fine Frame ------ */
