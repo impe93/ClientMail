@@ -475,7 +475,7 @@ public class CasellaServer extends Observable {
     public boolean eliminaEmailDaMittente(Email email, String clientRichiedente){
         Connection conn = null;
         Statement st = null;
-        String queryEliminaEmail="";
+        String queryEliminaEmail;
         
         //System.out.println("eliminata da mittente");
         
@@ -520,7 +520,7 @@ public class CasellaServer extends Observable {
     public boolean eliminaEmailDaDestinatario(Email email, String clientRichiedente){
         Connection conn = null;
         Statement st = null;
-        String queryEliminaEmail="";
+        String queryEliminaEmail;
         
         //System.out.println("eliminata da destinatario");
         queryEliminaEmail =

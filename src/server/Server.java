@@ -5,7 +5,6 @@ import modelli.Email;
 import modelli.Utente;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.concurrent.locks.Lock;
 import modelli.EmailDaInviare;
 
 /**
