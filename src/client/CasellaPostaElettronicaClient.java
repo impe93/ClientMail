@@ -139,7 +139,7 @@ public class CasellaPostaElettronicaClient extends Observable implements Casella
      *      tabellaEmail
      */
     private int getUltimaEmail(String tabellaEmail){
-        int idUltimaEmail = -1;
+        int idUltimaEmail = 0;
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;

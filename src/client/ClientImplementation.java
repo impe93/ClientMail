@@ -84,8 +84,10 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
         ArrayList<Email> nuoveEmailRicevute = null;
         if(this.server != null){
             try {
-                nuoveEmailInviate = this.server.getInviate(getUltimaInviata(), this.utente);
-                nuoveEmailRicevute = this.server.getRicevute(getUltimaRicevuta(), this.utente);
+                final int val1 =getUltimaInviata();
+                final int val2 =getUltimaRicevuta();
+                nuoveEmailInviate = this.server.getInviate(val1, this.utente);
+                nuoveEmailRicevute = this.server.getRicevute(val2, this.utente);
             } catch (RemoteException ex) {
                 Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
             }

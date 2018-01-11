@@ -32,9 +32,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
-public final class ServerImplementation extends UnicastRemoteObject implements 
+public final class ServerImplementation extends UnicastRemoteObject implements
         Server{
-     
+    
     private final Map<String, Client> clientConnessi;
     private final ReadWriteLock rwHM;
     private final Lock rHM;
@@ -42,11 +42,11 @@ public final class ServerImplementation extends UnicastRemoteObject implements
     private final int NUM_THREAD = 3;
     private final CasellaServer casella;
     private final Executor exec;
-  
+    
     /**
-    *  Costruttore di ServerImplementation
+     *  Costruttore di ServerImplementation
      * @throws java.rmi.RemoteException
-    */
+     */
     public ServerImplementation() throws RemoteException{
         
         clientConnessi = new HashMap<>();
@@ -61,7 +61,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
     
     /**
      * Metodo per lanciare l'RMI Registry.
-    */
+     */
     public static void lanciaRMIRegistry() {
         try {
             LocateRegistry.createRegistry(1099);
@@ -71,11 +71,11 @@ public final class ServerImplementation extends UnicastRemoteObject implements
     }
     
     /**
-     * Metodo per la registrazione dell'oggetto ServerImplementation presso il 
+     * Metodo per la registrazione dell'oggetto ServerImplementation presso il
      * registro di bootstrap (rmiregistry)
-    */
+     */
     public void serverUp(){
-       
+        
         lanciaRMIRegistry();
         try {
             Naming.rebind("//localhost/Server", this);
@@ -86,17 +86,17 @@ public final class ServerImplementation extends UnicastRemoteObject implements
     }
     
     /**
-     * Metodo per la registrazione dell'interfaccia grafica (ServerGUI) come 
+     * Metodo per la registrazione dell'interfaccia grafica (ServerGUI) come
      * observer del modello (CasellaServer)
      * @param serverGui
-    */  
+     */
     public void aggiungiObserver(ServerGUI serverGui){
         this.casella.addObserver(serverGui);
     }
     
-    /** Metodo che restituisce un ArrayList di Email contenente tutte le email 
+    /** Metodo che restituisce un ArrayList di Email contenente tutte le email
      * inviate dall'utente a partire da quella con id uguale a ultimaInviata
-     * @param ultimaInviata: identificativo numerico dell'ultima email presente 
+     * @param ultimaInviata: identificativo numerico dell'ultima email presente
      * nella casella di posta inviata
      * @param utente: utente di cui di vuole ricevere le email inviate
      * @return ArrayList di Email contenente tutte le Email inviate da utente a
@@ -126,9 +126,9 @@ public final class ServerImplementation extends UnicastRemoteObject implements
         return inviate;
     }
     
-    /** Metodo che restituisce un ArrayList di Email contenente tutte le email 
+    /** Metodo che restituisce un ArrayList di Email contenente tutte le email
      * ricevute dall'utente a partire da quella con id uguale a ultimaRicevuta
-     * @param ultimaRicevuta: identificativo numerico dell'ultima email presente 
+     * @param ultimaRicevuta: identificativo numerico dell'ultima email presente
      * nella casella di posta ricevuta
      * @param utente: utente di cui di vuole ricevere le email ricevute
      * @return ArrayList di Email contenente tutte le Email ricevute da utente a
@@ -158,11 +158,11 @@ public final class ServerImplementation extends UnicastRemoteObject implements
         return ricevute;
     }
     
-    /** Metodo che invia un Email nella casella di posta dei destinatari 
+    /** Metodo che invia un Email nella casella di posta dei destinatari
      * dell'EmailDaInviare passata come parametro; effettua il controllo sui
-     * destinatari (se esisteono o no) e per quelli esistenti e online effettua 
+     * destinatari (se esisteono o no) e per quelli esistenti e online effettua
      * la chiamata del metodo riceviEmail() sul rispettivo client
-     * @param emailDaInviare: Email che si vuole inviare ricevuta 
+     * @param emailDaInviare: Email che si vuole inviare ricevuta
      * dall'interfaccia grafica del client mittente
      * @return un oggetto di tipo Email che è una copia dell'EmailDaInviare
      * ricevuta come parametro, con la differenza che in questa Email i destinatari
@@ -211,7 +211,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
                     rHM.lock();
                     try{
                         try{
-                            clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("Email inviata correttamente!");
+                            clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("<b>Email inviata</b> correttamente!");
                         }
                         catch(RemoteException e){
                             System.out.println(e.getMessage());
@@ -240,9 +240,9 @@ public final class ServerImplementation extends UnicastRemoteObject implements
                                     System.out.println(e.getMessage());
                                 }
                                 try{
-                                    clientRicevente.riceviMessaggio("Hai ricevuto una nuova email da "
-                                            + emailRitorno.getMittente().getEmail()+"!\n"
-                                            + "Oggetto: " + emailRitorno.getOggetto());
+                                    clientRicevente.riceviMessaggio("Hai ricevuto una <b>nuova email</b> da <b>"
+                                            + emailRitorno.getMittente().getEmail()+"</b>!<br>"
+                                                    + "<b>Oggetto</b>: " + emailRitorno.getOggetto());
                                 }
                                 catch(RemoteException e){
                                     System.out.println(e.getMessage());
@@ -282,11 +282,11 @@ public final class ServerImplementation extends UnicastRemoteObject implements
                     clientConnessi.put(emailClient, (Client)Naming.lookup("//localhost/Client/" + emailClient));
                 } catch (NotBoundException | MalformedURLException | RemoteException ex) {
                     Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
-                    
-                    casella.setOperazioneEseguita("* [NUOVO CLIENT CONNESSO: " + emailClient + " - " +
-                            new Date().toString() + "]");
-                    casella.logUltimaOperazione();
                 }
+                casella.setOperazioneEseguita("* [NUOVO CLIENT CONNESSO: " + emailClient + " - " +
+                        new Date().toString() + "]");
+                casella.logUltimaOperazione();
+                
             }
             finally {
                 wHM.unlock();
@@ -294,7 +294,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
         }
     }
     
-    /**Metodo che viene chiamato quando un client si sconnette e rimuove il 
+    /**Metodo che viene chiamato quando un client si sconnette e rimuove il
      *rispettivo client dalla HashMap dei client connessi.
      * @param emailClient: email del client che si sconnette
      * @return true in caso di successo, false altrimenti
@@ -323,10 +323,10 @@ public final class ServerImplementation extends UnicastRemoteObject implements
      * @throws java.rmi.RemoteException*/
     @Override
     public boolean segnaEmailComeLetta(String emailClient, Email emailLetta) throws RemoteException {
-        return casella.setLetta(emailClient, emailLetta);  
+        return casella.setLetta(emailClient, emailLetta);
     }
     
-    /**Metodo che segna nel database l'eliminazione di un'email da parte 
+    /**Metodo che segna nel database l'eliminazione di un'email da parte
      * dell'utente (quando quest'ultimo ne è il mittente).
      * @param emailDaEliminare: email che si desidera eliminare
      * @param utente: utente che effettua l'eliminazione
@@ -339,7 +339,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
             if(eliminata){
                 rHM.lock();
                 try {
-                    clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+                    clientConnessi.get(utente.getEmail()).riceviMessaggio("<b>Email eliminata</b> con successo!");
                 } finally {
                     rHM.unlock();
                 }
@@ -349,7 +349,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
         else return false;
     }
     
-    /**Metodo che segna nel database l'eliminazione di un'email da parte 
+    /**Metodo che segna nel database l'eliminazione di un'email da parte
      * dell'utente (quando quest'ultimo ne è il destinatario).
      * @param emailDaEliminare: email che si desidera eliminare
      * @param utente: utente che effettua l'eliminazione
@@ -362,7 +362,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
             if(eliminata){
                 rHM.lock();
                 try {
-                    clientConnessi.get(utente.getEmail()).riceviMessaggio("Email eliminata con successo!");
+                    clientConnessi.get(utente.getEmail()).riceviMessaggio("<b>Email eliminata</b> con successo!");
                 } finally {
                     rHM.unlock();
                 }
