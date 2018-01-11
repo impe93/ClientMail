@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -17,7 +17,7 @@ public class MessaggioGUI extends JFrame {
     
     private String messaggio;
     
-    private JFrame questoFrame;
+    private final JFrame questoFrame;
     
     private JLabel messaggioCentrale;
     private JButton bottoneChiusura;
@@ -39,19 +39,21 @@ public class MessaggioGUI extends JFrame {
     
     private void initGUI() {
         this.setLayout(new BorderLayout());
-        this.messaggioCentrale = new JLabel(this.messaggio, SwingConstants.CENTER);
+        this.messaggioCentrale = new JLabel(this.messaggio, JLabel.CENTER);
+        
         this.bottoneChiusura = new JButton("Ok");
         this.bottoneChiusura.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 questoFrame.setVisible(false);
+                dispose();
             }
         });
         
         this.add(this.messaggioCentrale, BorderLayout.CENTER);
         this.add(this.bottoneChiusura, BorderLayout.SOUTH);
         
-        this.setPreferredSize(new Dimension(500, 200));
+        this.setPreferredSize(new Dimension(500, 130));
         this.pack();
         this.setVisible(true);
     }
