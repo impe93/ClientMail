@@ -211,7 +211,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
                     rHM.lock();
                     try{
                         try{
-                            clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("<b>Email inviata</b> correttamente!");
+                            clientConnessi.get(emailRitorno.getMittente().getEmail()).riceviMessaggio("<html><b>Email inviata</b> correttamente!</html>");
                         }
                         catch(RemoteException e){
                             System.out.println(e.getMessage());
@@ -240,9 +240,9 @@ public final class ServerImplementation extends UnicastRemoteObject implements
                                     System.out.println(e.getMessage());
                                 }
                                 try{
-                                    clientRicevente.riceviMessaggio("Hai ricevuto una <b>nuova email</b> da <b>"
+                                    clientRicevente.riceviMessaggio("<html>Hai ricevuto una <b>nuova email</b> da <b>"
                                             + emailRitorno.getMittente().getEmail()+"</b>!<br>"
-                                                    + "<b>Oggetto</b>: " + emailRitorno.getOggetto());
+                                                    + "<b>Oggetto</b>: " + emailRitorno.getOggetto() + "</html>");
                                 }
                                 catch(RemoteException e){
                                     System.out.println(e.getMessage());
@@ -339,7 +339,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
             if(eliminata){
                 rHM.lock();
                 try {
-                    clientConnessi.get(utente.getEmail()).riceviMessaggio("<b>Email eliminata</b> con successo!");
+                    clientConnessi.get(utente.getEmail()).riceviMessaggio("<html><b>Email eliminata</b> con successo!</html>");
                 } finally {
                     rHM.unlock();
                 }
@@ -362,7 +362,7 @@ public final class ServerImplementation extends UnicastRemoteObject implements
             if(eliminata){
                 rHM.lock();
                 try {
-                    clientConnessi.get(utente.getEmail()).riceviMessaggio("<b>Email eliminata</b> con successo!");
+                    clientConnessi.get(utente.getEmail()).riceviMessaggio("<html><b>Email eliminata</b> con successo!</html>");
                 } finally {
                     rHM.unlock();
                 }
