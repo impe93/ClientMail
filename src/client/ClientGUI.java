@@ -53,6 +53,7 @@ public class ClientGUI extends JFrame implements Observer{
     public static final String NUOVO_MESSAGGIO = "nuovoMessaggio";
     public static final String LETTA_EMAIL = "lettaEmail";
     
+    private String emailUtente;
     private Email emailDaVisualizzare;
     private final ClientImplementation modello;
     private final ClientController controller;
@@ -103,6 +104,7 @@ public class ClientGUI extends JFrame implements Observer{
     
     public ClientGUI(String email, ClientImplementation modello) {
         super(email);
+        this.emailUtente = email;
         this.emailDaVisualizzare = null;
         this.listaEmail = new ArrayList<>();
         this.inVisualizzazione = ClientGUI.RICEVUTI;
@@ -494,7 +496,7 @@ public class ClientGUI extends JFrame implements Observer{
             case ClientGUI.NUOVO_MESSAGGIO: {
                 ArrayList<String> messaggi = ((CasellaPostaElettronicaClient)oFinal).leggiMessaggi();
                 for (String messaggio : messaggi) {
-                    new MessaggioGUI("Messaggio", messaggio);
+                    MessaggioGUI messaggioGUI = new MessaggioGUI(this.emailUtente + " - Messaggio", messaggio);
                 }
                 break;
             }
