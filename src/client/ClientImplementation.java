@@ -115,6 +115,8 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
                 nuoveEmailInviate = this.server.getInviate(getUltimaInviata(), this.utente);
             } catch (RemoteException ex) {
                 Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+                String messaggio = "Impossibile prelevare eventuali nuove email dal server: connessione assente!";
+                this.casellaPostaleClient.inserisciMessaggio(messaggio);
             }
             if(nuoveEmailInviate != null && nuoveEmailInviate.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailInviate);
@@ -138,6 +140,8 @@ public class ClientImplementation extends UnicastRemoteObject implements Client{
                 nuoveEmailRicevute = this.server.getInviate(getUltimaInviata(), this.utente);
             } catch (RemoteException ex) {
                 Logger.getLogger(ClientImplementation.class.getName()).log(Level.SEVERE, null, ex);
+                String messaggio = "Impossibile prelevare eventuali nuove email dal server: connessione assente!";
+                this.casellaPostaleClient.inserisciMessaggio(messaggio);
             }
             if(nuoveEmailRicevute != null && nuoveEmailRicevute.size() > 0){
                 this.casellaPostaleClient.inserisciNuoveEmailInviate(nuoveEmailRicevute);
