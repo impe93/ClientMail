@@ -38,9 +38,9 @@ For the server there is no need to set the email or any run configuration.
 
 The three member that made this project are:
 
-* Lorenzo Imperatrice: Client GUI and client controller.
+* [Lorenzo Imperatrice](https://github.com/impe93): Client GUI and client controller.
 * Alessio Berger: Server GUI, Server controller, server model.
-* Francesca Riddone: Client Model
+* [Francesca Riddone](https://github.com/user/repo/blob/branch/other_file.md): Client Model
 
 ## License
 
